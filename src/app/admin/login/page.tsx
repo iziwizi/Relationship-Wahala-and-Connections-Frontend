@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { Lock, Mail, AlertCircle, Info, ArrowRight, ShieldAlert } from "lucide-react";
 
@@ -12,7 +11,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const router = useRouter();
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,25 +22,20 @@ export default function AdminLoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), password }),
-        signal: AbortSignal.timeout(10000),
       });
 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || "Access denied. Invalid admin credentials.");
+        setError(data.error || "Access denied. Invalid Super Admin credentials.");
         setSubmitting(false);
         return;
       }
 
-      // JWT cookie is now set by the server — navigate to admin dashboard
-      router.push("/admin");
-    } catch (err) {
-      if (err instanceof Error && err.name === "TimeoutError") {
-        setError("Request timed out. Please try again.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
+      // HttpOnly JWT cookie set — navigate cleanly to admin portal
+      window.location.assign("/admin");
+    } catch {
+      setError("Something went wrong. Please try again.");
       setSubmitting(false);
     }
   };
@@ -135,7 +128,7 @@ export default function AdminLoginPage() {
             <Button type="submit" variant="gold" size="lg" disabled={submitting} className="w-full justify-center">
               {submitting ? (
                 <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { demoUser, UserProfile } from "@/data/demo/user";
 
 interface AuthContextType {
@@ -18,9 +17,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const router = useRouter();
 
-  // On mount: check session via /api/auth/me
+  // Sync session on mount via /api/auth/me
   useEffect(() => {
     async function checkSession() {
       try {
@@ -29,14 +27,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const data = await res.json();
           if (data.user) {
             setIsAuthenticated(true);
-            setUser(demoUser);
+            setUser({
+              ...demoUser,
+              id: data.user.id,
+              email: data.user.email,
+              firstName: data.user.firstName || demoUser.firstName,
+            });
           } else {
             setIsAuthenticated(false);
             setUser(null);
           }
         }
       } catch (err) {
-        console.error("[AuthContext]", err);
+        console.error("[AuthContext checkSession error]", err);
+        setIsAuthenticated(false);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -49,17 +54,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password: pass }),
+        body: JSON.stringify({ email: email.trim(), password: pass }),
       });
       const data = await res.json();
+
       if (res.ok && data.success) {
         setIsAuthenticated(true);
-        setUser(demoUser);
+        setUser({
+          ...demoUser,
+          id: data.user.id,
+          email: data.user.email,
+          firstName: data.user.firstName || demoUser.firstName,
+        });
         return { success: true };
       }
-      return { success: false, error: data.error || "Login failed" };
-    } catch {
-      return { success: false, error: "Network error. Please try again." };
+      return { success: false, error: data.error || "Invalid email address or password." };
+    } catch (err) {
+      console.error("[AuthContext login error]", err);
+      return { success: false, error: "Network error. Please check your connection and try again." };
     }
   };
 
@@ -67,12 +79,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch (err) {
-      console.error("[AuthContext Logout]", err);
+      console.error("[AuthContext logout error]", err);
     } finally {
-      localStorage.removeItem("rwc_demo_auth");
       setIsAuthenticated(false);
       setUser(null);
-      router.push("/login");
+      window.location.assign("/login");
     }
   };
 

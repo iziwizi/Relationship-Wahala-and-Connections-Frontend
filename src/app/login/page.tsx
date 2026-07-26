@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/ui/Button";
 import { Lock, Mail, AlertCircle, Info, ArrowRight, ShieldCheck } from "lucide-react";
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,29 +22,16 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
-        signal: AbortSignal.timeout(10000), // 10s timeout
-      });
+      const result = await login(email, password);
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setError(data.error || "Invalid email or password. Please try again.");
-        setSubmitting(false);
-        return;
-      }
-
-      // JWT cookie is now set — navigate to dashboard
-      router.push("/dashboard");
-    } catch (err) {
-      if (err instanceof Error && err.name === "TimeoutError") {
-        setError("Request timed out. Please check your connection and try again.");
+      if (result.success) {
+        window.location.assign("/dashboard");
       } else {
-        setError("Something went wrong. Please try again.");
+        setError(result.error || "Login failed. Please check your credentials.");
+        setSubmitting(false);
       }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
       setSubmitting(false);
     }
   };
@@ -63,7 +50,7 @@ export default function LoginPage() {
           <div className="relative w-14 h-14">
             <Image
               src="/images/logo.jpeg"
-              alt="Relationship Wahala & Connections logo"
+              alt="Relationship Wahala &amp; Connections logo"
               fill
               className="object-contain rounded-md"
               priority
@@ -201,7 +188,7 @@ export default function LoginPage() {
               >
                 {submitting ? (
                   <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                     </svg>
