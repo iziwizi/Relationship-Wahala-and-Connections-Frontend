@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/ui/Button";
 import { Lock, Mail, AlertCircle, Info, ArrowRight, ShieldCheck } from "lucide-react";
 
@@ -15,20 +14,37 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
 
-    const result = login(email, password);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+        signal: AbortSignal.timeout(10000), // 10s timeout
+      });
 
-    if (result.success) {
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.error || "Invalid email or password. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      // JWT cookie is now set — navigate to dashboard
       router.push("/dashboard");
-    } else {
-      setError(result.error || "Login failed");
+    } catch (err) {
+      if (err instanceof Error && err.name === "TimeoutError") {
+        setError("Request timed out. Please check your connection and try again.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
       setSubmitting(false);
     }
   };
@@ -183,13 +199,23 @@ export default function LoginPage() {
                 disabled={submitting}
                 className="w-full justify-center"
               >
-                {submitting ? "Signing in..." : "Sign In to Dashboard"}
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In to Dashboard"
+                )}
               </Button>
             </div>
           </form>
 
-          {/* Footer link to Register */}
-          <div className="mt-6 text-center border-t border-gray-100 pt-6">
+          {/* Footer links */}
+          <div className="mt-6 text-center border-t border-gray-100 pt-6 space-y-2">
             <p className="font-sans text-sm text-gray-600">
               Don&apos;t have an account?{" "}
               <Link href="/register" className="font-semibold text-[#7b1d2a] hover:text-[#5c1520]">
@@ -199,7 +225,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Security / Confidentiality Note */}
+        {/* Security Note */}
         <div className="mt-6 text-center flex items-center justify-center gap-2 text-gray-500 font-sans text-xs">
           <ShieldCheck size={16} className="text-[#c9962c]" />
           <span>100% Confidential &amp; Vetted Matchmaking Platform</span>

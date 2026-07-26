@@ -206,6 +206,12 @@ export default function RegisterPage() {
         </Link>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a]">Join Our Intentional Community</h1>
         <p className="font-sans text-xs sm:text-sm text-gray-600 mt-1">Start your guided journey to a meaningful marriage.</p>
+        <p className="font-sans text-xs text-gray-600 mt-2">
+          Already have an account?{" "}
+          <Link href="/login" className="font-semibold text-[#7b1d2a] hover:underline">
+            Sign In
+          </Link>
+        </p>
       </div>
 
       {/* Main Container */}
@@ -728,6 +734,15 @@ export default function RegisterPage() {
             )}
           </div>
         </form>
+
+        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+          <p className="font-sans text-xs text-gray-600">
+            Already registered?{" "}
+            <Link href="/login" className="font-semibold text-[#7b1d2a] hover:underline">
+              Sign in to your member account
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
