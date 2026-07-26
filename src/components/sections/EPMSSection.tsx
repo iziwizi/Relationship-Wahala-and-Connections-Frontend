@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 import { Crown, CheckCircle, ArrowRight, Globe } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import { FadeUp } from "@/components/motion/Reveal";
 
 const epmsFeatures = [
   "Private Consultation",
@@ -37,6 +40,7 @@ export default function EPMSSection() {
       <Container>
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Left — EPMS Card */}
+          <FadeUp delay={0}>
           <div className="bg-[#7b1d2a] rounded-2xl p-8 lg:p-10 flex flex-col justify-between text-white min-h-[420px]">
             <div>
               {/* Icon */}
@@ -77,8 +81,10 @@ export default function EPMSSection() {
               <ArrowRight size={15} />
             </Button>
           </div>
+          </FadeUp>
 
           {/* Right — Global Vision Card */}
+          <FadeUp delay={0.15}>
           <div className="bg-[#111111] rounded-2xl p-8 lg:p-10 flex flex-col justify-between min-h-[420px] relative overflow-hidden">
             {/* Decorative network background */}
             <div className="absolute inset-0 opacity-15">
@@ -121,6 +127,7 @@ export default function EPMSSection() {
               </div>
             </div>
           </div>
+          </FadeUp>
         </div>
       </Container>
     </section>

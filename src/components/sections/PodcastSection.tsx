@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -6,6 +8,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import VideoCard from "@/components/sections/VideoCard";
 import Button from "@/components/ui/Button";
 import { videos } from "@/data/videos";
+import { FadeUp, Stagger, StaggerItem } from "@/components/motion/Reveal";
 
 function YoutubeIcon({ size = 30 }: { size?: number }) {
   return (
@@ -20,7 +23,7 @@ export default function PodcastSection() {
     <section className="py-20 bg-white">
       <Container>
         {/* Header row */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <FadeUp className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
             <SectionHeading
               eyebrow="RELATIONSHIP WAHALA TV"
@@ -39,19 +42,19 @@ export default function PodcastSection() {
             Watch All Episodes
             <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
           </Link>
-        </div>
+        </FadeUp>
 
         {/* Video grid + YouTube card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5" staggerDelay={0.09}>
           {/* 4 video cards */}
           {videos.map((video) => (
-            <div key={video.id} className="lg:col-span-1">
+            <StaggerItem key={video.id} className="lg:col-span-1">
               <VideoCard video={video} />
-            </div>
+            </StaggerItem>
           ))}
 
           {/* YouTube subscribe card */}
-          <div className="sm:col-span-2 lg:col-span-1">
+          <StaggerItem className="sm:col-span-2 lg:col-span-1">
             <div className="bg-[#7b1d2a] rounded-xl p-6 flex flex-col items-center justify-center text-center min-h-[280px] h-full gap-4">
               <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-md">
                 <YoutubeIcon size={30} />
@@ -74,8 +77,8 @@ export default function PodcastSection() {
                 Subscribe Now
               </Button>
             </div>
-          </div>
-        </div>
+          </StaggerItem>
+        </Stagger>
       </Container>
     </section>
   );

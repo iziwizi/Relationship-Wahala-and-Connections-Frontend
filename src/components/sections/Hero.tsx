@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { Heart, Play, Calendar, Globe, Users, Lock, BookOpen } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { motion, useReducedMotion } from "framer-motion";
 
 const featureBadges = [
   { icon: BookOpen, label: "Knowledge", sublabel: "First Approach" },
@@ -11,6 +14,16 @@ const featureBadges = [
 ];
 
 export default function Hero() {
+  const reduce = useReducedMotion();
+
+  const ease = [0.16, 1, 0.3, 1] as const;
+
+  const fadeUp = (delay: number) => ({
+    initial: reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.7, delay, ease },
+  });
+
   return (
     <section className="relative min-h-screen bg-[#1a1a1a] overflow-hidden flex items-center">
       {/* Background image — right side */}
@@ -33,8 +46,11 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[75vh]">
           {/* Left — Copy */}
           <div className="flex flex-col justify-center">
-            {/* Headline — 5 intentional lines on desktop */}
-            <h1 className="font-serif text-white text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl">
+            {/* Headline */}
+            <motion.h1
+              className="font-serif text-white text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl"
+              {...fadeUp(0.1)}
+            >
               Find <span className="text-[#c9962c]">Love.</span>
               <br className="hidden md:inline" />
               Build Lasting
@@ -44,17 +60,23 @@ export default function Hero() {
               Create a Successful
               <br className="hidden md:inline" />
               <span className="text-[#c9962c]">Marriage.</span>
-            </h1>
+            </motion.h1>
 
             {/* Body copy */}
-            <p className="font-sans text-white/80 text-base sm:text-lg leading-relaxed mb-8 max-w-lg">
+            <motion.p
+              className="font-sans text-white/80 text-base sm:text-lg leading-relaxed mb-8 max-w-lg"
+              {...fadeUp(0.3)}
+            >
               Nigeria&apos;s premier knowledge-based relationship and matchmaking
               platform, helping intentional singles and couples build healthy,
               lasting relationships.
-            </p>
+            </motion.p>
 
-            {/* CTA Buttons — 3 buttons on one single horizontal line on desktop */}
-            <div className="flex flex-wrap lg:flex-nowrap items-center gap-2.5 sm:gap-3 w-full">
+            {/* CTA Buttons */}
+            <motion.div
+              className="flex flex-wrap lg:flex-nowrap items-center gap-2.5 sm:gap-3 w-full"
+              {...fadeUp(0.45)}
+            >
               <Button href="/register" variant="primary" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap">
                 <Heart size={16} />
                 Find Your Life Partner
@@ -67,7 +89,7 @@ export default function Hero() {
                 <Calendar size={16} />
                 Book a Consultation
               </Button>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right — Space occupied by photography */}
@@ -75,7 +97,10 @@ export default function Hero() {
         </div>
 
         {/* Feature badges panel — bottom right */}
-        <div className="mt-8 lg:mt-0 lg:absolute lg:bottom-12 lg:right-8 xl:right-16">
+        <motion.div
+          className="mt-8 lg:mt-0 lg:absolute lg:bottom-12 lg:right-8 xl:right-16"
+          {...fadeUp(0.6)}
+        >
           <div className="bg-black/50 backdrop-blur-sm border border-white/10 rounded-xl p-5 grid grid-cols-4 sm:grid-cols-4 gap-6 lg:gap-8 w-full lg:w-auto">
             {featureBadges.map(({ icon: Icon, label, sublabel }) => (
               <div key={label} className="flex flex-col items-center text-center gap-2">
@@ -83,17 +108,13 @@ export default function Hero() {
                   <Icon size={18} className="text-white/90" />
                 </div>
                 <div>
-                  <p className="font-sans text-white text-xs font-semibold leading-tight">
-                    {label}
-                  </p>
-                  <p className="font-sans text-white/70 text-xs leading-tight">
-                    {sublabel}
-                  </p>
+                  <p className="font-sans text-white text-xs font-semibold leading-tight">{label}</p>
+                  <p className="font-sans text-white/70 text-xs leading-tight">{sublabel}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

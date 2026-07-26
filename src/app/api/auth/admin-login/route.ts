@@ -16,7 +16,8 @@ const DEMO_ADMIN = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json() as { email: string; password: string };
+    const body = await req.json() as { email?: string; password?: string };
+    const { email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
@@ -34,13 +35,33 @@ export async function POST(req: NextRequest) {
       userEmail = DEMO_ADMIN.email;
       firstName = DEMO_ADMIN.firstName;
     } else {
-      const user = await getUserByEmail(normalizedEmail);
+      let user;
+      try {
+        user = await getUserByEmail(normalizedEmail);
+      } catch (dbErr) {
+        const errMsg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+        console.error("[Admin Login API] Database error:", errMsg.replace(/postgres:\/\/[^@]+@[^/]+/g, "postgres://***@***"));
+        return NextResponse.json(
+          { error: "Unable to sign in right now. Please try again shortly." },
+          { status: 503 }
+        );
+      }
 
       if (!user || user.role !== "SUPER_ADMIN" || !user.isActive) {
         return NextResponse.json({ error: "Access denied. Invalid admin credentials." }, { status: 401 });
       }
 
-      const valid = await verifyPassword(password, user.passwordHash);
+      let valid = false;
+      try {
+        valid = await verifyPassword(password, user.passwordHash);
+      } catch (hashErr) {
+        console.error("[Admin Login API] Password verification error:", hashErr instanceof Error ? hashErr.message : "unknown");
+        return NextResponse.json(
+          { error: "Unable to sign in right now. Please try again shortly." },
+          { status: 503 }
+        );
+      }
+
       if (!valid) {
         return NextResponse.json({ error: "Access denied. Invalid admin credentials." }, { status: 401 });
       }
@@ -48,7 +69,10 @@ export async function POST(req: NextRequest) {
       userId = user.id;
       userEmail = user.email;
       firstName = user.profile?.firstName ?? "Admin";
-      await updateLastLogin(user.id);
+
+      updateLastLogin(user.id).catch((e: unknown) => {
+        console.error("[Admin Login API] updateLastLogin failed:", e instanceof Error ? e.message : "unknown");
+      });
     }
 
     const token = await signSession({
@@ -73,7 +97,10 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("[Admin Login API]", error);
-    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+    console.error("[Admin Login API] Unhandled error:", error instanceof Error ? error.message : "unknown");
+    return NextResponse.json(
+      { error: "Unable to sign in right now. Please try again shortly." },
+      { status: 500 }
+    );
   }
 }

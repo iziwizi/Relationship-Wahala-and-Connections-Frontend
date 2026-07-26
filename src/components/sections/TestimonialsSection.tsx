@@ -1,18 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
 import { Quote } from "lucide-react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { testimonials } from "@/data/testimonials";
+import { FadeUp } from "@/components/motion/Reveal";
 
 export default function TestimonialsSection() {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    if (trackRef.current) {
+      trackRef.current.style.animationPlayState = "paused";
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (trackRef.current) {
+      trackRef.current.style.animationPlayState = "running";
+    }
+  };
+
   return (
     <section className="py-20 bg-[#7b1d2a] overflow-hidden">
       <Container>
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <FadeUp className="text-center mb-12">
           <SectionHeading
             eyebrow="SUCCESS STORIES"
             heading="Love Stories That Inspire"
@@ -22,16 +37,19 @@ export default function TestimonialsSection() {
           <p className="font-sans text-white/70 text-sm mt-3 max-w-xl mx-auto">
             Real stories from intentional couples who built healthy, lasting marriages through Relationship Wahala &amp; Connections.
           </p>
-        </div>
+        </FadeUp>
 
-        {/* Continuous Marquee Slider Container — No arrows, No dots */}
-        <div className="relative group overflow-hidden py-4">
-          <div className="flex gap-6 animate-marquee group-hover:[animation-play-state:paused] motion-reduce:animate-none">
-            {/* Duplicate array twice for seamless infinite marquee loop */}
+        {/* Marquee Slider — hover pause via direct ref */}
+        <div
+          className="relative overflow-hidden py-4"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div ref={trackRef} className="animate-marquee">
             {[...testimonials, ...testimonials].map((testimonial, idx) => (
               <div
                 key={`${testimonial.id}-${idx}`}
-                className="w-[280px] sm:w-[340px] md:w-[360px] flex-shrink-0 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 lg:p-8 flex flex-col justify-between hover:border-[#c9962c] transition-all duration-300 card-hover-lift"
+                className="w-[280px] sm:w-[340px] md:w-[360px] flex-shrink-0 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 lg:p-8 flex flex-col justify-between hover:border-[#c9962c] transition-all duration-300 mx-3"
               >
                 <div>
                   <Quote size={28} className="text-[#c9962c] mb-4 flex-shrink-0" />

@@ -14,7 +14,8 @@ const DEMO_CREDENTIALS = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json() as { email: string; password: string };
+    const body = await req.json() as { email?: string; password?: string };
+    const { email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
@@ -38,8 +39,19 @@ export async function POST(req: NextRequest) {
       firstName = demo.firstName;
       role = demo.role;
     } else {
-      // Database mode — validate against DB
-      const user = await getUserByEmail(normalizedEmail);
+      // Database mode — validate against real DB
+      let user;
+      try {
+        user = await getUserByEmail(normalizedEmail);
+      } catch (dbErr) {
+        // Sanitised: never expose connection strings or DB internals to the browser
+        const errMsg = dbErr instanceof Error ? dbErr.message : String(dbErr);
+        console.error("[Login API] Database error:", errMsg.replace(/postgres:\/\/[^@]+@[^/]+/g, "postgres://***@***"));
+        return NextResponse.json(
+          { error: "Unable to sign in right now. Please try again shortly." },
+          { status: 503 }
+        );
+      }
 
       if (!user || !user.isActive) {
         return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
@@ -52,7 +64,17 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const valid = await verifyPassword(password, user.passwordHash);
+      let valid = false;
+      try {
+        valid = await verifyPassword(password, user.passwordHash);
+      } catch (hashErr) {
+        console.error("[Login API] Password verification error:", hashErr instanceof Error ? hashErr.message : "unknown");
+        return NextResponse.json(
+          { error: "Unable to sign in right now. Please try again shortly." },
+          { status: 503 }
+        );
+      }
+
       if (!valid) {
         return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
       }
@@ -62,7 +84,10 @@ export async function POST(req: NextRequest) {
       firstName = user.profile?.firstName ?? "Member";
       role = user.role;
 
-      await updateLastLogin(user.id);
+      // Non-blocking — don't fail login if this throws
+      updateLastLogin(user.id).catch((e: unknown) => {
+        console.error("[Login API] updateLastLogin failed:", e instanceof Error ? e.message : "unknown");
+      });
     }
 
     // Sign JWT session
@@ -83,7 +108,10 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("[Login API]", error);
-    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+    console.error("[Login API] Unhandled error:", error instanceof Error ? error.message : "unknown");
+    return NextResponse.json(
+      { error: "Unable to sign in right now. Please try again shortly." },
+      { status: 500 }
+    );
   }
 }
