@@ -33,11 +33,17 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[75vh]">
           {/* Left — Copy */}
           <div className="flex flex-col justify-center">
-            {/* Headline — 4 lines on desktop */}
-            <h1 className="font-serif text-white text-3xl sm:text-4xl lg:text-5xl xl:text-5.5xl font-bold leading-[1.15] mb-6 max-w-xl">
-              Find <span className="text-[#c9962c]">Love.</span> Build Lasting
-              <br className="hidden sm:inline" /> Relationships. Create a
-              <br className="hidden sm:inline" /> Successful <span className="text-[#c9962c]">Marriage.</span>
+            {/* Headline — 5 intentional lines on desktop */}
+            <h1 className="font-serif text-white text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl">
+              Find <span className="text-[#c9962c]">Love.</span>
+              <br className="hidden md:inline" />
+              Build Lasting
+              <br className="hidden md:inline" />
+              Relationships.
+              <br className="hidden md:inline" />
+              Create a Successful
+              <br className="hidden md:inline" />
+              <span className="text-[#c9962c]">Marriage.</span>
             </h1>
 
             {/* Body copy */}

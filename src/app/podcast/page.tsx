@@ -5,7 +5,7 @@ import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
 import VideoCard from "@/components/sections/VideoCard";
-import { videos } from "@/data/videos";
+import { getAllPodcastEpisodes } from "@/lib/repositories/podcast.repository";
 import { Mic, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -22,7 +22,23 @@ function YoutubeIcon({ size = 28 }: { size?: number }) {
   );
 }
 
-export default function PodcastPage() {
+export default async function PodcastPage() {
+  const episodes = await getAllPodcastEpisodes();
+
+  const formattedVideos = episodes.map((ep) => ({
+    id: ep.id,
+    title: ep.title,
+    youtubeUrl: ep.youtubeUrl,
+    youtubeId: ep.youtubeVideoId,
+    youtubeVideoId: ep.youtubeVideoId,
+    thumbnail: ep.thumbnail,
+    thumbnailAlt: ep.title,
+    duration: ep.duration,
+    description: ep.description,
+    views: ep.views,
+    publishedAgo: ep.publishedAt || "Recently",
+  }));
+
   return (
     <>
       <Header />
@@ -58,7 +74,7 @@ export default function PodcastPage() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {videos.map((video) => (
+              {formattedVideos.map((video) => (
                 <VideoCard key={video.id} video={video} />
               ))}
             </div>

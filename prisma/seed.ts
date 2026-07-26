@@ -4,11 +4,16 @@
 // Run: npx prisma db seed
 
 import bcrypt from "bcryptjs";
+import {
+  demoBlogPosts,
+  demoPodcasts,
+  demoGuides,
+  demoSuccessStories,
+  demoEvents,
+  demoFAQs,
+} from "../src/data/demo/cms";
 
-// We dynamically import PrismaClient from the generated path
-// This runs as a Node.js script (not Next.js), DATABASE_URL must be set
 async function main() {
-  // Dynamic import to avoid issues in environments without DB
   const { PrismaClient } = await import("../src/generated/prisma/index.js");
   const prisma = new PrismaClient();
 
@@ -158,9 +163,9 @@ async function main() {
       isActive: true,
     },
   });
-  console.log(`✅ Packages seeded: ${standardPkg.name}, ${epmsPkg.name}, Global Diaspora VIP`);
+  console.log(`✅ Packages seeded`);
 
-  // ─── 5. Demo subscription for member ──────────────────────
+  // ─── 5. Subscription ──────────────────────────────────────
   const existingSub = await prisma.subscription.findFirst({
     where: { userId: member.id, status: "ACTIVE" },
   });
@@ -178,10 +183,9 @@ async function main() {
         matchesRemaining: 5,
       },
     });
-    console.log("✅ Demo subscription created");
   }
 
-  // ─── 6. Welcome notification ──────────────────────────────
+  // ─── 6. Welcome notification & Enquiry ───────────────────
   await prisma.notification.upsert({
     where: { id: "seed-notif-welcome" },
     update: {},
@@ -193,9 +197,7 @@ async function main() {
       isRead: false,
     },
   });
-  console.log("✅ Welcome notification created");
 
-  // ─── 7. Demo enquiry ─────────────────────────────────────
   await prisma.contactEnquiry.upsert({
     where: { id: "seed-enquiry-demo-1" },
     update: {},
@@ -209,9 +211,8 @@ async function main() {
       status: "NEW",
     },
   });
-  console.log("✅ Demo enquiry seeded");
 
-  // ─── 8. Platform settings ─────────────────────────────────
+  // ─── 7. Platform Settings ─────────────────────────────────
   const defaults = [
     { key: "bank_name", value: "First Bank of Nigeria" },
     { key: "bank_account_name", value: "Relationship Wahala & Connections Ltd" },
@@ -229,7 +230,117 @@ async function main() {
       create: { key: setting.key, value: setting.value },
     });
   }
-  console.log("✅ Platform settings seeded");
+
+  // ─── 8. Seed CMS Content ──────────────────────────────────
+  for (const p of demoBlogPosts) {
+    await prisma.blogPost.upsert({
+      where: { slug: p.slug },
+      update: {},
+      create: {
+        title: p.title,
+        slug: p.slug,
+        excerpt: p.excerpt,
+        content: p.content,
+        author: p.author,
+        featuredImage: p.featuredImage,
+        featured: p.featured,
+        status: "PUBLISHED",
+        publishedAt: new Date(p.publishedAt),
+      },
+    });
+  }
+
+  for (const pod of demoPodcasts) {
+    await prisma.podcastEpisode.upsert({
+      where: { slug: pod.slug },
+      update: {},
+      create: {
+        title: pod.title,
+        slug: pod.slug,
+        description: pod.description,
+        youtubeUrl: pod.youtubeUrl,
+        youtubeVideoId: pod.youtubeVideoId,
+        thumbnail: pod.thumbnail,
+        duration: pod.duration,
+        views: pod.views,
+        featured: pod.featured,
+        status: "PUBLISHED",
+        publishedAt: new Date(pod.publishedAt),
+      },
+    });
+  }
+
+  for (const g of demoGuides) {
+    await prisma.guide.upsert({
+      where: { slug: g.slug },
+      update: {},
+      create: {
+        title: g.title,
+        slug: g.slug,
+        excerpt: g.excerpt,
+        content: g.content,
+        category: g.category,
+        featuredImage: g.featuredImage,
+        featured: g.featured,
+        status: "PUBLISHED",
+        publishedAt: new Date(g.publishedAt),
+      },
+    });
+  }
+
+  for (const s of demoSuccessStories) {
+    await prisma.successStory.upsert({
+      where: { slug: s.slug },
+      update: {},
+      create: {
+        title: s.title,
+        slug: s.slug,
+        displayNames: s.displayNames,
+        location: s.location,
+        weddingDate: s.weddingDate,
+        story: s.story,
+        photoUrl: s.photoUrl,
+        featured: s.featured,
+        status: "PUBLISHED",
+      },
+    });
+  }
+
+  for (const ev of demoEvents) {
+    await prisma.event.upsert({
+      where: { slug: ev.slug },
+      update: {},
+      create: {
+        title: ev.title,
+        slug: ev.slug,
+        description: ev.description,
+        eventDate: new Date(ev.eventDate),
+        eventTime: ev.eventTime,
+        location: ev.location,
+        isOnline: ev.isOnline,
+        registrationUrl: ev.registrationUrl,
+        image: ev.image,
+        status: "PUBLISHED",
+      },
+    });
+  }
+
+  for (const faq of demoFAQs) {
+    await prisma.fAQ.upsert({
+      where: { id: faq.id },
+      update: {},
+      create: {
+        id: faq.id,
+        question: faq.question,
+        answer: faq.answer,
+        category: faq.category,
+        sortOrder: faq.sortOrder,
+        isActive: true,
+      },
+    });
+  }
+
+  console.log("✅ CMS Content (Blog, Podcasts, Guides, Stories, Events, FAQs) seeded!");
 
   console.log("\n🎉 Database seeded successfully!");
   console.log("─────────────────────────────────────────");

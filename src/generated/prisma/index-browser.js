@@ -314,6 +314,108 @@ exports.Prisma.PlatformSettingScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BlogCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BlogPostScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  excerpt: 'excerpt',
+  content: 'content',
+  featuredImage: 'featuredImage',
+  author: 'author',
+  categoryId: 'categoryId',
+  status: 'status',
+  featured: 'featured',
+  metaTitle: 'metaTitle',
+  metaDescription: 'metaDescription',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PodcastEpisodeScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  description: 'description',
+  youtubeUrl: 'youtubeUrl',
+  youtubeVideoId: 'youtubeVideoId',
+  thumbnail: 'thumbnail',
+  duration: 'duration',
+  views: 'views',
+  featured: 'featured',
+  status: 'status',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GuideScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  excerpt: 'excerpt',
+  content: 'content',
+  category: 'category',
+  featuredImage: 'featuredImage',
+  status: 'status',
+  featured: 'featured',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SuccessStoryScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  displayNames: 'displayNames',
+  location: 'location',
+  weddingDate: 'weddingDate',
+  story: 'story',
+  photoUrl: 'photoUrl',
+  featured: 'featured',
+  status: 'status',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EventScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  description: 'description',
+  eventDate: 'eventDate',
+  eventTime: 'eventTime',
+  location: 'location',
+  isOnline: 'isOnline',
+  registrationUrl: 'registrationUrl',
+  image: 'image',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FAQScalarFieldEnum = {
+  id: 'id',
+  question: 'question',
+  answer: 'answer',
+  category: 'category',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -389,6 +491,12 @@ exports.EnquiryStatus = exports.$Enums.EnquiryStatus = {
   RESOLVED: 'RESOLVED'
 };
 
+exports.ContentStatus = exports.$Enums.ContentStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Profile: 'Profile',
@@ -404,7 +512,14 @@ exports.Prisma.ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   VerificationToken: 'VerificationToken',
   AdminAuditLog: 'AdminAuditLog',
-  PlatformSetting: 'PlatformSetting'
+  PlatformSetting: 'PlatformSetting',
+  BlogCategory: 'BlogCategory',
+  BlogPost: 'BlogPost',
+  PodcastEpisode: 'PodcastEpisode',
+  Guide: 'Guide',
+  SuccessStory: 'SuccessStory',
+  Event: 'Event',
+  FAQ: 'FAQ'
 };
 
 /**

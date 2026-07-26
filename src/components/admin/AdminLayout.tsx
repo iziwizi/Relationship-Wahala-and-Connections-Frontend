@@ -6,7 +6,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, UserCheck, Heart, Package,
-  CreditCard, MessageSquare, Settings, LogOut, Menu, X, ShieldAlert
+  CreditCard, MessageSquare, Settings, LogOut, Menu, X, ShieldAlert,
+  FileText, Video, BookOpen, Star, Calendar, HelpCircle, ChevronDown
 } from "lucide-react";
 
 interface AdminSidebarItem {
@@ -16,7 +17,7 @@ interface AdminSidebarItem {
   badge?: string;
 }
 
-const adminItems: AdminSidebarItem[] = [
+const mainAdminItems: AdminSidebarItem[] = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "User Management", href: "/admin/users", icon: Users },
   { label: "Profile Verification", href: "/admin/profiles", icon: UserCheck, badge: "4 Pending" },
@@ -27,9 +28,20 @@ const adminItems: AdminSidebarItem[] = [
   { label: "Platform Settings", href: "/admin/settings", icon: Settings },
 ];
 
+const cmsAdminItems: AdminSidebarItem[] = [
+  { label: "Blog Posts", href: "/admin/blog", icon: FileText },
+  { label: "Podcast Episodes", href: "/admin/podcast", icon: Video },
+  { label: "Relationship Guides", href: "/admin/guides", icon: BookOpen },
+  { label: "Success Stories", href: "/admin/success-stories", icon: Star },
+  { label: "Events & Mixers", href: "/admin/events", icon: Calendar },
+  { label: "FAQs Manager", href: "/admin/faqs", icon: HelpCircle },
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cmsOpen, setCmsOpen] = useState(true);
   const pathname = usePathname();
+
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col lg:flex-row">
@@ -54,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div>
+        <div className="overflow-y-auto max-h-screen">
           {/* Header */}
           <div className="p-6 border-b border-white/10 flex items-center gap-3">
             <div className="relative w-10 h-10 flex-shrink-0">
@@ -66,36 +78,79 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          {/* Nav Items */}
-          <nav className="px-3 py-6 space-y-1">
-            {adminItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== "/admin" && pathname?.startsWith(item.href));
+          {/* Core Operations Group */}
+          <div className="px-3 pt-4 pb-2">
+            <p className="px-4 font-sans text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+              Operations &amp; Members
+            </p>
+            <nav className="space-y-1">
+              {mainAdminItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || (item.href !== "/admin" && pathname?.startsWith(item.href));
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-sans text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-[#7b1d2a] text-white font-semibold border-l-4 border-[#c9962c]"
-                      : "text-white/70 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon size={18} className={isActive ? "text-[#c9962c]" : "text-white/70"} />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className="bg-[#c9962c] text-white font-sans text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-sans text-xs font-medium transition-colors ${
+                      isActive
+                        ? "bg-[#7b1d2a] text-white font-semibold border-l-4 border-[#c9962c]"
+                        : "text-white/70 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon size={16} className={isActive ? "text-[#c9962c]" : "text-white/70"} />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge && (
+                      <span className="bg-[#c9962c] text-white font-sans text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Content Management Group */}
+          <div className="px-3 pt-2 pb-6 border-t border-white/10">
+            <button
+              onClick={() => setCmsOpen(!cmsOpen)}
+              className="w-full px-4 py-2 flex items-center justify-between font-sans text-[10px] font-bold text-[#c9962c] uppercase tracking-widest hover:text-white transition-colors"
+            >
+              <span>Content Management (CMS)</span>
+              <ChevronDown size={14} className={`transition-transform ${cmsOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {cmsOpen && (
+              <nav className="mt-1 space-y-1">
+                {cmsAdminItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname?.startsWith(item.href);
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center justify-between px-4 py-2 rounded-xl font-sans text-xs font-medium transition-colors ${
+                        isActive
+                          ? "bg-[#7b1d2a]/80 text-white font-semibold border-l-4 border-[#c9962c]"
+                          : "text-white/70 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon size={15} className={isActive ? "text-[#c9962c]" : "text-white/60"} />
+                        <span>{item.label}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
@@ -119,10 +174,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="hidden lg:flex items-center justify-between bg-white border-b border-gray-200 px-8 py-4">
           <div>
             <h2 className="font-serif text-[#1a1a1a] text-xl font-bold">Platform Super Admin Dashboard</h2>
-            <p className="font-sans text-xs text-gray-500">System Management &amp; Matchmaking Operations</p>
+            <p className="font-sans text-xs text-gray-500">System Management, CMS &amp; Matchmaking Operations</p>
           </div>
           <div className="flex items-center gap-2 bg-[#7b1d2a]/10 text-[#7b1d2a] px-3 py-1.5 rounded-full text-xs font-bold font-sans">
-            ● Live System
+            ● Live Operational Mode
           </div>
         </div>
 
