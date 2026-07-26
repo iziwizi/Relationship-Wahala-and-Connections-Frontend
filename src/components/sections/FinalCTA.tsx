@@ -10,10 +10,9 @@ export default function FinalCTA() {
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left — Heading */}
           <div>
-            <h2 className="font-serif text-[#1a1a1a] text-3xl md:text-4xl font-bold leading-tight mb-4">
+            <h2 className="font-serif text-[#1a1a1a] text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.2] mb-4 max-w-xl">
               Ready for a Relationship Built on
-              <br />
-              Knowledge and Intention?
+              <br className="hidden sm:inline" /> Knowledge and Intention?
             </h2>
             <p className="font-sans text-gray-600 text-base leading-relaxed">
               Take the next step towards love, growth and a lasting marriage.
@@ -23,7 +22,7 @@ export default function FinalCTA() {
           {/* Right — Two cards */}
           <div className="grid sm:grid-cols-2 gap-5">
             {/* Card 1 — I'm Looking for Love */}
-            <div className="bg-white rounded-2xl p-6 border border-[#e8e0d4] shadow-sm flex flex-col items-center text-center gap-4">
+            <div className="bg-white rounded-2xl p-6 border border-[#e8e0d4] shadow-sm flex flex-col items-center text-center gap-4 hover:shadow-md transition-shadow">
               <div className="w-14 h-14 bg-[#fbf5ec] rounded-full flex items-center justify-center">
                 <Heart size={26} className="text-[#7b1d2a]" fill="#7b1d2a" />
               </div>
@@ -42,7 +41,7 @@ export default function FinalCTA() {
             </div>
 
             {/* Card 2 — I Want to Learn */}
-            <div className="bg-white rounded-2xl p-6 border border-[#e8e0d4] shadow-sm flex flex-col items-center text-center gap-4">
+            <div className="bg-white rounded-2xl p-6 border border-[#e8e0d4] shadow-sm flex flex-col items-center text-center gap-4 hover:shadow-md transition-shadow">
               <div className="w-14 h-14 bg-[#fbf5ec] rounded-full flex items-center justify-center">
                 <GraduationCap size={26} className="text-[#c9962c]" />
               </div>

@@ -33,18 +33,11 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[75vh]">
           {/* Left — Copy */}
           <div className="flex flex-col justify-center">
-            {/* Headline */}
-            <h1 className="font-serif text-white text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Find{" "}
-              <span className="text-[#c9962c]">Love.</span>
-              <br />
-              Build Lasting
-              <br />
-              Relationships.
-              <br />
-              Create a Successful
-              <br />
-              <span className="text-[#c9962c]">Marriage.</span>
+            {/* Headline — 4 lines on desktop */}
+            <h1 className="font-serif text-white text-3xl sm:text-4xl lg:text-5xl xl:text-5.5xl font-bold leading-[1.15] mb-6 max-w-xl">
+              Find <span className="text-[#c9962c]">Love.</span> Build Lasting
+              <br className="hidden sm:inline" /> Relationships. Create a
+              <br className="hidden sm:inline" /> Successful <span className="text-[#c9962c]">Marriage.</span>
             </h1>
 
             {/* Body copy */}
@@ -54,27 +47,25 @@ export default function Hero() {
               lasting relationships.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-3">
-              <Button href="/register" variant="primary" size="md" className="gap-2">
+            {/* CTA Buttons — 3 buttons on one single horizontal line on desktop */}
+            <div className="flex flex-wrap lg:flex-nowrap items-center gap-2.5 sm:gap-3 w-full">
+              <Button href="/register" variant="primary" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap">
                 <Heart size={16} />
                 Find Your Life Partner
               </Button>
-              <Button href="/podcast" variant="outline" size="md" className="gap-2">
+              <Button href="/podcast" variant="outline" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap">
                 <Play size={16} />
                 Watch Our Podcast
               </Button>
-              <Button href="/contact" variant="secondary" size="md" className="gap-2 !border-white/20 !bg-white/10 hover:!bg-white/20">
+              <Button href="/contact" variant="secondary" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap !border-white/20 !bg-white/10 hover:!bg-white/20">
                 <Calendar size={16} />
                 Book a Consultation
               </Button>
             </div>
           </div>
 
-          {/* Right — Feature badges (bottom-right panel matching reference) */}
-          <div className="hidden lg:flex items-end justify-end h-full pb-0">
-            {/* intentionally empty — image occupies this space */}
-          </div>
+          {/* Right — Space occupied by photography */}
+          <div className="hidden lg:flex items-end justify-end h-full pb-0" />
         </div>
 
         {/* Feature badges panel — bottom right */}

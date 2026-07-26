@@ -229,6 +229,15 @@ export default function Footer() {
             >
               Terms of Use
             </Link>
+            <span className="text-white/30 text-xs">|</span>
+            <a
+              href="https://mujteknify.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans text-[#c9962c] text-xs hover:underline font-semibold"
+            >
+              Powered by MUJTEKNIFY
+            </a>
           </div>
         </div>
       </div>
