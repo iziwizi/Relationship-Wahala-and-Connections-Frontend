@@ -1,0 +1,124 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap");
+
+/* ─────────────────────────────────────────────
+   Design Tokens
+   ───────────────────────────────────────────── */
+:root {
+  /* Brand colours */
+  --burgundy: #7b1d2a;
+  --burgundy-dark: #5c1520;
+  --burgundy-light: #9b2535;
+  --gold: #c9962c;
+  --gold-light: #e8b84b;
+  --gold-muted: #b8882a;
+  --cream: #fbf5ec;
+  --cream-dark: #f3e9d7;
+  --charcoal: #1a1a1a;
+  --charcoal-light: #2d2d2d;
+  --off-white: #f9f3ea;
+  --text-muted: #6b6b6b;
+  --border-light: #e8e0d4;
+
+  /* Typography */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Spacing tokens */
+  --section-padding: 5rem;
+  --section-padding-mobile: 3rem;
+}
+
+/* ─────────────────────────────────────────────
+   Base Reset
+   ───────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--charcoal);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─────────────────────────────────────────────
+   Typography Utilities
+   ───────────────────────────────────────────── */
+.font-serif {
+  font-family: var(--font-serif);
+}
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* ─────────────────────────────────────────────
+   Colour Utilities
+   ───────────────────────────────────────────── */
+.text-burgundy { color: var(--burgundy); }
+.text-gold { color: var(--gold); }
+.text-gold-light { color: var(--gold-light); }
+.text-cream { color: var(--cream); }
+.bg-burgundy { background-color: var(--burgundy); }
+.bg-burgundy-dark { background-color: var(--burgundy-dark); }
+.bg-gold { background-color: var(--gold); }
+.bg-cream { background-color: var(--cream); }
+.bg-cream-dark { background-color: var(--cream-dark); }
+.border-gold { border-color: var(--gold); }
+.border-burgundy { border-color: var(--burgundy); }
+
+/* ─────────────────────────────────────────────
+   Section Spacing
+   ───────────────────────────────────────────── */
+.section-padding {
+  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
+}
+@media (max-width: 768px) {
+  .section-padding {
+    padding-top: var(--section-padding-mobile);
+    padding-bottom: var(--section-padding-mobile);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Smooth Hover Transitions
+   ───────────────────────────────────────────── */
+.transition-smooth {
+  transition: all 0.25s ease;
+}
+
+/* ─────────────────────────────────────────────
+   Nav Underline (active)
+   ───────────────────────────────────────────── */
+.nav-link-active::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background-color: var(--burgundy);
+  margin-top: 2px;
+  border-radius: 1px;
+}
+
+/* ─────────────────────────────────────────────
+   Scrollbar (optional subtle styling)
+   ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--burgundy);
+  border-radius: 3px;
+}
