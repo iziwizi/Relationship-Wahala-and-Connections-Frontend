@@ -1,0 +1,336 @@
+// Prisma Schema for Relationship Wahala & Connections
+// Prisma 7 — datasource url managed in prisma.config.ts (not here)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────
+
+enum UserRole {
+  MEMBER
+  SUPER_ADMIN
+}
+
+enum ProfileStatus {
+  DRAFT
+  SUBMITTED
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESSFUL
+  FAILED
+  CANCELLED
+  PENDING_REVIEW
+  REJECTED
+}
+
+enum PaymentProvider {
+  PAYSTACK
+  FLUTTERWAVE
+  BANK_TRANSFER
+}
+
+enum InteractionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING_PAYMENT
+}
+
+// ─── Core Models ──────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(MEMBER)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profile             Profile?
+  subscriptions       Subscription[]
+  payments            Payment[]
+  notifications       Notification[]
+  passwordResetTokens PasswordResetToken[]
+  verificationTokens  VerificationToken[]
+
+  requestedInteractions MatchInteraction[] @relation("Requester")
+  targetInteractions    MatchInteraction[] @relation("Target")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Profile {
+  id                String        @id @default(cuid())
+  userId            String        @unique
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName         String
+  lastName          String
+  phone             String
+  dateOfBirth       DateTime
+  gender            String
+  maritalStatus     String
+  nationality       String        @default("Nigerian")
+  stateOfOrigin     String?
+  currentCityState  String
+  currentCountry    String        @default("Nigeria")
+  educationLevel    String
+  profession        String
+  employmentStatus  String
+  religion          String?
+  smoking           String        @default("Never")
+  drinking          String        @default("Socially")
+  hasChildren       String        @default("No")
+  wantsChildren     String        @default("Yes")
+  aboutMe           String        @db.Text
+  keyValues         String[]
+  interestsHobbies  String[]
+  relationshipGoal  String
+  profileCompletion Int           @default(0)
+  status            ProfileStatus @default(PENDING_VERIFICATION)
+  verifiedAt        DateTime?
+  verifiedByAdminId String?
+  rejectionReason   String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  preferences MatchPreference?
+  photos      Photo[]
+
+  @@index([status])
+  @@index([userId])
+}
+
+model MatchPreference {
+  id                   String   @id @default(cuid())
+  profileId            String   @unique
+  profile              Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  ageMin               Int      @default(25)
+  ageMax               Int      @default(45)
+  location             String?
+  educationLevel       String?
+  religion             String?
+  lifestyle            String?
+  relocationPreference String?
+  updatedAt            DateTime @updatedAt
+}
+
+model Photo {
+  id         String   @id @default(cuid())
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  url        String
+  publicId   String? // Cloudinary public ID for deletion
+  isPrimary  Boolean  @default(false)
+  uploadedAt DateTime @default(now())
+
+  @@index([profileId])
+}
+
+// ─── Packages & Subscriptions ─────────────────────────────
+
+model Package {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  description    String   @db.Text
+  price          Decimal  @db.Decimal(12, 2)
+  currency       String   @default("NGN")
+  durationDays   Int      @default(30)
+  matchAllowance Int      @default(5)
+  features       String[]
+  isPopular      Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subscriptions Subscription[]
+  payments      Payment[]
+
+  @@index([isActive])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packageId            String
+  package              Package            @relation(fields: [packageId], references: [id])
+  status               SubscriptionStatus @default(ACTIVE)
+  startDate            DateTime           @default(now())
+  endDate              DateTime
+  matchesRemaining     Int                @default(5)
+  activatedByPaymentId String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([userId, status])
+  @@index([endDate])
+}
+
+// ─── Payments ─────────────────────────────────────────────
+
+model Payment {
+  id                    String          @id @default(cuid())
+  userId                String
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  packageId             String
+  package               Package         @relation(fields: [packageId], references: [id])
+  reference             String          @unique
+  amount                Decimal         @db.Decimal(12, 2)
+  currency              String          @default("NGN")
+  provider              PaymentProvider @default(PAYSTACK)
+  providerTransactionId String?
+  status                PaymentStatus   @default(PENDING)
+  metadata              Json?
+  bankTransferProofUrl  String?
+  approvedByAdminId     String?
+  approvalNote          String?
+  verifiedAt            DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  events PaymentEvent[]
+
+  @@index([reference])
+  @@index([userId, status])
+  @@index([status])
+}
+
+model PaymentEvent {
+  id        String   @id @default(cuid())
+  paymentId String
+  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  eventType String // e.g. "webhook.received", "status.updated", "subscription.activated"
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([paymentId])
+}
+
+// ─── Matchmaking ──────────────────────────────────────────
+
+model MatchInteraction {
+  id                 String            @id @default(cuid())
+  requesterId        String
+  requester          User              @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetId           String
+  target             User              @relation("Target", fields: [targetId], references: [id], onDelete: Cascade)
+  status             InteractionStatus @default(PENDING)
+  compatibilityScore Int               @default(85)
+  initiatedByAdmin   Boolean           @default(false)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@unique([requesterId, targetId])
+  @@index([requesterId])
+  @@index([targetId])
+}
+
+// ─── Communication ────────────────────────────────────────
+
+model ContactEnquiry {
+  id         String        @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  category   String
+  message    String        @db.Text
+  status     EnquiryStatus @default(NEW)
+  assignedTo String?
+  notes      String?       @db.Text
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+}
+
+// ─── Auth Tokens ──────────────────────────────────────────
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([tokenHash])
+}
+
+model VerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([tokenHash])
+}
+
+// ─── Admin ────────────────────────────────────────────────
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String // e.g. "PROFILE_VERIFIED", "PAYMENT_APPROVED", "PACKAGE_UPDATED"
+  targetType String? // e.g. "Profile", "Payment"
+  targetId   String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+}
+
+model PlatformSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
