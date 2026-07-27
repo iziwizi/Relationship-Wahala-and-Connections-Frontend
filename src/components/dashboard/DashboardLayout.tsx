@@ -44,7 +44,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<DbNotification[]>([]);
   const [notifLoading, setNotifLoading] = useState(true);
-  const notifRef = useRef<HTMLDivElement>(null);
+  const mobileNotifRef = useRef<HTMLDivElement>(null);
+  const desktopNotifRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -69,11 +70,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     loadNotifications();
   }, []);
 
-  // Close notification dropdown on outside pointer/click — use pointerdown
-  // so it works on both mouse and touch devices reliably
+  // Close notification dropdown when route changes
   useEffect(() => {
-    const handler = (e: PointerEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+    setNotifOpen(false);
+  }, [pathname]);
+
+  // Close notification dropdown on outside pointer/click
+  // Check BOTH mobile and desktop container refs so taps inside mobile dropdown are not mistaken for outside clicks
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const target = e.target as Node;
+      const insideMobile = mobileNotifRef.current?.contains(target);
+      const insideDesktop = desktopNotifRef.current?.contains(target);
+      if (!insideMobile && !insideDesktop) {
         setNotifOpen(false);
       }
     };
@@ -118,13 +127,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       ) : (
         <div className="divide-y divide-gray-50">
           {notifications.slice(0, 5).map((n) => (
-            // Use <Link> for reliable navigation on ALL devices including mobile
             <Link
               key={n.id}
               href={n.link || "/dashboard/notifications"}
               onClick={() => {
                 if (!n.isRead) markReadBackground(n.id);
-                setNotifOpen(false);
+                setTimeout(() => setNotifOpen(false), 50);
               }}
               className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
             >
@@ -139,10 +147,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
       <div className="px-4 pt-2 border-t border-gray-100">
-        {/* <Link> for View All — reliable on all devices */}
         <Link
           href="/dashboard/notifications"
-          onClick={() => setNotifOpen(false)}
+          onClick={() => setTimeout(() => setNotifOpen(false), 50)}
           className="block w-full text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
         >
           View all notifications
@@ -168,7 +175,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Mobile right: bell + hamburger */}
         <div className="flex items-center gap-1">
           {/* Mobile Notification Bell */}
-          <div className="relative" ref={notifRef}>
+          <div className="relative" ref={mobileNotifRef}>
             <button
               onClick={(e) => { e.stopPropagation(); setNotifOpen((prev) => !prev); }}
               className="relative p-2 text-gray-600 hover:text-[#7b1d2a]"
@@ -299,7 +306,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <div className="flex items-center gap-4 relative">
             {/* Desktop Notification Bell */}
-            <div className="relative" ref={notifRef}>
+            <div className="relative" ref={desktopNotifRef}>
               <button
                 onClick={(e) => { e.stopPropagation(); setNotifOpen((prev) => !prev); }}
                 className="p-2 rounded-full text-gray-600 hover:bg-gray-100 relative"
