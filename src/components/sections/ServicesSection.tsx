@@ -17,7 +17,7 @@ export default function ServicesSection() {
         <FadeUp className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <SectionHeading
             eyebrow="OUR SERVICES"
-            heading="Everything You Need for a<br/>Healthy Relationship Journey"
+            heading="Everything You Need for a<br class='hidden sm:inline'/> Healthy Relationship Journey"
             theme="dark"
           />
           <Link

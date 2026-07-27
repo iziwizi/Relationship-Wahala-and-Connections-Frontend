@@ -143,34 +143,61 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
+        <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
           <nav className="max-w-7xl mx-auto px-4 py-4 space-y-1">
-            {navItems.map((item) => (
-              <div key={item.label}>
-                <Link
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-between py-3 px-3 font-sans text-sm font-medium text-gray-800 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded-md transition-colors"
-                >
-                  {item.label}
-                  {item.children && <ChevronDown size={14} className="text-gray-400" />}
-                </Link>
-                {item.children && (
-                  <div className="pl-4 border-l-2 border-[#fbf5ec] ml-3 mt-1 mb-2 space-y-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.label}
-                        href={child.href}
-                        onClick={() => setMobileOpen(false)}
-                        className="block py-2 px-3 font-sans text-sm text-gray-600 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded transition-colors"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+            {navItems.map((item) => {
+              const hasChildren = Boolean(item.children?.length);
+              const isExpanded = openDropdown === `mobile-${item.label}`;
+
+              return (
+                <div key={item.label}>
+                  {hasChildren ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenDropdown(isExpanded ? null : `mobile-${item.label}`)
+                      }
+                      className="w-full flex items-center justify-between py-3 px-3 font-sans text-sm font-medium text-gray-800 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded-md transition-colors text-left"
+                      aria-expanded={isExpanded}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown
+                        size={16}
+                        className={`text-gray-500 transition-transform duration-200 ${
+                          isExpanded ? "rotate-180 text-[#7b1d2a]" : ""
+                        }`}
+                      />
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-between py-3 px-3 font-sans text-sm font-medium text-gray-800 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded-md transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+
+                  {hasChildren && isExpanded && (
+                    <div className="pl-4 border-l-2 border-[#7b1d2a]/30 ml-3 mt-1 mb-2 space-y-1">
+                      {item.children?.map((child) => (
+                        <Link
+                          key={child.label}
+                          href={child.href}
+                          onClick={() => {
+                            setOpenDropdown(null);
+                            setMobileOpen(false);
+                          }}
+                          className="block py-2 px-3 font-sans text-sm text-gray-600 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded transition-colors"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
             <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
               <Button href="/login" variant="outline" size="md" className="!text-gray-700 !border-gray-300 !bg-transparent w-full">
                 Sign In

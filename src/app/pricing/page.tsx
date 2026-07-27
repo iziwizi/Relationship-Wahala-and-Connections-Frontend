@@ -3,7 +3,7 @@ import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
-import { demoPackages } from "@/data/demo/packages";
+import { getActivePackages } from "@/lib/repositories/packages.repository";
 import { CheckCircle2, Crown, Star, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -16,8 +16,8 @@ function formatNGN(amount: number) {
   return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(amount);
 }
 
-export default function PricingPage() {
-  const activePackages = demoPackages.filter((p) => p.isActive);
+export default async function PricingPage() {
+  const activePackages = await getActivePackages();
 
   return (
     <>

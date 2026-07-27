@@ -36,7 +36,9 @@ export default function CheckoutPage() {
   const router = useRouter();
   const slug = params?.packageId as string;
 
-  const pkg: MatchmakingPackage | null = demoPackages.find((p) => p.slug === slug) ?? null;
+  const [pkg, setPkg] = useState<MatchmakingPackage | null>(
+    demoPackages.find((p) => p.slug === slug) ?? null
+  );
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [loading, setLoading] = useState(false);
   const [bankTransferRef, setBankTransferRef] = useState("");
@@ -44,6 +46,24 @@ export default function CheckoutPage() {
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    async function loadLivePackage() {
+      try {
+        const res = await fetch("/api/admin/packages");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.packages) {
+            const found = json.packages.find((p: MatchmakingPackage) => p.slug === slug || p.id === slug);
+            if (found) setPkg(found);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load live package for checkout:", err);
+      }
+    }
+    loadLivePackage();
+  }, [slug]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);

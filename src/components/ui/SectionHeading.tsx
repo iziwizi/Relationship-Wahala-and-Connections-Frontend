@@ -37,7 +37,7 @@ export default function SectionHeading({
         </p>
       )}
       <h2
-        className={`font-serif ${headingColor} text-3xl md:text-4xl leading-tight font-bold`}
+        className={`font-serif ${headingColor} text-2xl sm:text-3xl md:text-4xl leading-tight font-bold`}
         dangerouslySetInnerHTML={{ __html: heading }}
       />
       {subtext && (

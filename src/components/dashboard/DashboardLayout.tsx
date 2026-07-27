@@ -23,6 +23,7 @@ const sidebarItems: SidebarItem[] = [
   { label: "My Profile", href: "/dashboard/profile", icon: User },
   { label: "My Matches", href: "/dashboard/matches", icon: Users, badge: "3 New" },
   { label: "Match Preferences", href: "/dashboard/preferences", icon: Sliders },
+  { label: "Notifications", href: "/dashboard/notifications", icon: Bell },
   { label: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
   { label: "Payments", href: "/dashboard/payments", icon: Receipt },
   { label: "Messages", href: "/dashboard/messages", icon: MessageSquare, badge: "2" },

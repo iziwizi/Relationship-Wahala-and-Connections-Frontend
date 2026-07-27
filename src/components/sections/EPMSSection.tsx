@@ -38,10 +38,10 @@ export default function EPMSSection() {
   return (
     <section className="py-20 bg-[#f9f3ea]">
       <Container>
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6 items-stretch">
           {/* Left — EPMS Card */}
-          <FadeUp delay={0}>
-          <div className="bg-[#7b1d2a] rounded-2xl p-8 lg:p-10 flex flex-col justify-between text-white min-h-[420px]">
+          <FadeUp delay={0} className="h-full">
+          <div className="bg-[#7b1d2a] rounded-2xl p-8 lg:p-10 flex flex-col justify-between text-white h-full min-h-[420px]">
             <div>
               {/* Icon */}
               <div className="w-14 h-14 bg-[#c9962c]/20 border border-[#c9962c]/40 rounded-xl flex items-center justify-center mb-6">
@@ -84,8 +84,8 @@ export default function EPMSSection() {
           </FadeUp>
 
           {/* Right — Global Vision Card */}
-          <FadeUp delay={0.15}>
-          <div className="bg-[#111111] rounded-2xl p-8 lg:p-10 flex flex-col justify-between min-h-[420px] relative overflow-hidden">
+          <FadeUp delay={0.15} className="h-full">
+          <div className="bg-[#111111] rounded-2xl p-8 lg:p-10 flex flex-col justify-between h-full min-h-[420px] relative overflow-hidden">
             {/* Decorative network background */}
             <div className="absolute inset-0 opacity-15">
               {networkNodes.map((pos, i) => (

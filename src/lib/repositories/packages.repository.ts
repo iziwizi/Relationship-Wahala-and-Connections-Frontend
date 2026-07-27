@@ -7,18 +7,52 @@ import { isDatabaseMode } from "@/lib/db/mode";
 // Normalised type that both demo and DB return
 export type PackageRecord = MatchmakingPackage;
 
+export interface PackageInput {
+  name: string;
+  slug?: string;
+  description: string;
+  price: number;
+  currency?: string;
+  durationDays: number;
+  matchAllowance: number;
+  features: string[];
+  isPopular?: boolean;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
 export async function getActivePackages(): Promise<PackageRecord[]> {
   if (!isDatabaseMode()) {
     return demoPackages.filter((p) => p.isActive);
   }
 
-  // Database mode — lazy import Prisma so build works without DB_URL
   const { prisma } = await import("@/lib/db/prisma");
   const dbPkgs = await prisma.package.findMany({
     where: { isActive: true },
     orderBy: { sortOrder: "asc" },
   });
 
+  return dbPkgs.map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description,
+    price: Number(p.price),
+    currency: p.currency,
+    durationDays: p.durationDays,
+    matchAllowance: p.matchAllowance,
+    features: p.features,
+    isPopular: p.isPopular,
+    isActive: p.isActive,
+  }));
+}
+
+export async function getAllPackages(): Promise<PackageRecord[]> {
+  if (!isDatabaseMode()) return demoPackages;
+  const { prisma } = await import("@/lib/db/prisma");
+  const dbPkgs = await prisma.package.findMany({
+    orderBy: { sortOrder: "asc" },
+  });
   return dbPkgs.map((p) => ({
     id: p.id,
     name: p.name,
@@ -64,9 +98,58 @@ export async function getPackageById(id: string): Promise<PackageRecord | null> 
   const p = await prisma.package.findUnique({ where: { id } });
   if (!p) return null;
   return {
-    id: p.id, name: p.name, slug: p.slug, description: p.description,
-    price: Number(p.price), currency: p.currency, durationDays: p.durationDays,
-    matchAllowance: p.matchAllowance, features: p.features,
-    isPopular: p.isPopular, isActive: p.isActive,
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description,
+    price: Number(p.price),
+    currency: p.currency,
+    durationDays: p.durationDays,
+    matchAllowance: p.matchAllowance,
+    features: p.features,
+    isPopular: p.isPopular,
+    isActive: p.isActive,
   };
+}
+
+export async function updatePackage(id: string, data: Partial<PackageInput>) {
+  if (!isDatabaseMode()) return null;
+  const { prisma } = await import("@/lib/db/prisma");
+  return prisma.package.update({
+    where: { id },
+    data: {
+      ...(data.name && { name: data.name }),
+      ...(data.slug && { slug: data.slug }),
+      ...(data.description !== undefined && { description: data.description }),
+      ...(data.price !== undefined && { price: data.price }),
+      ...(data.currency && { currency: data.currency }),
+      ...(data.durationDays !== undefined && { durationDays: data.durationDays }),
+      ...(data.matchAllowance !== undefined && { matchAllowance: data.matchAllowance }),
+      ...(data.features && { features: data.features }),
+      ...(data.isPopular !== undefined && { isPopular: data.isPopular }),
+      ...(data.isActive !== undefined && { isActive: data.isActive }),
+      ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+    },
+  });
+}
+
+export async function createPackage(data: PackageInput) {
+  if (!isDatabaseMode()) return null;
+  const { prisma } = await import("@/lib/db/prisma");
+  const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return prisma.package.create({
+    data: {
+      name: data.name,
+      slug,
+      description: data.description,
+      price: data.price,
+      currency: data.currency || "NGN",
+      durationDays: data.durationDays,
+      matchAllowance: data.matchAllowance,
+      features: data.features,
+      isPopular: data.isPopular || false,
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      sortOrder: data.sortOrder || 0,
+    },
+  });
 }

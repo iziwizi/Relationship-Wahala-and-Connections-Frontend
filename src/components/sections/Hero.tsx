@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import { motion, useReducedMotion } from "framer-motion";
 
 const featureBadges = [
-  { icon: BookOpen, label: "Knowledge", sublabel: "First Approach" },
+  { icon: BookOpen, label: "Knowledge", sublabel: "Driven" },
   { icon: Globe, label: "Global", sublabel: "Connections" },
   { icon: Users, label: "Vetted &", sublabel: "Intentional" },
   { icon: Lock, label: "100%", sublabel: "Confidential" },
@@ -45,10 +45,10 @@ export default function Hero() {
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[75vh]">
           {/* Left — Copy */}
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center min-w-0">
             {/* Headline */}
             <motion.h1
-              className="font-serif text-white text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl"
+              className="font-serif text-white text-2xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl break-words"
               {...fadeUp(0.1)}
             >
               Find <span className="text-[#c9962c]">Love.</span>
@@ -64,7 +64,7 @@ export default function Hero() {
 
             {/* Body copy */}
             <motion.p
-              className="font-sans text-white/80 text-base sm:text-lg leading-relaxed mb-8 max-w-lg"
+              className="font-sans text-white/80 text-sm sm:text-base lg:text-lg leading-relaxed mb-8 max-w-lg"
               {...fadeUp(0.3)}
             >
               Nigeria&apos;s premier knowledge-based relationship and matchmaking
@@ -72,21 +72,36 @@ export default function Hero() {
               lasting relationships.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons — 2 buttons row 1 on mobile, 3rd button full-width row 2. Single horizontal row on desktop */}
             <motion.div
-              className="flex flex-wrap lg:flex-nowrap items-center gap-2.5 sm:gap-3 w-full"
+              className="grid grid-cols-2 lg:flex lg:flex-nowrap items-center gap-2 sm:gap-3 w-full"
               {...fadeUp(0.45)}
             >
-              <Button href="/register" variant="primary" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap">
-                <Heart size={16} />
+              <Button
+                href="/register"
+                variant="primary"
+                size="md"
+                className="col-span-1 gap-1.5 sm:gap-2 !px-2.5 sm:!px-4 !text-[11px] sm:!text-xs lg:!text-sm justify-center whitespace-nowrap"
+              >
+                <Heart size={14} className="flex-shrink-0" />
                 Find Your Life Partner
               </Button>
-              <Button href="/podcast" variant="outline" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap">
-                <Play size={16} />
+              <Button
+                href="/podcast"
+                variant="outline"
+                size="md"
+                className="col-span-1 gap-1.5 sm:gap-2 !px-2.5 sm:!px-4 !text-[11px] sm:!text-xs lg:!text-sm justify-center whitespace-nowrap"
+              >
+                <Play size={14} className="flex-shrink-0" />
                 Watch Our Podcast
               </Button>
-              <Button href="/contact" variant="secondary" size="md" className="gap-2 !px-4 sm:!px-5 whitespace-nowrap !border-white/20 !bg-white/10 hover:!bg-white/20">
-                <Calendar size={16} />
+              <Button
+                href="/contact"
+                variant="secondary"
+                size="md"
+                className="col-span-2 lg:col-span-1 gap-1.5 sm:gap-2 !px-2.5 sm:!px-4 !text-[11px] sm:!text-xs lg:!text-sm justify-center whitespace-nowrap !border-white/20 !bg-white/10 hover:!bg-white/20"
+              >
+                <Calendar size={14} className="flex-shrink-0" />
                 Book a Consultation
               </Button>
             </motion.div>
@@ -101,15 +116,15 @@ export default function Hero() {
           className="mt-8 lg:mt-0 lg:absolute lg:bottom-12 lg:right-8 xl:right-16"
           {...fadeUp(0.6)}
         >
-          <div className="bg-black/50 backdrop-blur-sm border border-white/10 rounded-xl p-5 grid grid-cols-4 sm:grid-cols-4 gap-6 lg:gap-8 w-full lg:w-auto">
+          <div className="bg-black/50 backdrop-blur-sm border border-white/10 rounded-xl p-3.5 sm:p-5 grid grid-cols-4 gap-3 sm:gap-6 lg:gap-8 w-full lg:w-auto">
             {featureBadges.map(({ icon: Icon, label, sublabel }) => (
-              <div key={label} className="flex flex-col items-center text-center gap-2">
-                <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center">
-                  <Icon size={18} className="text-white/90" />
+              <div key={label} className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white/30 flex items-center justify-center">
+                  <Icon size={15} className="text-white/90" />
                 </div>
                 <div>
-                  <p className="font-sans text-white text-xs font-semibold leading-tight">{label}</p>
-                  <p className="font-sans text-white/70 text-xs leading-tight">{sublabel}</p>
+                  <p className="font-sans text-white text-[11px] sm:text-xs font-semibold leading-tight">{label}</p>
+                  <p className="font-sans text-white/70 text-[10px] sm:text-xs leading-tight">{sublabel}</p>
                 </div>
               </div>
             ))}
