@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, User, Users, Sliders, CreditCard,
   Receipt, MessageSquare, Settings, LogOut, Menu, X,
-  ShieldCheck, Crown, Bell, CheckCircle2, Sparkles
+  ShieldCheck, Crown, Bell, CheckCircle2, Sparkles, Info
 } from "lucide-react";
 
 interface SidebarItem {
@@ -21,32 +21,90 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "My Profile", href: "/dashboard/profile", icon: User },
-  { label: "My Matches", href: "/dashboard/matches", icon: Users, badge: "3 New" },
+  { label: "My Matches", href: "/dashboard/matches", icon: Users },
   { label: "Match Preferences", href: "/dashboard/preferences", icon: Sliders },
   { label: "Notifications", href: "/dashboard/notifications", icon: Bell },
   { label: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
   { label: "Payments", href: "/dashboard/payments", icon: Receipt },
-  { label: "Messages", href: "/dashboard/messages", icon: MessageSquare, badge: "2" },
+  { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-const mockNotifications = [
-  { id: "n-1", title: "Profile Verification Approved", time: "10 mins ago", read: false, icon: CheckCircle2 },
-  { id: "n-2", title: "New Recommended Match: Amara (94%)", time: "2 hours ago", read: false, icon: Sparkles },
-  { id: "n-3", title: "Welcome to Standard Matchmaking", time: "1 day ago", read: true, icon: Crown },
-];
+interface DbNotification {
+  id: string;
+  title: string;
+  message: string;
+  link?: string;
+  isRead: boolean;
+  createdAt: string;
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState<DbNotification[]>([]);
+  const [notifLoading, setNotifLoading] = useState(true);
+  const notifRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  // Load notifications from database
+  useEffect(() => {
+    async function loadNotifications() {
+      try {
+        const res = await fetch("/api/notifications");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success) setNotifications(json.notifications || []);
+        }
+      } catch (err) {
+        console.error("[DashboardLayout] notifications fetch error:", err);
+      } finally {
+        setNotifLoading(false);
+      }
+    }
+    loadNotifications();
+  }, []);
+
+  // Close notification dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const markRead = async (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+    await fetch("/api/notifications", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notificationId: id }),
+    });
+  };
+
+  const markAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    await fetch("/api/notifications", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ markAllRead: true }),
+    });
+  };
+
+  const handleNotifClick = async (notif: DbNotification) => {
+    if (!notif.isRead) await markRead(notif.id);
+    setNotifOpen(false);
+    const dest = notif.link || "/dashboard/notifications";
+    router.push(dest);
   };
 
   return (
@@ -62,9 +120,79 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <p className="font-sans text-[8px] text-[#c9962c] tracking-widest uppercase font-semibold">Member Portal</p>
           </div>
         </Link>
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-gray-700">
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+
+        {/* Mobile right: bell + hamburger */}
+        <div className="flex items-center gap-1">
+          {/* Mobile Notification Bell */}
+          <div className="relative" ref={notifRef}>
+            <button
+              onClick={() => setNotifOpen(!notifOpen)}
+              className="relative p-2 text-gray-600 hover:text-[#7b1d2a]"
+              aria-label="Notifications"
+            >
+              <Bell size={20} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 bg-[#7b1d2a] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Mobile notification dropdown */}
+            {notifOpen && (
+              <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 z-50 max-h-[70vh] overflow-y-auto">
+                <div className="px-4 pb-2 border-b border-gray-100 flex items-center justify-between">
+                  <span className="font-serif font-bold text-sm text-[#1a1a1a]">Notifications</span>
+                  {unreadCount > 0 && (
+                    <button onClick={markAllRead} className="font-sans text-[11px] font-semibold text-[#7b1d2a] hover:underline">
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                {notifications.length === 0 ? (
+                  <p className="text-center text-xs font-sans text-gray-400 py-6">No notifications.</p>
+                ) : (
+                  <div className="divide-y divide-gray-50">
+                    {notifications.slice(0, 5).map((n) => (
+                      <button
+                        key={n.id}
+                        onClick={() => handleNotifClick(n)}
+                        className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
+                      >
+                        <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-sans text-xs font-semibold text-[#1a1a1a]">{n.title}</p>
+                          <p className="font-sans text-[10px] text-gray-400 mt-0.5 line-clamp-1">{n.message}</p>
+                        </div>
+                        {!n.isRead && <span className="w-2 h-2 bg-[#7b1d2a] rounded-full flex-shrink-0 mt-1 ml-auto" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="px-4 pt-2 border-t border-gray-100">
+                  <Link
+                    href="/dashboard/notifications"
+                    onClick={() => setNotifOpen(false)}
+                    className="block text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
+                  >
+                    View all notifications
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setMobileOpen((prev) => {
+              if (prev) { /* closing */ }
+              return !prev;
+            })}
+            className="p-2 text-gray-700"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          >
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </header>
 
       {/* Desktop Sidebar */}
@@ -107,9 +235,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <Icon size={18} className={isActive ? "text-[#c9962c]" : "text-white/75"} />
                     <span>{item.label}</span>
                   </div>
-                  {item.badge && (
+                  {/* Notifications badge from real data */}
+                  {item.href === "/dashboard/notifications" && unreadCount > 0 && (
                     <span className="bg-[#c9962c] text-white font-sans text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {item.badge}
+                      {unreadCount}
                     </span>
                   )}
                 </Link>
@@ -120,21 +249,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <div className="p-4 border-t border-white/10 bg-black/20">
           <div className="flex items-center gap-3 mb-4">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[#c9962c]">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[#c9962c] flex-shrink-0">
               <Image
                 src={user?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80"}
                 alt="User avatar"
                 fill
                 className="object-cover"
+                unoptimized
               />
             </div>
             <div className="overflow-hidden">
               <p className="font-sans text-sm font-semibold text-white truncate">
-                {user ? `${user.firstName} ${user.lastName}` : "Daniel Okonkwo"}
+                {user ? `${user.firstName} ${user.lastName || ""}`.trim() : "Member"}
               </p>
               <div className="flex items-center gap-1">
                 <Crown size={12} className="text-[#c9962c]" />
-                <span className="font-sans text-[10px] text-white/70">Standard Member</span>
+                <span className="font-sans text-[10px] text-white/70">Member</span>
               </div>
             </div>
           </div>
@@ -149,8 +279,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
+      {/* Mobile sidebar overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Desktop Header */}
         <div className="hidden lg:flex items-center justify-between bg-white border-b border-[#e8e0d4] px-8 py-4">
           <div>
             <h2 className="font-serif text-[#1a1a1a] text-xl font-bold">Intentional Matchmaking Portal</h2>
@@ -158,8 +297,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="flex items-center gap-4 relative">
-            {/* Interactive Notification Bell */}
-            <div className="relative">
+            {/* Desktop Notification Bell */}
+            <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
                 className="p-2 rounded-full text-gray-600 hover:bg-gray-100 relative"
@@ -173,7 +312,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 )}
               </button>
 
-              {/* Notification Dropdown */}
+              {/* Desktop Notification Dropdown */}
               {notifOpen && (
                 <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 z-50">
                   <div className="px-4 pb-2 border-b border-gray-100 flex items-center justify-between">
@@ -184,19 +323,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </button>
                     )}
                   </div>
-                  <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
-                    {notifications.map((n) => {
-                      const Icon = n.icon;
-                      return (
-                        <div key={n.id} className={`p-3.5 flex items-start gap-3 ${!n.read ? "bg-[#fbf5ec]/60" : ""}`}>
-                          <Icon size={16} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
+                  {notifications.length === 0 ? (
+                    <p className="text-center text-xs font-sans text-gray-400 py-6">No notifications.</p>
+                  ) : (
+                    <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+                      {notifications.slice(0, 5).map((n) => (
+                        <button
+                          key={n.id}
+                          onClick={() => handleNotifClick(n)}
+                          className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
+                        >
+                          <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
                           <div className="flex-1">
                             <p className="font-sans text-xs font-semibold text-[#1a1a1a]">{n.title}</p>
-                            <p className="font-sans text-[10px] text-gray-400 mt-0.5">{n.time}</p>
+                            <p className="font-sans text-[10px] text-gray-400 mt-0.5 line-clamp-1">{n.message}</p>
                           </div>
-                        </div>
-                      );
-                    })}
+                          {!n.isRead && <span className="w-2 h-2 bg-[#7b1d2a] rounded-full flex-shrink-0 mt-1" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="px-4 pt-2 border-t border-gray-100">
+                    <Link
+                      href="/dashboard/notifications"
+                      onClick={() => setNotifOpen(false)}
+                      className="block text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
+                    >
+                      View all notifications
+                    </Link>
                   </div>
                 </div>
               )}
@@ -209,7 +363,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
-        <main className="p-4 sm:p-6 lg:p-8 flex-1">{children}</main>
+        <main className="p-4 sm:p-6 lg:p-8 flex-1 min-w-0 overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

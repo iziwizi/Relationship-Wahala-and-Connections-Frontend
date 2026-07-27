@@ -122,6 +122,68 @@ async function main() {
   });
   console.log(`✅ Demo member seeded: ${member.email}`);
 
+  // ─── 3B. Second Verified Test Member (Amina Bello) ──────────
+  const testMemberHash = await bcrypt.hash("Demo@123", 12);
+  const aminaMember = await prisma.user.upsert({
+    where: { email: "testmatch@relationshipwahala.com" },
+    update: { passwordHash: testMemberHash },
+    create: {
+      email: "testmatch@relationshipwahala.com",
+      passwordHash: testMemberHash,
+      role: "MEMBER",
+      isActive: true,
+      profile: {
+        create: {
+          firstName: "Amina",
+          lastName: "Bello",
+          phone: "+234 802 987 6543",
+          dateOfBirth: new Date("1996-08-20"),
+          gender: "Female",
+          maritalStatus: "Single (Never Married)",
+          nationality: "Nigerian",
+          stateOfOrigin: "Kano State",
+          currentCityState: "Victoria Island, Lagos",
+          currentCountry: "Nigeria",
+          educationLevel: "Master's Degree",
+          profession: "Fintech Product Lead",
+          employmentStatus: "Full-Time Employed",
+          religion: "Christian",
+          smoking: "Never",
+          drinking: "Never",
+          hasChildren: "No",
+          wantsChildren: "Yes",
+          aboutMe:
+            "I am a passionate tech product leader with a love for family, classical literature, and community service. I value integrity, emotional intelligence, and open communication in a marriage partner.",
+          keyValues: ["Faith & Morals", "Financial Wisdom", "Family First", "Honesty & Transparency"],
+          interestsHobbies: ["Tech Products", "Badminton", "Reading", "Baking"],
+          relationshipGoal: "Marriage within 1 year",
+          status: "VERIFIED",
+          profileCompletion: 90,
+          verifiedAt: new Date(),
+          photos: {
+            create: [
+              {
+                url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80",
+                isPrimary: true,
+              },
+            ],
+          },
+          preferences: {
+            create: {
+              ageMin: 28,
+              ageMax: 42,
+              location: "Lagos / Abuja / Remote",
+              educationLevel: "Master's Degree",
+              religion: "Christian",
+            },
+          },
+        },
+      },
+    },
+    include: { profile: true },
+  });
+  console.log(`✅ Second test member seeded: ${aminaMember.email}`);
+
   // ─── 4. Packages ──────────────────────────────────────────
   const standardPkg = await prisma.package.upsert({
     where: { slug: "standard-matchmaking" },

@@ -131,7 +131,12 @@ export default function Header() {
 
           {/* Mobile Hamburger */}
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={() => {
+              setMobileOpen((prev) => {
+                if (prev) setOpenDropdown(null);
+                return !prev;
+              });
+            }}
             className="lg:hidden p-2 rounded-md text-gray-700 hover:text-[#7b1d2a] hover:bg-gray-100 transition-colors"
             aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={mobileOpen}
@@ -155,7 +160,7 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() =>
-                        setOpenDropdown(isExpanded ? null : `mobile-${item.label}`)
+                        setOpenDropdown((prev) => (prev === `mobile-${item.label}` ? null : `mobile-${item.label}`))
                       }
                       className="w-full flex items-center justify-between py-3 px-3 font-sans text-sm font-medium text-gray-800 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded-md transition-colors text-left"
                       aria-expanded={isExpanded}
