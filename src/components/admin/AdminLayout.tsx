@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -20,7 +20,7 @@ interface AdminSidebarItem {
 const mainAdminItems: AdminSidebarItem[] = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "User Management", href: "/admin/users", icon: Users },
-  { label: "Profile Verification", href: "/admin/profiles", icon: UserCheck, badge: "4 Pending" },
+  { label: "Profile Verification", href: "/admin/profiles", icon: UserCheck },
   { label: "Matchmaking Control", href: "/admin/matches", icon: Heart },
   { label: "Packages Management", href: "/admin/packages", icon: Package },
   { label: "Payment Logs", href: "/admin/payments", icon: CreditCard },
@@ -40,8 +40,17 @@ const cmsAdminItems: AdminSidebarItem[] = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cmsOpen, setCmsOpen] = useState(true);
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
   const pathname = usePathname();
 
+  useEffect(() => {
+    fetch("/api/admin/profiles/pending-count")
+      .then((r) => r.json())
+      .then((data) => {
+        if (typeof data?.count === "number") setPendingCount(data.count);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col lg:flex-row">
@@ -103,9 +112,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       <Icon size={16} className={isActive ? "text-[#c9962c]" : "text-white/70"} />
                       <span>{item.label}</span>
                     </div>
-                    {item.badge && (
+                    {item.href === "/admin/profiles" && pendingCount !== null && pendingCount > 0 && (
                       <span className="bg-[#c9962c] text-white font-sans text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        {item.badge}
+                        {pendingCount} Pending
                       </span>
                     )}
                   </Link>

@@ -222,8 +222,11 @@ export default function AdminPackagesPage() {
         {/* Create Modal */}
         {showNewModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="px-6 py-4 border-b border-gray-100">
               <h2 className="font-serif text-lg font-bold text-[#1a1a1a]">Create New Package</h2>
+            </div>
+            <div className="overflow-y-auto flex-1 p-6 space-y-4">
 
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Package Name</label>
@@ -326,23 +329,24 @@ export default function AdminPackagesPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 justify-end pt-2 border-t">
-                <button
-                  onClick={() => setShowNewModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-gray-600 border rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddPackage}
-                  disabled={creating}
-                  className="px-4 py-2 text-xs font-bold text-white bg-[#7b1d2a] rounded-lg hover:bg-[#5c1520] flex items-center gap-1"
-                >
-                  {creating ? <Loader2 size={14} className="animate-spin" /> : null}
-                  <span>Save Package</span>
-                </button>
-              </div>
             </div>
+            <div className="flex gap-3 justify-end p-4 border-t border-gray-100 bg-white rounded-b-2xl">
+              <button
+                onClick={() => setShowNewModal(false)}
+                className="px-4 py-2 text-xs font-semibold text-gray-600 border rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddPackage}
+                disabled={creating}
+                className="px-4 py-2 text-xs font-bold text-white bg-[#7b1d2a] rounded-lg hover:bg-[#5c1520] flex items-center gap-1"
+              >
+                {creating ? <Loader2 size={14} className="animate-spin" /> : null}
+                <span>Save Package</span>
+              </button>
+            </div>
+          </div>
           </div>
         )}
       </div>

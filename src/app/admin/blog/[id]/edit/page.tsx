@@ -1,41 +1,97 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CheckCircle, XCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { demoBlogPosts } from "@/data/demo/cms";
+import MediaUploader from "@/components/ui/MediaUploader";
 
 export default function AdminEditBlogPostPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
 
-  const post = demoBlogPosts.find((p) => p.id === id) || demoBlogPosts[0];
-
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [title, setTitle] = useState(post?.title || "");
-  const [category, setCategory] = useState(post?.category || "Pre-Marital Preparation");
-  const [excerpt, setExcerpt] = useState(post?.excerpt || "");
-  const [content, setContent] = useState(post?.content || "");
-  const [featuredImage, setFeaturedImage] = useState(post?.featuredImage || "");
-  const [featured, setFeatured] = useState(post?.featured || false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("Pre-Marital Preparation");
+  const [excerpt, setExcerpt] = useState("");
+  const [content, setContent] = useState("");
+  const [featuredImage, setFeaturedImage] = useState("");
+  const [featured, setFeatured] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/admin/blog/${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.post) {
+          const p = data.post;
+          setTitle(p.title || "");
+          setCategory(p.category || "Pre-Marital Preparation");
+          setExcerpt(p.excerpt || "");
+          setContent(p.content || "");
+          setFeaturedImage(p.featuredImage || "");
+          setFeatured(p.featured || false);
+        }
+      })
+      .catch(() => {/* use empty defaults */})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const showToast = (type: "success" | "error", msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-
-    setTimeout(() => {
-      alert("Blog post updated successfully!");
-      router.push("/admin/blog");
-    }, 800);
+    try {
+      const res = await fetch(`/api/admin/blog/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, category, excerpt, content, featuredImage, featured }),
+      });
+      if (res.ok) {
+        showToast("success", "Blog post updated successfully.");
+        setTimeout(() => router.push("/admin/blog"), 1200);
+      } else {
+        const err = await res.json();
+        showToast("error", err.error || "Failed to update blog post.");
+      }
+    } catch {
+      showToast("error", "Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 size={32} className="animate-spin text-[#7b1d2a]" />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-4xl">
+        {/* Toast */}
+        {toast && (
+          <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg font-sans text-sm font-semibold text-white transition-all ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+            {toast.type === "success" ? <CheckCircle size={16} /> : <XCircle size={16} />}
+            {toast.msg}
+          </div>
+        )}
+
         <div className="flex items-center gap-3">
           <Link href="/admin/blog" className="text-gray-500 hover:text-[#7b1d2a]">
             <ArrowLeft size={18} />
@@ -58,31 +114,28 @@ export default function AdminEditBlogPostPage() {
             />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Category</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
-              >
-                <option>Pre-Marital Preparation</option>
-                <option>Marriage &amp; Intimacy</option>
-                <option>Matchmaking &amp; Safety</option>
-                <option>Conflict Resolution</option>
-                <option>Intentional Dating</option>
-              </select>
-            </div>
+          <div>
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
+            >
+              <option>Pre-Marital Preparation</option>
+              <option>Marriage &amp; Intimacy</option>
+              <option>Matchmaking &amp; Safety</option>
+              <option>Conflict Resolution</option>
+              <option>Intentional Dating</option>
+            </select>
+          </div>
 
-            <div>
-              <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Featured Image URL</label>
-              <input
-                type="text"
-                value={featuredImage}
-                onChange={(e) => setFeaturedImage(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
-              />
-            </div>
+          <div>
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Featured Image</label>
+            <MediaUploader
+              value={featuredImage}
+              onChange={setFeaturedImage}
+              label="Upload Featured Image"
+            />
           </div>
 
           <div>

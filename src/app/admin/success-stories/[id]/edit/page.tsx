@@ -1,41 +1,98 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CheckCircle, XCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { demoSuccessStories } from "@/data/demo/cms";
+import MediaUploader from "@/components/ui/MediaUploader";
 
 export default function AdminEditSuccessStoryPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
 
-  const s = demoSuccessStories.find((item) => item.id === id) || demoSuccessStories[0];
-
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [displayNames, setDisplayNames] = useState(s?.displayNames || "");
-  const [title, setTitle] = useState(s?.title || "");
-  const [location, setLocation] = useState(s?.location || "");
-  const [weddingDate, setWeddingDate] = useState(s?.weddingDate || "");
-  const [photoUrl, setPhotoUrl] = useState(s?.photoUrl || "");
-  const [story, setStory] = useState(s?.story || "");
-  const [featured, setFeatured] = useState(s?.featured || false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [displayNames, setDisplayNames] = useState("");
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
+  const [weddingDate, setWeddingDate] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [story, setStory] = useState("");
+  const [featured, setFeatured] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/admin/success-stories/${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.story) {
+          const s = data.story;
+          setDisplayNames(s.displayNames || "");
+          setTitle(s.title || "");
+          setLocation(s.location || "");
+          setWeddingDate(s.weddingDate || "");
+          setPhotoUrl(s.photoUrl || "");
+          setStory(s.story || "");
+          setFeatured(s.featured || false);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const showToast = (type: "success" | "error", msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      alert("Success story updated successfully!");
-      router.push("/admin/success-stories");
-    }, 800);
+    try {
+      const res = await fetch(`/api/admin/success-stories/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayNames, title, location, weddingDate, photoUrl, story, featured }),
+      });
+      if (res.ok) {
+        showToast("success", "Success story updated successfully.");
+        setTimeout(() => router.push("/admin/success-stories"), 1200);
+      } else {
+        const err = await res.json();
+        showToast("error", err.error || "Failed to update success story.");
+      }
+    } catch {
+      showToast("error", "Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 size={32} className="animate-spin text-[#7b1d2a]" />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-3xl">
+        {toast && (
+          <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg font-sans text-sm font-semibold text-white ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+            {toast.type === "success" ? <CheckCircle size={16} /> : <XCircle size={16} />}
+            {toast.msg}
+          </div>
+        )}
+
         <div className="flex items-center gap-3">
           <Link href="/admin/success-stories" className="text-gray-500 hover:text-[#7b1d2a]">
             <ArrowLeft size={18} />
@@ -93,13 +150,11 @@ export default function AdminEditSuccessStoryPage() {
           </div>
 
           <div>
-            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Photo URL</label>
-            <input
-              type="text"
-              required
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Couple Photo</label>
+            <MediaUploader
               value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
+              onChange={setPhotoUrl}
+              label="Upload Couple Photo"
             />
           </div>
 

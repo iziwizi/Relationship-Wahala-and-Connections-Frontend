@@ -100,11 +100,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     });
   };
 
-  const handleNotifClick = async (notif: DbNotification) => {
-    if (!notif.isRead) await markRead(notif.id);
+  const handleNotifClick = (e: React.MouseEvent, notif: DbNotification) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!notif.isRead) {
+      markRead(notif.id);
+    }
     setNotifOpen(false);
     const dest = notif.link || "/dashboard/notifications";
     router.push(dest);
+  };
+
+  const handleViewAllNotifs = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setNotifOpen(false);
+    router.push("/dashboard/notifications");
   };
 
   return (
@@ -156,7 +167,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {notifications.slice(0, 5).map((n) => (
                       <button
                         key={n.id}
-                        onClick={() => handleNotifClick(n)}
+                        onClick={(e) => handleNotifClick(e, n)}
                         className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
                       >
                         <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
@@ -170,13 +181,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                 )}
                 <div className="px-4 pt-2 border-t border-gray-100">
-                  <Link
-                    href="/dashboard/notifications"
-                    onClick={() => setNotifOpen(false)}
-                    className="block text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
+                  <button
+                    onClick={handleViewAllNotifs}
+                    className="w-full text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
                   >
                     View all notifications
-                  </Link>
+                  </button>
                 </div>
               </div>
             )}
@@ -330,7 +340,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       {notifications.slice(0, 5).map((n) => (
                         <button
                           key={n.id}
-                          onClick={() => handleNotifClick(n)}
+                          onClick={(e) => handleNotifClick(e, n)}
                           className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
                         >
                           <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
@@ -344,13 +354,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                   )}
                   <div className="px-4 pt-2 border-t border-gray-100">
-                    <Link
-                      href="/dashboard/notifications"
-                      onClick={() => setNotifOpen(false)}
-                      className="block text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
+                    <button
+                      onClick={handleViewAllNotifs}
+                      className="w-full text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
                     >
                       View all notifications
-                    </Link>
+                    </button>
                   </div>
                 </div>
               )}

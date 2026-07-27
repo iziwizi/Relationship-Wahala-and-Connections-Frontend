@@ -48,7 +48,7 @@ export default function Hero() {
           <div className="flex flex-col justify-center min-w-0">
             {/* Headline */}
             <motion.h1
-              className="font-serif text-white text-2xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl"
+              className="font-serif text-white text-2xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold leading-[1.2] mb-6 max-w-xl lg:max-w-2xl xl:max-w-3xl"
               {...fadeUp(0.1)}
             >
               {/* Mobile: each sentence on its own line */}
@@ -57,10 +57,10 @@ export default function Hero() {
                 <span className="block">Build Lasting Relationships.</span>
                 <span className="block">Create a Successful <span className="text-[#c9962c]">Marriage.</span></span>
               </span>
-              {/* Desktop: natural flowing text, no forced breaks */}
+              {/* Desktop: clean 3-line sentence layout matching left column */}
               <span className="hidden lg:inline">
-                Find <span className="text-[#c9962c]">Love.</span>{" "}
-                Build Lasting Relationships.{" "}
+                Find <span className="text-[#c9962c]">Love.</span><br className="hidden lg:block" />
+                Build Lasting Relationships.<br className="hidden lg:block" />
                 Create a Successful <span className="text-[#c9962c]">Marriage.</span>
               </span>
             </motion.h1>

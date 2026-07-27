@@ -1,42 +1,100 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CheckCircle, XCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { demoEvents } from "@/data/demo/cms";
+import MediaUploader from "@/components/ui/MediaUploader";
 
 export default function AdminEditEventPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
 
-  const ev = demoEvents.find((e) => e.id === id) || demoEvents[0];
-
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [title, setTitle] = useState(ev?.title || "");
-  const [eventDate, setEventDate] = useState(ev?.eventDate || "");
-  const [eventTime, setEventTime] = useState(ev?.eventTime || "");
-  const [location, setLocation] = useState(ev?.location || "");
-  const [isOnline, setIsOnline] = useState(ev?.isOnline || false);
-  const [registrationUrl, setRegistrationUrl] = useState(ev?.registrationUrl || "");
-  const [description, setDescription] = useState(ev?.description || "");
-  const [image, setImage] = useState(ev?.image || "");
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [title, setTitle] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventTime, setEventTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [isOnline, setIsOnline] = useState(false);
+  const [registrationUrl, setRegistrationUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/admin/events/${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.event) {
+          const ev = data.event;
+          setTitle(ev.title || "");
+          setEventDate(ev.eventDate || "");
+          setEventTime(ev.eventTime || "");
+          setLocation(ev.location || "");
+          setIsOnline(ev.isOnline || false);
+          setRegistrationUrl(ev.registrationUrl || "");
+          setDescription(ev.description || "");
+          setImage(ev.image || "");
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const showToast = (type: "success" | "error", msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      alert("Event updated successfully!");
-      router.push("/admin/events");
-    }, 800);
+    try {
+      const res = await fetch(`/api/admin/events/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, eventDate, eventTime, location, isOnline, registrationUrl, description, image }),
+      });
+      if (res.ok) {
+        showToast("success", "Event updated successfully.");
+        setTimeout(() => router.push("/admin/events"), 1200);
+      } else {
+        const err = await res.json();
+        showToast("error", err.error || "Failed to update event.");
+      }
+    } catch {
+      showToast("error", "Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 size={32} className="animate-spin text-[#7b1d2a]" />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-3xl">
+        {toast && (
+          <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg font-sans text-sm font-semibold text-white ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+            {toast.type === "success" ? <CheckCircle size={16} /> : <XCircle size={16} />}
+            {toast.msg}
+          </div>
+        )}
+
         <div className="flex items-center gap-3">
           <Link href="/admin/events" className="text-gray-500 hover:text-[#7b1d2a]">
             <ArrowLeft size={18} />
@@ -93,25 +151,23 @@ export default function AdminEditEventPage() {
             />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Registration URL</label>
-              <input
-                type="text"
-                value={registrationUrl}
-                onChange={(e) => setRegistrationUrl(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
-              />
-            </div>
-            <div>
-              <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Image URL</label>
-              <input
-                type="text"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
-              />
-            </div>
+          <div>
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Registration URL</label>
+            <input
+              type="text"
+              value={registrationUrl}
+              onChange={(e) => setRegistrationUrl(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Event Image</label>
+            <MediaUploader
+              value={image}
+              onChange={setImage}
+              label="Upload Event Image"
+            />
           </div>
 
           <div>

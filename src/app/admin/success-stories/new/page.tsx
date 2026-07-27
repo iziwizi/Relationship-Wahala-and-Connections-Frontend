@@ -4,32 +4,61 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CheckCircle, XCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
+import MediaUploader from "@/components/ui/MediaUploader";
 
 export default function AdminNewSuccessStoryPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+
   const [displayNames, setDisplayNames] = useState("");
   const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("Lagos, Nigeria");
-  const [weddingDate, setWeddingDate] = useState("December 2025");
-  const [photoUrl, setPhotoUrl] = useState("/images/testimonials/tunde-aminat.jpg");
+  const [location, setLocation] = useState("");
+  const [weddingDate, setWeddingDate] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
   const [story, setStory] = useState("");
   const [featured, setFeatured] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const showToast = (type: "success" | "error", msg: string) => {
+    setToast({ type, msg });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      alert("Success story created successfully!");
-      router.push("/admin/success-stories");
-    }, 800);
+    try {
+      const res = await fetch("/api/admin/success-stories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayNames, title, location, weddingDate, photoUrl, story, featured }),
+      });
+      if (res.ok) {
+        showToast("success", "Success story created successfully.");
+        setTimeout(() => router.push("/admin/success-stories"), 1200);
+      } else {
+        const err = await res.json();
+        showToast("error", err.error || "Failed to create success story.");
+      }
+    } catch {
+      showToast("error", "Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-3xl">
+        {toast && (
+          <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg font-sans text-sm font-semibold text-white ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+            {toast.type === "success" ? <CheckCircle size={16} /> : <XCircle size={16} />}
+            {toast.msg}
+          </div>
+        )}
+
         <div className="flex items-center gap-3">
           <Link href="/admin/success-stories" className="text-gray-500 hover:text-[#7b1d2a]">
             <ArrowLeft size={18} />
@@ -91,13 +120,11 @@ export default function AdminNewSuccessStoryPage() {
           </div>
 
           <div>
-            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Couple Photo URL</label>
-            <input
-              type="text"
-              required
+            <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Couple Photo</label>
+            <MediaUploader
               value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
+              onChange={setPhotoUrl}
+              label="Upload Couple Photo"
             />
           </div>
 
