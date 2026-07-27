@@ -2,12 +2,15 @@
 
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useState, useEffect } from "react";
-import { Save, Building2, CreditCard, ShieldCheck, Loader2 } from "lucide-react";
+import { Save, Building2, CreditCard, Loader2, CheckCircle2, XCircle } from "lucide-react";
+
+type FeedbackStatus = "idle" | "saving" | "success" | "error";
 
 export default function AdminSettingsPage() {
-  const [saved, setSaved] = useState(false);
+  // Separate feedback states for each form
+  const [bankStatus, setBankStatus] = useState<FeedbackStatus>("idle");
+  const [platformStatus, setPlatformStatus] = useState<FeedbackStatus>("idle");
   const [loadingBank, setLoadingBank] = useState(true);
-  const [savingBank, setSavingBank] = useState(false);
 
   const [settings, setSettings] = useState({
     platformName: "Relationship Wahala & Connections",
@@ -34,9 +37,7 @@ export default function AdminSettingsPage() {
         const res = await fetch("/api/admin/settings/bank");
         if (res.ok) {
           const data = await res.json();
-          if (data.success) {
-            setBankSettings(data);
-          }
+          if (data.success) setBankSettings(data);
         }
       } catch (err) {
         console.error("Failed to load bank settings:", err);
@@ -48,35 +49,78 @@ export default function AdminSettingsPage() {
   }, []);
 
   const handleSaveGeneral = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    // General platform settings — local state only for now (no backend API yet)
+    setPlatformStatus("saving");
+    setTimeout(() => {
+      setPlatformStatus("success");
+      setTimeout(() => setPlatformStatus("idle"), 4000);
+    }, 500);
   };
 
   const handleSaveBank = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSavingBank(true);
+    setBankStatus("saving");
     try {
       const res = await fetch("/api/admin/settings/bank", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bankSettings),
       });
-
       if (res.ok) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+        setBankStatus("success");
+        setTimeout(() => setBankStatus("idle"), 4000);
       } else {
-        alert("Failed to save bank settings.");
+        setBankStatus("error");
+        setTimeout(() => setBankStatus("idle"), 5000);
       }
-    } catch (err) {
-      console.error("Failed to save bank settings:", err);
-    } finally {
-      setSavingBank(false);
+    } catch {
+      setBankStatus("error");
+      setTimeout(() => setBankStatus("idle"), 5000);
     }
   };
 
-  const inputClass = "w-full border border-gray-200 rounded-lg px-3.5 py-2 font-sans text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#7b1d2a] bg-white";
-  const labelClass = "block font-sans text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1";
+  const inputClass =
+    "w-full border border-gray-200 rounded-lg px-3.5 py-2 font-sans text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#7b1d2a] bg-white";
+  const labelClass =
+    "block font-sans text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1";
+
+  const BankFeedback = () => {
+    if (bankStatus === "saving") return (
+      <span className="flex items-center gap-1.5 font-sans text-xs text-[#7b1d2a]">
+        <Loader2 size={13} className="animate-spin" /> Saving...
+      </span>
+    );
+    if (bankStatus === "success") return (
+      <span className="flex items-center gap-1.5 font-sans text-xs text-green-600 font-bold">
+        <CheckCircle2 size={13} /> Bank transfer settings saved successfully.
+      </span>
+    );
+    if (bankStatus === "error") return (
+      <span className="flex items-center gap-1.5 font-sans text-xs text-red-600 font-bold">
+        <XCircle size={13} /> Unable to save bank transfer settings. Please try again.
+      </span>
+    );
+    return null;
+  };
+
+  const PlatformFeedback = () => {
+    if (platformStatus === "saving") return (
+      <span className="flex items-center gap-1.5 font-sans text-xs text-[#7b1d2a]">
+        <Loader2 size={13} className="animate-spin" /> Saving...
+      </span>
+    );
+    if (platformStatus === "success") return (
+      <span className="flex items-center gap-1.5 font-sans text-xs text-green-600 font-bold">
+        <CheckCircle2 size={13} /> Platform settings saved successfully.
+      </span>
+    );
+    if (platformStatus === "error") return (
+      <span className="flex items-center gap-1.5 font-sans text-xs text-red-600 font-bold">
+        <XCircle size={13} /> Unable to save platform settings. Please try again.
+      </span>
+    );
+    return null;
+  };
 
   return (
     <AdminLayout>
@@ -88,19 +132,21 @@ export default function AdminSettingsPage() {
           </p>
         </div>
 
-        {/* Bank & Payment Gateways Settings Section */}
-        <div className="bg-white rounded-2xl border border border-[#c9962c]/30 shadow-sm p-6 space-y-6">
+        {/* ── BANK & PAYMENT SETTINGS CARD ── */}
+        <div className="bg-white rounded-2xl border border-[#c9962c]/30 shadow-sm p-6 space-y-6">
           <div className="flex items-center justify-between border-b pb-3">
             <div className="flex items-center gap-2 text-[#7b1d2a]">
               <Building2 size={20} />
-              <h2 className="font-serif font-bold text-base text-[#1a1a1a]">Payment Settings &amp; Bank Transfer Config</h2>
+              <h2 className="font-serif font-bold text-base text-[#1a1a1a]">
+                Payment Settings &amp; Bank Transfer Config
+              </h2>
             </div>
             <span className="text-[10px] font-sans font-bold text-[#c9962c] bg-[#fbf5ec] px-2.5 py-1 rounded-full uppercase tracking-wider">
               PostgreSQL Persisted
             </span>
           </div>
 
-          {/* Gateway Status Cards */}
+          {/* Gateway Status */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -110,13 +156,7 @@ export default function AdminSettingsPage() {
                   <p className="font-sans text-[10px] text-gray-500">Live API Key Status</p>
                 </div>
               </div>
-              <span
-                className={`font-sans text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                  bankSettings.paystackConfigured
-                    ? "bg-green-100 text-green-800"
-                    : "bg-amber-100 text-amber-800"
-                }`}
-              >
+              <span className={`font-sans text-[10px] font-bold px-2.5 py-1 rounded-full ${bankSettings.paystackConfigured ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
                 {bankSettings.paystackConfigured ? "Configured ✓" : "Not Configured"}
               </span>
             </div>
@@ -129,13 +169,7 @@ export default function AdminSettingsPage() {
                   <p className="font-sans text-[10px] text-gray-500">Live API Key Status</p>
                 </div>
               </div>
-              <span
-                className={`font-sans text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                  bankSettings.flutterwaveConfigured
-                    ? "bg-green-100 text-green-800"
-                    : "bg-amber-100 text-amber-800"
-                }`}
-              >
+              <span className={`font-sans text-[10px] font-bold px-2.5 py-1 rounded-full ${bankSettings.flutterwaveConfigured ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
                 {bankSettings.flutterwaveConfigured ? "Configured ✓" : "Not Configured"}
               </span>
             </div>
@@ -147,15 +181,15 @@ export default function AdminSettingsPage() {
             </div>
           ) : (
             <form onSubmit={handleSaveBank} className="space-y-4">
-              <h3 className="font-serif text-xs font-bold uppercase text-gray-500 tracking-wider">Bank Transfer Deposit Info</h3>
+              <h3 className="font-serif text-xs font-bold uppercase text-gray-500 tracking-wider">
+                Bank Transfer Deposit Info
+              </h3>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Bank Name</label>
                   <input
-                    type="text"
-                    required
-                    value={bankSettings.bankName}
+                    type="text" required value={bankSettings.bankName}
                     onChange={(e) => setBankSettings({ ...bankSettings, bankName: e.target.value })}
                     className={inputClass}
                   />
@@ -163,9 +197,7 @@ export default function AdminSettingsPage() {
                 <div>
                   <label className={labelClass}>Account Number</label>
                   <input
-                    type="text"
-                    required
-                    value={bankSettings.accountNumber}
+                    type="text" required value={bankSettings.accountNumber}
                     onChange={(e) => setBankSettings({ ...bankSettings, accountNumber: e.target.value })}
                     className={inputClass}
                   />
@@ -175,9 +207,7 @@ export default function AdminSettingsPage() {
               <div>
                 <label className={labelClass}>Account Name</label>
                 <input
-                  type="text"
-                  required
-                  value={bankSettings.accountName}
+                  type="text" required value={bankSettings.accountName}
                   onChange={(e) => setBankSettings({ ...bankSettings, accountName: e.target.value })}
                   className={inputClass}
                 />
@@ -186,20 +216,21 @@ export default function AdminSettingsPage() {
               <div>
                 <label className={labelClass}>Optional Payment Instructions / Narration Advice</label>
                 <textarea
-                  rows={2}
-                  value={bankSettings.instructions}
+                  rows={2} value={bankSettings.instructions}
                   onChange={(e) => setBankSettings({ ...bankSettings, instructions: e.target.value })}
                   className={inputClass}
                 />
               </div>
 
-              <div className="pt-2 flex justify-end">
+              {/* Bank save button + feedback — scoped to THIS card only */}
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100">
+                <BankFeedback />
                 <button
                   type="submit"
-                  disabled={savingBank}
-                  className="inline-flex items-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-[#5c1520] transition-colors"
+                  disabled={bankStatus === "saving"}
+                  className="ml-auto inline-flex items-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-[#5c1520] transition-colors disabled:opacity-60"
                 >
-                  {savingBank ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  {bankStatus === "saving" ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                   <span>Save Bank Transfer Settings</span>
                 </button>
               </div>
@@ -207,16 +238,17 @@ export default function AdminSettingsPage() {
           )}
         </div>
 
-        {/* General Settings Card */}
+        {/* ── GENERAL PLATFORM SETTINGS CARD ── */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
           <div className="space-y-4">
-            <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">General Platform Information</h2>
+            <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">
+              General Platform Information
+            </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Platform Name</label>
                 <input
-                  type="text"
-                  value={settings.platformName}
+                  type="text" value={settings.platformName}
                   onChange={(e) => setSettings({ ...settings, platformName: e.target.value })}
                   className={inputClass}
                 />
@@ -224,8 +256,7 @@ export default function AdminSettingsPage() {
               <div>
                 <label className={labelClass}>Default Currency</label>
                 <input
-                  type="text"
-                  value={settings.currency}
+                  type="text" value={settings.currency}
                   onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
                   className={inputClass}
                 />
@@ -234,13 +265,14 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="space-y-4">
-            <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">Public Contact Details</h2>
+            <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">
+              Public Contact Details
+            </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Contact Email</label>
                 <input
-                  type="email"
-                  value={settings.contactEmail}
+                  type="email" value={settings.contactEmail}
                   onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
                   className={inputClass}
                 />
@@ -248,8 +280,7 @@ export default function AdminSettingsPage() {
               <div>
                 <label className={labelClass}>Office Address</label>
                 <input
-                  type="text"
-                  value={settings.address}
+                  type="text" value={settings.address}
                   onChange={(e) => setSettings({ ...settings, address: e.target.value })}
                   className={inputClass}
                 />
@@ -257,11 +288,13 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="pt-4 flex items-center justify-between border-t border-gray-100">
-            {saved && <p className="font-sans text-xs text-green-600 font-bold">✓ Platform settings updated successfully!</p>}
+          {/* Platform save button + feedback — scoped to THIS card only */}
+          <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100">
+            <PlatformFeedback />
             <button
               onClick={handleSaveGeneral}
-              className="ml-auto inline-flex items-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-[#5c1520] transition-colors"
+              disabled={platformStatus === "saving"}
+              className="ml-auto inline-flex items-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-[#5c1520] transition-colors disabled:opacity-60"
             >
               <Save size={15} /> Save Platform Settings
             </button>

@@ -69,26 +69,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     loadNotifications();
   }, []);
 
-  // Close notification dropdown on outside click
+  // Close notification dropdown on outside pointer/click — use pointerdown
+  // so it works on both mouse and touch devices reliably
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    const handler = (e: PointerEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setNotifOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, []);
 
-  const markRead = async (id: string) => {
+  // Background markRead — never awaited before navigation
+  const markReadBackground = (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
-    await fetch("/api/notifications", {
+    fetch("/api/notifications", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ notificationId: id }),
-    });
+    }).catch(() => {});
   };
 
   const markAllRead = async () => {
@@ -100,23 +102,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     });
   };
 
-  const handleNotifClick = (e: React.MouseEvent, notif: DbNotification) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!notif.isRead) {
-      markRead(notif.id);
-    }
-    setNotifOpen(false);
-    const dest = notif.link || "/dashboard/notifications";
-    router.push(dest);
-  };
-
-  const handleViewAllNotifs = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setNotifOpen(false);
-    router.push("/dashboard/notifications");
-  };
+  // Notification dropdown shared across mobile + desktop
+  const NotificationDropdown = () => (
+    <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 z-[200] max-h-[70vh] overflow-y-auto">
+      <div className="px-4 pb-2 border-b border-gray-100 flex items-center justify-between">
+        <span className="font-serif font-bold text-sm text-[#1a1a1a]">Notifications</span>
+        {unreadCount > 0 && (
+          <button onClick={markAllRead} className="font-sans text-[11px] font-semibold text-[#7b1d2a] hover:underline">
+            Mark all read
+          </button>
+        )}
+      </div>
+      {notifications.length === 0 ? (
+        <p className="text-center text-xs font-sans text-gray-400 py-6">No notifications.</p>
+      ) : (
+        <div className="divide-y divide-gray-50">
+          {notifications.slice(0, 5).map((n) => (
+            // Use <Link> for reliable navigation on ALL devices including mobile
+            <Link
+              key={n.id}
+              href={n.link || "/dashboard/notifications"}
+              onClick={() => {
+                if (!n.isRead) markReadBackground(n.id);
+                setNotifOpen(false);
+              }}
+              className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
+            >
+              <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-sans text-xs font-semibold text-[#1a1a1a]">{n.title}</p>
+                <p className="font-sans text-[10px] text-gray-400 mt-0.5 line-clamp-1">{n.message}</p>
+              </div>
+              {!n.isRead && <span className="w-2 h-2 bg-[#7b1d2a] rounded-full flex-shrink-0 mt-1 ml-auto" />}
+            </Link>
+          ))}
+        </div>
+      )}
+      <div className="px-4 pt-2 border-t border-gray-100">
+        {/* <Link> for View All — reliable on all devices */}
+        <Link
+          href="/dashboard/notifications"
+          onClick={() => setNotifOpen(false)}
+          className="block w-full text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
+        >
+          View all notifications
+        </Link>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#fbf5ec] flex flex-col lg:flex-row">
@@ -137,7 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Mobile Notification Bell */}
           <div className="relative" ref={notifRef}>
             <button
-              onClick={() => setNotifOpen(!notifOpen)}
+              onClick={(e) => { e.stopPropagation(); setNotifOpen((prev) => !prev); }}
               className="relative p-2 text-gray-600 hover:text-[#7b1d2a]"
               aria-label="Notifications"
             >
@@ -150,53 +183,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
 
             {/* Mobile notification dropdown */}
-            {notifOpen && (
-              <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 z-50 max-h-[70vh] overflow-y-auto">
-                <div className="px-4 pb-2 border-b border-gray-100 flex items-center justify-between">
-                  <span className="font-serif font-bold text-sm text-[#1a1a1a]">Notifications</span>
-                  {unreadCount > 0 && (
-                    <button onClick={markAllRead} className="font-sans text-[11px] font-semibold text-[#7b1d2a] hover:underline">
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                {notifications.length === 0 ? (
-                  <p className="text-center text-xs font-sans text-gray-400 py-6">No notifications.</p>
-                ) : (
-                  <div className="divide-y divide-gray-50">
-                    {notifications.slice(0, 5).map((n) => (
-                      <button
-                        key={n.id}
-                        onClick={(e) => handleNotifClick(e, n)}
-                        className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
-                      >
-                        <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-sans text-xs font-semibold text-[#1a1a1a]">{n.title}</p>
-                          <p className="font-sans text-[10px] text-gray-400 mt-0.5 line-clamp-1">{n.message}</p>
-                        </div>
-                        {!n.isRead && <span className="w-2 h-2 bg-[#7b1d2a] rounded-full flex-shrink-0 mt-1 ml-auto" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <div className="px-4 pt-2 border-t border-gray-100">
-                  <button
-                    onClick={handleViewAllNotifs}
-                    className="w-full text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
-                  >
-                    View all notifications
-                  </button>
-                </div>
-              </div>
-            )}
+            {notifOpen && <NotificationDropdown />}
           </div>
 
           <button
-            onClick={() => setMobileOpen((prev) => {
-              if (prev) { /* closing */ }
-              return !prev;
-            })}
+            onClick={() => setMobileOpen((prev) => !prev)}
             className="p-2 text-gray-700"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
@@ -310,7 +301,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Desktop Notification Bell */}
             <div className="relative" ref={notifRef}>
               <button
-                onClick={() => setNotifOpen(!notifOpen)}
+                onClick={(e) => { e.stopPropagation(); setNotifOpen((prev) => !prev); }}
                 className="p-2 rounded-full text-gray-600 hover:bg-gray-100 relative"
                 aria-label="Notifications"
               >
@@ -323,46 +314,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
 
               {/* Desktop Notification Dropdown */}
-              {notifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 z-50">
-                  <div className="px-4 pb-2 border-b border-gray-100 flex items-center justify-between">
-                    <span className="font-serif font-bold text-sm text-[#1a1a1a]">Notifications</span>
-                    {unreadCount > 0 && (
-                      <button onClick={markAllRead} className="font-sans text-[11px] font-semibold text-[#7b1d2a] hover:underline">
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
-                  {notifications.length === 0 ? (
-                    <p className="text-center text-xs font-sans text-gray-400 py-6">No notifications.</p>
-                  ) : (
-                    <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
-                      {notifications.slice(0, 5).map((n) => (
-                        <button
-                          key={n.id}
-                          onClick={(e) => handleNotifClick(e, n)}
-                          className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 ${!n.isRead ? "bg-[#fbf5ec]/60" : ""}`}
-                        >
-                          <Info size={14} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <p className="font-sans text-xs font-semibold text-[#1a1a1a]">{n.title}</p>
-                            <p className="font-sans text-[10px] text-gray-400 mt-0.5 line-clamp-1">{n.message}</p>
-                          </div>
-                          {!n.isRead && <span className="w-2 h-2 bg-[#7b1d2a] rounded-full flex-shrink-0 mt-1" />}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <div className="px-4 pt-2 border-t border-gray-100">
-                    <button
-                      onClick={handleViewAllNotifs}
-                      className="w-full text-center font-sans text-xs font-semibold text-[#7b1d2a] hover:underline py-1"
-                    >
-                      View all notifications
-                    </button>
-                  </div>
-                </div>
-              )}
+              {notifOpen && <NotificationDropdown />}
             </div>
 
             <div className="flex items-center gap-2 bg-[#fbf5ec] px-3 py-1.5 rounded-full border border-[#e8e0d4]">
