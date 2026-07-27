@@ -6,6 +6,8 @@ import Button from "@/components/ui/Button";
 import { getActivePackages } from "@/lib/repositories/packages.repository";
 import { CheckCircle2, Crown, Star, ArrowRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Matchmaking Packages & Pricing | Relationship Wahala",
   description:

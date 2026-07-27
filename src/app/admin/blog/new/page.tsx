@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
+import MediaUploader from "@/components/ui/MediaUploader";
 
 export default function AdminNewBlogPostPage() {
   const router = useRouter();
@@ -70,12 +71,11 @@ export default function AdminNewBlogPostPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-gray-700 uppercase tracking-wider mb-2">Featured Image URL</label>
-              <input
-                type="text"
+              <MediaUploader
                 value={featuredImage}
-                onChange={(e) => setFeaturedImage(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"
+                onChange={setFeaturedImage}
+                bucket="cms-media"
+                label="Featured Article Image"
               />
             </div>
           </div>

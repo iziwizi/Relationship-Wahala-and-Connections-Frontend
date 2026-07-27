@@ -11,6 +11,9 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  // Separate state for mobile submenus — NOT shared with desktop openDropdown
+  // This prevents the desktop handleClickOutside handler from resetting mobile accordion state
+  const [mobileOpenItem, setMobileOpenItem] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,6 +22,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Only close DESKTOP dropdown on outside click — does NOT affect mobileOpenItem
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -29,14 +33,21 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close mobile menu on resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) setMobileOpen(false);
+      if (window.innerWidth >= 1024) {
+        setMobileOpen(false);
+        setMobileOpenItem(null);
+      }
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
+    setMobileOpenItem(null);
+  };
 
   return (
     <header
@@ -133,7 +144,7 @@ export default function Header() {
           <button
             onClick={() => {
               setMobileOpen((prev) => {
-                if (prev) setOpenDropdown(null);
+                if (prev) setMobileOpenItem(null);
                 return !prev;
               });
             }}
@@ -152,7 +163,8 @@ export default function Header() {
           <nav className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {navItems.map((item) => {
               const hasChildren = Boolean(item.children?.length);
-              const isExpanded = openDropdown === `mobile-${item.label}`;
+              // Uses mobileOpenItem — completely independent from desktop openDropdown
+              const isExpanded = mobileOpenItem === item.label;
 
               return (
                 <div key={item.label}>
@@ -160,7 +172,7 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() =>
-                        setOpenDropdown((prev) => (prev === `mobile-${item.label}` ? null : `mobile-${item.label}`))
+                        setMobileOpenItem((prev) => (prev === item.label ? null : item.label))
                       }
                       className="w-full flex items-center justify-between py-3 px-3 font-sans text-sm font-medium text-gray-800 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded-md transition-colors text-left"
                       aria-expanded={isExpanded}
@@ -176,7 +188,7 @@ export default function Header() {
                   ) : (
                     <Link
                       href={item.href}
-                      onClick={() => setMobileOpen(false)}
+                      onClick={closeMobileMenu}
                       className="flex items-center justify-between py-3 px-3 font-sans text-sm font-medium text-gray-800 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded-md transition-colors"
                     >
                       {item.label}
@@ -189,10 +201,7 @@ export default function Header() {
                         <Link
                           key={child.label}
                           href={child.href}
-                          onClick={() => {
-                            setOpenDropdown(null);
-                            setMobileOpen(false);
-                          }}
+                          onClick={closeMobileMenu}
                           className="block py-2 px-3 font-sans text-sm text-gray-600 hover:text-[#7b1d2a] hover:bg-[#fbf5ec] rounded transition-colors"
                         >
                           {child.label}

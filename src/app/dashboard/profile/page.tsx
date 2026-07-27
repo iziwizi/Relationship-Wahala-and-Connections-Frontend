@@ -85,11 +85,12 @@ export default function ProfilePage() {
         {/* Profile Hero Card */}
         <div className="bg-white rounded-2xl border border-[#e8e0d4] shadow-sm overflow-hidden">
           {/* Cover Banner */}
-          <div className="h-32 bg-gradient-to-r from-[#7b1d2a] via-[#9b2535] to-[#5c1520]" />
-          <div className="px-6 pb-6 -mt-12">
-            <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-              {/* Avatar */}
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md flex-shrink-0 bg-gray-100">
+          <div className="h-28 sm:h-32 bg-gradient-to-r from-[#7b1d2a] via-[#9b2535] to-[#5c1520]" />
+          
+          <div className="px-6 pt-0 pb-6 relative">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 sm:-mt-14 mb-2">
+              {/* Avatar overlapping cover */}
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-md flex-shrink-0 bg-gray-100">
                 <Image
                   src={formData.avatar || demoUser.avatar}
                   alt="Profile photo"
@@ -102,22 +103,22 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-              <div className="pb-1 flex-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">
-                    {user?.firstName || formData.firstName} {user?.lastName || formData.lastName}
-                  </h2>
-                  <CheckCircle2 size={18} className="text-green-500" />
-                </div>
-                <p className="font-sans text-sm text-gray-500">
-                  {formData.profession || demoUser.educationCareer.occupation} · {formData.currentCityState || demoUser.location.city}
-                </p>
-                <div className="mt-2">
-                  <div className="inline-flex items-center gap-1.5 bg-[#7b1d2a]/10 text-[#7b1d2a] font-sans text-xs font-semibold px-3 py-1 rounded-full">
-                    <span>Profile {user?.profileCompletion || 75}% Complete</span>
-                  </div>
-                </div>
+            </div>
+
+            {/* Identity Info — cleanly inside white content section */}
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1a1a1a]">
+                  {user?.firstName || formData.firstName} {user?.lastName || formData.lastName}
+                </h2>
+                <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
+                <span className="bg-[#7b1d2a]/10 text-[#7b1d2a] font-sans text-xs font-semibold px-3 py-0.5 rounded-full ml-auto">
+                  Profile {user?.profileCompletion || 75}% Complete
+                </span>
               </div>
+              <p className="font-sans text-sm text-gray-500">
+                {formData.profession || demoUser.educationCareer.occupation} · {formData.currentCityState || demoUser.location.city}
+              </p>
             </div>
           </div>
         </div>

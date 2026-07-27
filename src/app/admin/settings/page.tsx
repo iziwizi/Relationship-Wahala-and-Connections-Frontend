@@ -1,11 +1,14 @@
 "use client";
 
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useState } from "react";
-import { Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, Building2, CreditCard, ShieldCheck, Loader2 } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
+  const [loadingBank, setLoadingBank] = useState(true);
+  const [savingBank, setSavingBank] = useState(false);
+
   const [settings, setSettings] = useState({
     platformName: "Relationship Wahala & Connections",
     contactEmail: "hello@relationshipwahala.com",
@@ -14,14 +17,62 @@ export default function AdminSettingsPage() {
     address: "Lagos, Nigeria",
     requireVerificationBeforeMatching: true,
     currency: "NGN",
-    facebookUrl: "https://facebook.com",
-    instagramUrl: "https://instagram.com",
-    youtubeUrl: "https://youtube.com",
   });
 
-  const handleSave = () => {
+  const [bankSettings, setBankSettings] = useState({
+    bankName: "First Bank of Nigeria",
+    accountName: "Relationship Wahala & Connections Ltd",
+    accountNumber: "3012345678",
+    instructions: "Please include your full name in transfer narration.",
+    paystackConfigured: false,
+    flutterwaveConfigured: false,
+  });
+
+  useEffect(() => {
+    async function loadBankSettings() {
+      try {
+        const res = await fetch("/api/admin/settings/bank");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            setBankSettings(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load bank settings:", err);
+      } finally {
+        setLoadingBank(false);
+      }
+    }
+    loadBankSettings();
+  }, []);
+
+  const handleSaveGeneral = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handleSaveBank = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingBank(true);
+    try {
+      const res = await fetch("/api/admin/settings/bank", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bankSettings),
+      });
+
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        alert("Failed to save bank settings.");
+      }
+    } catch (err) {
+      console.error("Failed to save bank settings:", err);
+    } finally {
+      setSavingBank(false);
+    }
   };
 
   const inputClass = "w-full border border-gray-200 rounded-lg px-3.5 py-2 font-sans text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#7b1d2a] bg-white";
@@ -31,14 +82,133 @@ export default function AdminSettingsPage() {
     <AdminLayout>
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-[#1a1a1a]">Platform Settings</h1>
+          <h1 className="font-serif text-2xl font-bold text-[#1a1a1a]">Platform &amp; Payment Settings</h1>
           <p className="font-sans text-xs text-gray-500 mt-1">
-            Global system configuration, contact info, social links, and verification policies.
+            Global system configuration, bank transfer details, payment gateways, and policies.
           </p>
         </div>
 
+        {/* Bank & Payment Gateways Settings Section */}
+        <div className="bg-white rounded-2xl border border border-[#c9962c]/30 shadow-sm p-6 space-y-6">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex items-center gap-2 text-[#7b1d2a]">
+              <Building2 size={20} />
+              <h2 className="font-serif font-bold text-base text-[#1a1a1a]">Payment Settings &amp; Bank Transfer Config</h2>
+            </div>
+            <span className="text-[10px] font-sans font-bold text-[#c9962c] bg-[#fbf5ec] px-2.5 py-1 rounded-full uppercase tracking-wider">
+              PostgreSQL Persisted
+            </span>
+          </div>
+
+          {/* Gateway Status Cards */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CreditCard size={18} className="text-[#7b1d2a]" />
+                <div>
+                  <p className="font-sans text-xs font-bold text-[#1a1a1a]">Paystack Gateway</p>
+                  <p className="font-sans text-[10px] text-gray-500">Live API Key Status</p>
+                </div>
+              </div>
+              <span
+                className={`font-sans text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                  bankSettings.paystackConfigured
+                    ? "bg-green-100 text-green-800"
+                    : "bg-amber-100 text-amber-800"
+                }`}
+              >
+                {bankSettings.paystackConfigured ? "Configured ✓" : "Not Configured"}
+              </span>
+            </div>
+
+            <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CreditCard size={18} className="text-[#7b1d2a]" />
+                <div>
+                  <p className="font-sans text-xs font-bold text-[#1a1a1a]">Flutterwave Gateway</p>
+                  <p className="font-sans text-[10px] text-gray-500">Live API Key Status</p>
+                </div>
+              </div>
+              <span
+                className={`font-sans text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                  bankSettings.flutterwaveConfigured
+                    ? "bg-green-100 text-green-800"
+                    : "bg-amber-100 text-amber-800"
+                }`}
+              >
+                {bankSettings.flutterwaveConfigured ? "Configured ✓" : "Not Configured"}
+              </span>
+            </div>
+          </div>
+
+          {loadingBank ? (
+            <div className="py-6 text-center text-xs font-sans text-gray-400 flex items-center justify-center gap-2">
+              <Loader2 size={16} className="animate-spin text-[#7b1d2a]" /> Loading bank settings...
+            </div>
+          ) : (
+            <form onSubmit={handleSaveBank} className="space-y-4">
+              <h3 className="font-serif text-xs font-bold uppercase text-gray-500 tracking-wider">Bank Transfer Deposit Info</h3>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Bank Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={bankSettings.bankName}
+                    onChange={(e) => setBankSettings({ ...bankSettings, bankName: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Account Number</label>
+                  <input
+                    type="text"
+                    required
+                    value={bankSettings.accountNumber}
+                    onChange={(e) => setBankSettings({ ...bankSettings, accountNumber: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Account Name</label>
+                <input
+                  type="text"
+                  required
+                  value={bankSettings.accountName}
+                  onChange={(e) => setBankSettings({ ...bankSettings, accountName: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>Optional Payment Instructions / Narration Advice</label>
+                <textarea
+                  rows={2}
+                  value={bankSettings.instructions}
+                  onChange={(e) => setBankSettings({ ...bankSettings, instructions: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={savingBank}
+                  className="inline-flex items-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-[#5c1520] transition-colors"
+                >
+                  {savingBank ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  <span>Save Bank Transfer Settings</span>
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* General Settings Card */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
-          {/* General Platform Info */}
           <div className="space-y-4">
             <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">General Platform Information</h2>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -63,7 +233,6 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          {/* Contact Details */}
           <div className="space-y-4">
             <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">Public Contact Details</h2>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -86,50 +255,12 @@ export default function AdminSettingsPage() {
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Phone Line 1</label>
-                <input
-                  type="text"
-                  value={settings.contactPhone1}
-                  onChange={(e) => setSettings({ ...settings, contactPhone1: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Phone Line 2</label>
-                <input
-                  type="text"
-                  value={settings.contactPhone2}
-                  onChange={(e) => setSettings({ ...settings, contactPhone2: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-            </div>
           </div>
 
-          {/* Verification Policies */}
-          <div className="space-y-3">
-            <h2 className="font-serif font-bold text-base text-[#1a1a1a] border-b pb-2">Matchmaking Policies</h2>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-              <div>
-                <p className="font-sans text-xs font-bold text-[#1a1a1a]">Require Verification Before Matching</p>
-                <p className="font-sans text-[11px] text-gray-500">Require Super Admin approval before member profile appears in candidate matches.</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.requireVerificationBeforeMatching}
-                onChange={(e) => setSettings({ ...settings, requireVerificationBeforeMatching: e.target.checked })}
-                className="h-4 w-4 text-[#7b1d2a]"
-              />
-            </div>
-          </div>
-
-          {/* Save Button */}
           <div className="pt-4 flex items-center justify-between border-t border-gray-100">
             {saved && <p className="font-sans text-xs text-green-600 font-bold">✓ Platform settings updated successfully!</p>}
             <button
-              onClick={handleSave}
+              onClick={handleSaveGeneral}
               className="ml-auto inline-flex items-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-[#5c1520] transition-colors"
             >
               <Save size={15} /> Save Platform Settings
