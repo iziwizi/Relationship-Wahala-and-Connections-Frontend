@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
@@ -20,7 +20,6 @@ import {
   Building2,
   Loader2,
   Lock,
-  FileText,
 } from "lucide-react";
 import { MatchmakingPackage } from "@/data/demo/packages";
 
@@ -42,7 +41,7 @@ const DAYTIME_TIME_SLOTS = [
   "4:00 PM",
 ];
 
-export default function BookPhysicalAppointmentPage() {
+function BookPhysicalAppointmentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const packageId = searchParams.get("packageId");
@@ -569,5 +568,19 @@ export default function BookPhysicalAppointmentPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function BookPhysicalAppointmentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#fbf5ec] flex items-center justify-center">
+          <Loader2 className="animate-spin text-[#7b1d2a]" size={32} />
+        </div>
+      }
+    >
+      <BookPhysicalAppointmentContent />
+    </Suspense>
   );
 }

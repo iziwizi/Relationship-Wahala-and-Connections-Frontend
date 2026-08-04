@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
@@ -8,8 +8,6 @@ import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import {
   CheckCircle2,
-  Calendar,
-  Clock,
   Mail,
   Phone,
   MessageCircle,
@@ -17,7 +15,6 @@ import {
   MapPin,
   Home,
   Loader2,
-  FileText,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -44,7 +41,7 @@ function formatNGN(amount: number) {
   }).format(amount);
 }
 
-export default function BookingConfirmationPage() {
+function BookingConfirmationContent() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
 
@@ -222,5 +219,19 @@ export default function BookingConfirmationPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function BookingConfirmationPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#fbf5ec] flex items-center justify-center">
+          <Loader2 className="animate-spin text-[#7b1d2a]" size={32} />
+        </div>
+      }
+    >
+      <BookingConfirmationContent />
+    </Suspense>
   );
 }
