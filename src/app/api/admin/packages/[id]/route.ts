@@ -1,5 +1,6 @@
 // src/app/api/admin/packages/[id]/route.ts
-// GET, PUT & DELETE package editing endpoint (SUPER_ADMIN authorized)
+// GET, PUT & DELETE package endpoint (SUPER_ADMIN authorized)
+// DELETE: attempts hard delete; if FK constraint exists, soft-deletes (isActive=false) instead.
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth/session";
@@ -90,14 +91,54 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await deletePackage(id);
 
-    revalidatePath("/pricing");
-    revalidatePath("/admin/packages");
+    // Verify the package exists first
+    const existing = await getPackageById(id);
+    if (!existing) {
+      return NextResponse.json({ error: "Package not found." }, { status: 404 });
+    }
 
-    return NextResponse.json({ success: true });
+    try {
+      // Attempt hard delete from PostgreSQL
+      await deletePackage(id);
+
+      revalidatePath("/pricing");
+      revalidatePath("/admin/packages");
+
+      return NextResponse.json({ success: true, deleted: true, message: "Package permanently deleted." });
+    } catch (deleteError: unknown) {
+      // FK constraint: package has linked subscriptions, payments, or bookings
+      // Fall back to soft delete — deactivate the package instead
+      const isConstraintError =
+        deleteError instanceof Error &&
+        (deleteError.message.includes("Foreign key constraint") ||
+          deleteError.message.includes("foreign key") ||
+          deleteError.message.includes("violates") ||
+          // Prisma error code for FK constraint violation
+          (deleteError as { code?: string }).code === "P2003" ||
+          (deleteError as { code?: string }).code === "P2014");
+
+      if (isConstraintError) {
+        // Soft-delete: deactivate the package so it no longer appears publicly
+        await updatePackage(id, { isActive: false });
+
+        revalidatePath("/pricing");
+        revalidatePath("/admin/packages");
+
+        return NextResponse.json({
+          success: true,
+          deleted: false,
+          softDeleted: true,
+          message:
+            "This package has linked subscriptions or payment records and cannot be permanently deleted. It has been deactivated and hidden from the public instead.",
+        });
+      }
+
+      // Unknown error — rethrow
+      throw deleteError;
+    }
   } catch (error) {
     console.error("[Admin Package DELETE ID API] Error:", error);
-    return NextResponse.json({ error: "Failed to delete package." }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete package. Please try again." }, { status: 500 });
   }
 }
