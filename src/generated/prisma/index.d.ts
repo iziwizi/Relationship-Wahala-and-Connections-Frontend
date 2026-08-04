@@ -39,6 +39,11 @@ export type Photo = $Result.DefaultSelection<Prisma.$PhotoPayload>
  */
 export type Package = $Result.DefaultSelection<Prisma.$PackagePayload>
 /**
+ * Model PhysicalBooking
+ * 
+ */
+export type PhysicalBooking = $Result.DefaultSelection<Prisma.$PhysicalBookingPayload>
+/**
  * Model Subscription
  * 
  */
@@ -207,6 +212,24 @@ export const ContentStatus: {
 
 export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus]
 
+
+export const PackageType: {
+  ONLINE: 'ONLINE',
+  PHYSICAL: 'PHYSICAL'
+};
+
+export type PackageType = (typeof PackageType)[keyof typeof PackageType]
+
+
+export const BookingStatus: {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -240,6 +263,14 @@ export const SubscriptionStatus: typeof $Enums.SubscriptionStatus
 export type ContentStatus = $Enums.ContentStatus
 
 export const ContentStatus: typeof $Enums.ContentStatus
+
+export type PackageType = $Enums.PackageType
+
+export const PackageType: typeof $Enums.PackageType
+
+export type BookingStatus = $Enums.BookingStatus
+
+export const BookingStatus: typeof $Enums.BookingStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -411,6 +442,16 @@ export class PrismaClient<
     * ```
     */
   get package(): Prisma.PackageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.physicalBooking`: Exposes CRUD operations for the **PhysicalBooking** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PhysicalBookings
+    * const physicalBookings = await prisma.physicalBooking.findMany()
+    * ```
+    */
+  get physicalBooking(): Prisma.PhysicalBookingDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.subscription`: Exposes CRUD operations for the **Subscription** model.
@@ -1033,6 +1074,7 @@ export namespace Prisma {
     MatchPreference: 'MatchPreference',
     Photo: 'Photo',
     Package: 'Package',
+    PhysicalBooking: 'PhysicalBooking',
     Subscription: 'Subscription',
     Payment: 'Payment',
     PaymentEvent: 'PaymentEvent',
@@ -1065,7 +1107,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "profile" | "matchPreference" | "photo" | "package" | "subscription" | "payment" | "paymentEvent" | "matchInteraction" | "contactEnquiry" | "notification" | "passwordResetToken" | "verificationToken" | "adminAuditLog" | "platformSetting" | "blogCategory" | "blogPost" | "podcastEpisode" | "guide" | "successStory" | "event" | "fAQ"
+      modelProps: "user" | "profile" | "matchPreference" | "photo" | "package" | "physicalBooking" | "subscription" | "payment" | "paymentEvent" | "matchInteraction" | "contactEnquiry" | "notification" | "passwordResetToken" | "verificationToken" | "adminAuditLog" | "platformSetting" | "blogCategory" | "blogPost" | "podcastEpisode" | "guide" | "successStory" | "event" | "fAQ"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1436,6 +1478,80 @@ export namespace Prisma {
           count: {
             args: Prisma.PackageCountArgs<ExtArgs>
             result: $Utils.Optional<PackageCountAggregateOutputType> | number
+          }
+        }
+      }
+      PhysicalBooking: {
+        payload: Prisma.$PhysicalBookingPayload<ExtArgs>
+        fields: Prisma.PhysicalBookingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PhysicalBookingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PhysicalBookingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>
+          }
+          findFirst: {
+            args: Prisma.PhysicalBookingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PhysicalBookingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>
+          }
+          findMany: {
+            args: Prisma.PhysicalBookingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>[]
+          }
+          create: {
+            args: Prisma.PhysicalBookingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>
+          }
+          createMany: {
+            args: Prisma.PhysicalBookingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PhysicalBookingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>[]
+          }
+          delete: {
+            args: Prisma.PhysicalBookingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>
+          }
+          update: {
+            args: Prisma.PhysicalBookingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>
+          }
+          deleteMany: {
+            args: Prisma.PhysicalBookingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PhysicalBookingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PhysicalBookingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>[]
+          }
+          upsert: {
+            args: Prisma.PhysicalBookingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PhysicalBookingPayload>
+          }
+          aggregate: {
+            args: Prisma.PhysicalBookingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePhysicalBooking>
+          }
+          groupBy: {
+            args: Prisma.PhysicalBookingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PhysicalBookingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PhysicalBookingCountArgs<ExtArgs>
+            result: $Utils.Optional<PhysicalBookingCountAggregateOutputType> | number
           }
         }
       }
@@ -2825,6 +2941,7 @@ export namespace Prisma {
     matchPreference?: MatchPreferenceOmit
     photo?: PhotoOmit
     package?: PackageOmit
+    physicalBooking?: PhysicalBookingOmit
     subscription?: SubscriptionOmit
     payment?: PaymentOmit
     paymentEvent?: PaymentEventOmit
@@ -2927,6 +3044,7 @@ export namespace Prisma {
     notifications: number
     passwordResetTokens: number
     verificationTokens: number
+    physicalBookings: number
     requestedInteractions: number
     targetInteractions: number
   }
@@ -2937,6 +3055,7 @@ export namespace Prisma {
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
     passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
     verificationTokens?: boolean | UserCountOutputTypeCountVerificationTokensArgs
+    physicalBookings?: boolean | UserCountOutputTypeCountPhysicalBookingsArgs
     requestedInteractions?: boolean | UserCountOutputTypeCountRequestedInteractionsArgs
     targetInteractions?: boolean | UserCountOutputTypeCountTargetInteractionsArgs
   }
@@ -2985,6 +3104,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountVerificationTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: VerificationTokenWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPhysicalBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhysicalBookingWhereInput
   }
 
   /**
@@ -3040,11 +3166,13 @@ export namespace Prisma {
   export type PackageCountOutputType = {
     subscriptions: number
     payments: number
+    physicalBookings: number
   }
 
   export type PackageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     subscriptions?: boolean | PackageCountOutputTypeCountSubscriptionsArgs
     payments?: boolean | PackageCountOutputTypeCountPaymentsArgs
+    physicalBookings?: boolean | PackageCountOutputTypeCountPhysicalBookingsArgs
   }
 
   // Custom InputTypes
@@ -3070,6 +3198,13 @@ export namespace Prisma {
    */
   export type PackageCountOutputTypeCountPaymentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PaymentWhereInput
+  }
+
+  /**
+   * PackageCountOutputType without action
+   */
+  export type PackageCountOutputTypeCountPhysicalBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhysicalBookingWhereInput
   }
 
 
@@ -3333,6 +3468,7 @@ export namespace Prisma {
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
     verificationTokens?: boolean | User$verificationTokensArgs<ExtArgs>
+    physicalBookings?: boolean | User$physicalBookingsArgs<ExtArgs>
     requestedInteractions?: boolean | User$requestedInteractionsArgs<ExtArgs>
     targetInteractions?: boolean | User$targetInteractionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -3379,6 +3515,7 @@ export namespace Prisma {
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
     verificationTokens?: boolean | User$verificationTokensArgs<ExtArgs>
+    physicalBookings?: boolean | User$physicalBookingsArgs<ExtArgs>
     requestedInteractions?: boolean | User$requestedInteractionsArgs<ExtArgs>
     targetInteractions?: boolean | User$targetInteractionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -3395,6 +3532,7 @@ export namespace Prisma {
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
       verificationTokens: Prisma.$VerificationTokenPayload<ExtArgs>[]
+      physicalBookings: Prisma.$PhysicalBookingPayload<ExtArgs>[]
       requestedInteractions: Prisma.$MatchInteractionPayload<ExtArgs>[]
       targetInteractions: Prisma.$MatchInteractionPayload<ExtArgs>[]
     }
@@ -3807,6 +3945,7 @@ export namespace Prisma {
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     passwordResetTokens<T extends User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     verificationTokens<T extends User$verificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$verificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    physicalBookings<T extends User$physicalBookingsArgs<ExtArgs> = {}>(args?: Subset<T, User$physicalBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     requestedInteractions<T extends User$requestedInteractionsArgs<ExtArgs> = {}>(args?: Subset<T, User$requestedInteractionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MatchInteractionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     targetInteractions<T extends User$targetInteractionsArgs<ExtArgs> = {}>(args?: Subset<T, User$targetInteractionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MatchInteractionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -4375,6 +4514,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: VerificationTokenScalarFieldEnum | VerificationTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.physicalBookings
+   */
+  export type User$physicalBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    where?: PhysicalBookingWhereInput
+    orderBy?: PhysicalBookingOrderByWithRelationInput | PhysicalBookingOrderByWithRelationInput[]
+    cursor?: PhysicalBookingWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PhysicalBookingScalarFieldEnum | PhysicalBookingScalarFieldEnum[]
   }
 
   /**
@@ -8203,6 +8366,7 @@ export namespace Prisma {
     matchAllowance: number | null
     isPopular: boolean | null
     isActive: boolean | null
+    type: $Enums.PackageType | null
     sortOrder: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -8219,6 +8383,7 @@ export namespace Prisma {
     matchAllowance: number | null
     isPopular: boolean | null
     isActive: boolean | null
+    type: $Enums.PackageType | null
     sortOrder: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -8236,6 +8401,7 @@ export namespace Prisma {
     features: number
     isPopular: number
     isActive: number
+    type: number
     sortOrder: number
     createdAt: number
     updatedAt: number
@@ -8268,6 +8434,7 @@ export namespace Prisma {
     matchAllowance?: true
     isPopular?: true
     isActive?: true
+    type?: true
     sortOrder?: true
     createdAt?: true
     updatedAt?: true
@@ -8284,6 +8451,7 @@ export namespace Prisma {
     matchAllowance?: true
     isPopular?: true
     isActive?: true
+    type?: true
     sortOrder?: true
     createdAt?: true
     updatedAt?: true
@@ -8301,6 +8469,7 @@ export namespace Prisma {
     features?: true
     isPopular?: true
     isActive?: true
+    type?: true
     sortOrder?: true
     createdAt?: true
     updatedAt?: true
@@ -8405,6 +8574,7 @@ export namespace Prisma {
     features: string[]
     isPopular: boolean
     isActive: boolean
+    type: $Enums.PackageType
     sortOrder: number
     createdAt: Date
     updatedAt: Date
@@ -8441,11 +8611,13 @@ export namespace Prisma {
     features?: boolean
     isPopular?: boolean
     isActive?: boolean
+    type?: boolean
     sortOrder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     subscriptions?: boolean | Package$subscriptionsArgs<ExtArgs>
     payments?: boolean | Package$paymentsArgs<ExtArgs>
+    physicalBookings?: boolean | Package$physicalBookingsArgs<ExtArgs>
     _count?: boolean | PackageCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["package"]>
 
@@ -8461,6 +8633,7 @@ export namespace Prisma {
     features?: boolean
     isPopular?: boolean
     isActive?: boolean
+    type?: boolean
     sortOrder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8478,6 +8651,7 @@ export namespace Prisma {
     features?: boolean
     isPopular?: boolean
     isActive?: boolean
+    type?: boolean
     sortOrder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8495,15 +8669,17 @@ export namespace Prisma {
     features?: boolean
     isPopular?: boolean
     isActive?: boolean
+    type?: boolean
     sortOrder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PackageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "description" | "price" | "currency" | "durationDays" | "matchAllowance" | "features" | "isPopular" | "isActive" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["package"]>
+  export type PackageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "description" | "price" | "currency" | "durationDays" | "matchAllowance" | "features" | "isPopular" | "isActive" | "type" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["package"]>
   export type PackageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     subscriptions?: boolean | Package$subscriptionsArgs<ExtArgs>
     payments?: boolean | Package$paymentsArgs<ExtArgs>
+    physicalBookings?: boolean | Package$physicalBookingsArgs<ExtArgs>
     _count?: boolean | PackageCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PackageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -8514,6 +8690,7 @@ export namespace Prisma {
     objects: {
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
       payments: Prisma.$PaymentPayload<ExtArgs>[]
+      physicalBookings: Prisma.$PhysicalBookingPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8527,6 +8704,7 @@ export namespace Prisma {
       features: string[]
       isPopular: boolean
       isActive: boolean
+      type: $Enums.PackageType
       sortOrder: number
       createdAt: Date
       updatedAt: Date
@@ -8926,6 +9104,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     subscriptions<T extends Package$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, Package$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payments<T extends Package$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Package$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    physicalBookings<T extends Package$physicalBookingsArgs<ExtArgs> = {}>(args?: Subset<T, Package$physicalBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8966,6 +9145,7 @@ export namespace Prisma {
     readonly features: FieldRef<"Package", 'String[]'>
     readonly isPopular: FieldRef<"Package", 'Boolean'>
     readonly isActive: FieldRef<"Package", 'Boolean'>
+    readonly type: FieldRef<"Package", 'PackageType'>
     readonly sortOrder: FieldRef<"Package", 'Int'>
     readonly createdAt: FieldRef<"Package", 'DateTime'>
     readonly updatedAt: FieldRef<"Package", 'DateTime'>
@@ -9410,6 +9590,30 @@ export namespace Prisma {
   }
 
   /**
+   * Package.physicalBookings
+   */
+  export type Package$physicalBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    where?: PhysicalBookingWhereInput
+    orderBy?: PhysicalBookingOrderByWithRelationInput | PhysicalBookingOrderByWithRelationInput[]
+    cursor?: PhysicalBookingWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PhysicalBookingScalarFieldEnum | PhysicalBookingScalarFieldEnum[]
+  }
+
+  /**
    * Package without action
    */
   export type PackageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9425,6 +9629,1299 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PackageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PhysicalBooking
+   */
+
+  export type AggregatePhysicalBooking = {
+    _count: PhysicalBookingCountAggregateOutputType | null
+    _avg: PhysicalBookingAvgAggregateOutputType | null
+    _sum: PhysicalBookingSumAggregateOutputType | null
+    _min: PhysicalBookingMinAggregateOutputType | null
+    _max: PhysicalBookingMaxAggregateOutputType | null
+  }
+
+  export type PhysicalBookingAvgAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type PhysicalBookingSumAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type PhysicalBookingMinAggregateOutputType = {
+    id: string | null
+    bookingReference: string | null
+    userId: string | null
+    packageId: string | null
+    customerName: string | null
+    customerEmail: string | null
+    customerPhone: string | null
+    bookingDate: Date | null
+    bookingTime: string | null
+    amount: Decimal | null
+    currency: string | null
+    paymentStatus: $Enums.PaymentStatus | null
+    paymentReference: string | null
+    paymentMethod: string | null
+    status: $Enums.BookingStatus | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PhysicalBookingMaxAggregateOutputType = {
+    id: string | null
+    bookingReference: string | null
+    userId: string | null
+    packageId: string | null
+    customerName: string | null
+    customerEmail: string | null
+    customerPhone: string | null
+    bookingDate: Date | null
+    bookingTime: string | null
+    amount: Decimal | null
+    currency: string | null
+    paymentStatus: $Enums.PaymentStatus | null
+    paymentReference: string | null
+    paymentMethod: string | null
+    status: $Enums.BookingStatus | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PhysicalBookingCountAggregateOutputType = {
+    id: number
+    bookingReference: number
+    userId: number
+    packageId: number
+    customerName: number
+    customerEmail: number
+    customerPhone: number
+    bookingDate: number
+    bookingTime: number
+    amount: number
+    currency: number
+    paymentStatus: number
+    paymentReference: number
+    paymentMethod: number
+    status: number
+    notes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PhysicalBookingAvgAggregateInputType = {
+    amount?: true
+  }
+
+  export type PhysicalBookingSumAggregateInputType = {
+    amount?: true
+  }
+
+  export type PhysicalBookingMinAggregateInputType = {
+    id?: true
+    bookingReference?: true
+    userId?: true
+    packageId?: true
+    customerName?: true
+    customerEmail?: true
+    customerPhone?: true
+    bookingDate?: true
+    bookingTime?: true
+    amount?: true
+    currency?: true
+    paymentStatus?: true
+    paymentReference?: true
+    paymentMethod?: true
+    status?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PhysicalBookingMaxAggregateInputType = {
+    id?: true
+    bookingReference?: true
+    userId?: true
+    packageId?: true
+    customerName?: true
+    customerEmail?: true
+    customerPhone?: true
+    bookingDate?: true
+    bookingTime?: true
+    amount?: true
+    currency?: true
+    paymentStatus?: true
+    paymentReference?: true
+    paymentMethod?: true
+    status?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PhysicalBookingCountAggregateInputType = {
+    id?: true
+    bookingReference?: true
+    userId?: true
+    packageId?: true
+    customerName?: true
+    customerEmail?: true
+    customerPhone?: true
+    bookingDate?: true
+    bookingTime?: true
+    amount?: true
+    currency?: true
+    paymentStatus?: true
+    paymentReference?: true
+    paymentMethod?: true
+    status?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PhysicalBookingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PhysicalBooking to aggregate.
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhysicalBookings to fetch.
+     */
+    orderBy?: PhysicalBookingOrderByWithRelationInput | PhysicalBookingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PhysicalBookingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhysicalBookings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhysicalBookings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PhysicalBookings
+    **/
+    _count?: true | PhysicalBookingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PhysicalBookingAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PhysicalBookingSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PhysicalBookingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PhysicalBookingMaxAggregateInputType
+  }
+
+  export type GetPhysicalBookingAggregateType<T extends PhysicalBookingAggregateArgs> = {
+        [P in keyof T & keyof AggregatePhysicalBooking]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePhysicalBooking[P]>
+      : GetScalarType<T[P], AggregatePhysicalBooking[P]>
+  }
+
+
+
+
+  export type PhysicalBookingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PhysicalBookingWhereInput
+    orderBy?: PhysicalBookingOrderByWithAggregationInput | PhysicalBookingOrderByWithAggregationInput[]
+    by: PhysicalBookingScalarFieldEnum[] | PhysicalBookingScalarFieldEnum
+    having?: PhysicalBookingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PhysicalBookingCountAggregateInputType | true
+    _avg?: PhysicalBookingAvgAggregateInputType
+    _sum?: PhysicalBookingSumAggregateInputType
+    _min?: PhysicalBookingMinAggregateInputType
+    _max?: PhysicalBookingMaxAggregateInputType
+  }
+
+  export type PhysicalBookingGroupByOutputType = {
+    id: string
+    bookingReference: string
+    userId: string | null
+    packageId: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date
+    bookingTime: string
+    amount: Decimal
+    currency: string
+    paymentStatus: $Enums.PaymentStatus
+    paymentReference: string | null
+    paymentMethod: string | null
+    status: $Enums.BookingStatus
+    notes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PhysicalBookingCountAggregateOutputType | null
+    _avg: PhysicalBookingAvgAggregateOutputType | null
+    _sum: PhysicalBookingSumAggregateOutputType | null
+    _min: PhysicalBookingMinAggregateOutputType | null
+    _max: PhysicalBookingMaxAggregateOutputType | null
+  }
+
+  type GetPhysicalBookingGroupByPayload<T extends PhysicalBookingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PhysicalBookingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PhysicalBookingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PhysicalBookingGroupByOutputType[P]>
+            : GetScalarType<T[P], PhysicalBookingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PhysicalBookingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bookingReference?: boolean
+    userId?: boolean
+    packageId?: boolean
+    customerName?: boolean
+    customerEmail?: boolean
+    customerPhone?: boolean
+    bookingDate?: boolean
+    bookingTime?: boolean
+    amount?: boolean
+    currency?: boolean
+    paymentStatus?: boolean
+    paymentReference?: boolean
+    paymentMethod?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | PhysicalBooking$userArgs<ExtArgs>
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["physicalBooking"]>
+
+  export type PhysicalBookingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bookingReference?: boolean
+    userId?: boolean
+    packageId?: boolean
+    customerName?: boolean
+    customerEmail?: boolean
+    customerPhone?: boolean
+    bookingDate?: boolean
+    bookingTime?: boolean
+    amount?: boolean
+    currency?: boolean
+    paymentStatus?: boolean
+    paymentReference?: boolean
+    paymentMethod?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | PhysicalBooking$userArgs<ExtArgs>
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["physicalBooking"]>
+
+  export type PhysicalBookingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bookingReference?: boolean
+    userId?: boolean
+    packageId?: boolean
+    customerName?: boolean
+    customerEmail?: boolean
+    customerPhone?: boolean
+    bookingDate?: boolean
+    bookingTime?: boolean
+    amount?: boolean
+    currency?: boolean
+    paymentStatus?: boolean
+    paymentReference?: boolean
+    paymentMethod?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | PhysicalBooking$userArgs<ExtArgs>
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["physicalBooking"]>
+
+  export type PhysicalBookingSelectScalar = {
+    id?: boolean
+    bookingReference?: boolean
+    userId?: boolean
+    packageId?: boolean
+    customerName?: boolean
+    customerEmail?: boolean
+    customerPhone?: boolean
+    bookingDate?: boolean
+    bookingTime?: boolean
+    amount?: boolean
+    currency?: boolean
+    paymentStatus?: boolean
+    paymentReference?: boolean
+    paymentMethod?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PhysicalBookingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bookingReference" | "userId" | "packageId" | "customerName" | "customerEmail" | "customerPhone" | "bookingDate" | "bookingTime" | "amount" | "currency" | "paymentStatus" | "paymentReference" | "paymentMethod" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["physicalBooking"]>
+  export type PhysicalBookingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | PhysicalBooking$userArgs<ExtArgs>
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+  }
+  export type PhysicalBookingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | PhysicalBooking$userArgs<ExtArgs>
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+  }
+  export type PhysicalBookingIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | PhysicalBooking$userArgs<ExtArgs>
+    package?: boolean | PackageDefaultArgs<ExtArgs>
+  }
+
+  export type $PhysicalBookingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PhysicalBooking"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs> | null
+      package: Prisma.$PackagePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      bookingReference: string
+      userId: string | null
+      packageId: string
+      customerName: string
+      customerEmail: string
+      customerPhone: string
+      bookingDate: Date
+      bookingTime: string
+      amount: Prisma.Decimal
+      currency: string
+      paymentStatus: $Enums.PaymentStatus
+      paymentReference: string | null
+      paymentMethod: string | null
+      status: $Enums.BookingStatus
+      notes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["physicalBooking"]>
+    composites: {}
+  }
+
+  type PhysicalBookingGetPayload<S extends boolean | null | undefined | PhysicalBookingDefaultArgs> = $Result.GetResult<Prisma.$PhysicalBookingPayload, S>
+
+  type PhysicalBookingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PhysicalBookingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PhysicalBookingCountAggregateInputType | true
+    }
+
+  export interface PhysicalBookingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PhysicalBooking'], meta: { name: 'PhysicalBooking' } }
+    /**
+     * Find zero or one PhysicalBooking that matches the filter.
+     * @param {PhysicalBookingFindUniqueArgs} args - Arguments to find a PhysicalBooking
+     * @example
+     * // Get one PhysicalBooking
+     * const physicalBooking = await prisma.physicalBooking.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PhysicalBookingFindUniqueArgs>(args: SelectSubset<T, PhysicalBookingFindUniqueArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PhysicalBooking that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PhysicalBookingFindUniqueOrThrowArgs} args - Arguments to find a PhysicalBooking
+     * @example
+     * // Get one PhysicalBooking
+     * const physicalBooking = await prisma.physicalBooking.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PhysicalBookingFindUniqueOrThrowArgs>(args: SelectSubset<T, PhysicalBookingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PhysicalBooking that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingFindFirstArgs} args - Arguments to find a PhysicalBooking
+     * @example
+     * // Get one PhysicalBooking
+     * const physicalBooking = await prisma.physicalBooking.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PhysicalBookingFindFirstArgs>(args?: SelectSubset<T, PhysicalBookingFindFirstArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PhysicalBooking that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingFindFirstOrThrowArgs} args - Arguments to find a PhysicalBooking
+     * @example
+     * // Get one PhysicalBooking
+     * const physicalBooking = await prisma.physicalBooking.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PhysicalBookingFindFirstOrThrowArgs>(args?: SelectSubset<T, PhysicalBookingFindFirstOrThrowArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PhysicalBookings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PhysicalBookings
+     * const physicalBookings = await prisma.physicalBooking.findMany()
+     * 
+     * // Get first 10 PhysicalBookings
+     * const physicalBookings = await prisma.physicalBooking.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const physicalBookingWithIdOnly = await prisma.physicalBooking.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PhysicalBookingFindManyArgs>(args?: SelectSubset<T, PhysicalBookingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PhysicalBooking.
+     * @param {PhysicalBookingCreateArgs} args - Arguments to create a PhysicalBooking.
+     * @example
+     * // Create one PhysicalBooking
+     * const PhysicalBooking = await prisma.physicalBooking.create({
+     *   data: {
+     *     // ... data to create a PhysicalBooking
+     *   }
+     * })
+     * 
+     */
+    create<T extends PhysicalBookingCreateArgs>(args: SelectSubset<T, PhysicalBookingCreateArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PhysicalBookings.
+     * @param {PhysicalBookingCreateManyArgs} args - Arguments to create many PhysicalBookings.
+     * @example
+     * // Create many PhysicalBookings
+     * const physicalBooking = await prisma.physicalBooking.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PhysicalBookingCreateManyArgs>(args?: SelectSubset<T, PhysicalBookingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PhysicalBookings and returns the data saved in the database.
+     * @param {PhysicalBookingCreateManyAndReturnArgs} args - Arguments to create many PhysicalBookings.
+     * @example
+     * // Create many PhysicalBookings
+     * const physicalBooking = await prisma.physicalBooking.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PhysicalBookings and only return the `id`
+     * const physicalBookingWithIdOnly = await prisma.physicalBooking.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PhysicalBookingCreateManyAndReturnArgs>(args?: SelectSubset<T, PhysicalBookingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PhysicalBooking.
+     * @param {PhysicalBookingDeleteArgs} args - Arguments to delete one PhysicalBooking.
+     * @example
+     * // Delete one PhysicalBooking
+     * const PhysicalBooking = await prisma.physicalBooking.delete({
+     *   where: {
+     *     // ... filter to delete one PhysicalBooking
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PhysicalBookingDeleteArgs>(args: SelectSubset<T, PhysicalBookingDeleteArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PhysicalBooking.
+     * @param {PhysicalBookingUpdateArgs} args - Arguments to update one PhysicalBooking.
+     * @example
+     * // Update one PhysicalBooking
+     * const physicalBooking = await prisma.physicalBooking.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PhysicalBookingUpdateArgs>(args: SelectSubset<T, PhysicalBookingUpdateArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PhysicalBookings.
+     * @param {PhysicalBookingDeleteManyArgs} args - Arguments to filter PhysicalBookings to delete.
+     * @example
+     * // Delete a few PhysicalBookings
+     * const { count } = await prisma.physicalBooking.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PhysicalBookingDeleteManyArgs>(args?: SelectSubset<T, PhysicalBookingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PhysicalBookings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PhysicalBookings
+     * const physicalBooking = await prisma.physicalBooking.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PhysicalBookingUpdateManyArgs>(args: SelectSubset<T, PhysicalBookingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PhysicalBookings and returns the data updated in the database.
+     * @param {PhysicalBookingUpdateManyAndReturnArgs} args - Arguments to update many PhysicalBookings.
+     * @example
+     * // Update many PhysicalBookings
+     * const physicalBooking = await prisma.physicalBooking.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PhysicalBookings and only return the `id`
+     * const physicalBookingWithIdOnly = await prisma.physicalBooking.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PhysicalBookingUpdateManyAndReturnArgs>(args: SelectSubset<T, PhysicalBookingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PhysicalBooking.
+     * @param {PhysicalBookingUpsertArgs} args - Arguments to update or create a PhysicalBooking.
+     * @example
+     * // Update or create a PhysicalBooking
+     * const physicalBooking = await prisma.physicalBooking.upsert({
+     *   create: {
+     *     // ... data to create a PhysicalBooking
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PhysicalBooking we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PhysicalBookingUpsertArgs>(args: SelectSubset<T, PhysicalBookingUpsertArgs<ExtArgs>>): Prisma__PhysicalBookingClient<$Result.GetResult<Prisma.$PhysicalBookingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PhysicalBookings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingCountArgs} args - Arguments to filter PhysicalBookings to count.
+     * @example
+     * // Count the number of PhysicalBookings
+     * const count = await prisma.physicalBooking.count({
+     *   where: {
+     *     // ... the filter for the PhysicalBookings we want to count
+     *   }
+     * })
+    **/
+    count<T extends PhysicalBookingCountArgs>(
+      args?: Subset<T, PhysicalBookingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PhysicalBookingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PhysicalBooking.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PhysicalBookingAggregateArgs>(args: Subset<T, PhysicalBookingAggregateArgs>): Prisma.PrismaPromise<GetPhysicalBookingAggregateType<T>>
+
+    /**
+     * Group by PhysicalBooking.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PhysicalBookingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PhysicalBookingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PhysicalBookingGroupByArgs['orderBy'] }
+        : { orderBy?: PhysicalBookingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PhysicalBookingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPhysicalBookingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PhysicalBooking model
+   */
+  readonly fields: PhysicalBookingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PhysicalBooking.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PhysicalBookingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends PhysicalBooking$userArgs<ExtArgs> = {}>(args?: Subset<T, PhysicalBooking$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    package<T extends PackageDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PackageDefaultArgs<ExtArgs>>): Prisma__PackageClient<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PhysicalBooking model
+   */
+  interface PhysicalBookingFieldRefs {
+    readonly id: FieldRef<"PhysicalBooking", 'String'>
+    readonly bookingReference: FieldRef<"PhysicalBooking", 'String'>
+    readonly userId: FieldRef<"PhysicalBooking", 'String'>
+    readonly packageId: FieldRef<"PhysicalBooking", 'String'>
+    readonly customerName: FieldRef<"PhysicalBooking", 'String'>
+    readonly customerEmail: FieldRef<"PhysicalBooking", 'String'>
+    readonly customerPhone: FieldRef<"PhysicalBooking", 'String'>
+    readonly bookingDate: FieldRef<"PhysicalBooking", 'DateTime'>
+    readonly bookingTime: FieldRef<"PhysicalBooking", 'String'>
+    readonly amount: FieldRef<"PhysicalBooking", 'Decimal'>
+    readonly currency: FieldRef<"PhysicalBooking", 'String'>
+    readonly paymentStatus: FieldRef<"PhysicalBooking", 'PaymentStatus'>
+    readonly paymentReference: FieldRef<"PhysicalBooking", 'String'>
+    readonly paymentMethod: FieldRef<"PhysicalBooking", 'String'>
+    readonly status: FieldRef<"PhysicalBooking", 'BookingStatus'>
+    readonly notes: FieldRef<"PhysicalBooking", 'String'>
+    readonly createdAt: FieldRef<"PhysicalBooking", 'DateTime'>
+    readonly updatedAt: FieldRef<"PhysicalBooking", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PhysicalBooking findUnique
+   */
+  export type PhysicalBookingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * Filter, which PhysicalBooking to fetch.
+     */
+    where: PhysicalBookingWhereUniqueInput
+  }
+
+  /**
+   * PhysicalBooking findUniqueOrThrow
+   */
+  export type PhysicalBookingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * Filter, which PhysicalBooking to fetch.
+     */
+    where: PhysicalBookingWhereUniqueInput
+  }
+
+  /**
+   * PhysicalBooking findFirst
+   */
+  export type PhysicalBookingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * Filter, which PhysicalBooking to fetch.
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhysicalBookings to fetch.
+     */
+    orderBy?: PhysicalBookingOrderByWithRelationInput | PhysicalBookingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PhysicalBookings.
+     */
+    cursor?: PhysicalBookingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhysicalBookings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhysicalBookings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhysicalBookings.
+     */
+    distinct?: PhysicalBookingScalarFieldEnum | PhysicalBookingScalarFieldEnum[]
+  }
+
+  /**
+   * PhysicalBooking findFirstOrThrow
+   */
+  export type PhysicalBookingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * Filter, which PhysicalBooking to fetch.
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhysicalBookings to fetch.
+     */
+    orderBy?: PhysicalBookingOrderByWithRelationInput | PhysicalBookingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PhysicalBookings.
+     */
+    cursor?: PhysicalBookingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhysicalBookings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhysicalBookings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhysicalBookings.
+     */
+    distinct?: PhysicalBookingScalarFieldEnum | PhysicalBookingScalarFieldEnum[]
+  }
+
+  /**
+   * PhysicalBooking findMany
+   */
+  export type PhysicalBookingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * Filter, which PhysicalBookings to fetch.
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PhysicalBookings to fetch.
+     */
+    orderBy?: PhysicalBookingOrderByWithRelationInput | PhysicalBookingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PhysicalBookings.
+     */
+    cursor?: PhysicalBookingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PhysicalBookings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PhysicalBookings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PhysicalBookings.
+     */
+    distinct?: PhysicalBookingScalarFieldEnum | PhysicalBookingScalarFieldEnum[]
+  }
+
+  /**
+   * PhysicalBooking create
+   */
+  export type PhysicalBookingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PhysicalBooking.
+     */
+    data: XOR<PhysicalBookingCreateInput, PhysicalBookingUncheckedCreateInput>
+  }
+
+  /**
+   * PhysicalBooking createMany
+   */
+  export type PhysicalBookingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PhysicalBookings.
+     */
+    data: PhysicalBookingCreateManyInput | PhysicalBookingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PhysicalBooking createManyAndReturn
+   */
+  export type PhysicalBookingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * The data used to create many PhysicalBookings.
+     */
+    data: PhysicalBookingCreateManyInput | PhysicalBookingCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PhysicalBooking update
+   */
+  export type PhysicalBookingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PhysicalBooking.
+     */
+    data: XOR<PhysicalBookingUpdateInput, PhysicalBookingUncheckedUpdateInput>
+    /**
+     * Choose, which PhysicalBooking to update.
+     */
+    where: PhysicalBookingWhereUniqueInput
+  }
+
+  /**
+   * PhysicalBooking updateMany
+   */
+  export type PhysicalBookingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PhysicalBookings.
+     */
+    data: XOR<PhysicalBookingUpdateManyMutationInput, PhysicalBookingUncheckedUpdateManyInput>
+    /**
+     * Filter which PhysicalBookings to update
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * Limit how many PhysicalBookings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PhysicalBooking updateManyAndReturn
+   */
+  export type PhysicalBookingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * The data used to update PhysicalBookings.
+     */
+    data: XOR<PhysicalBookingUpdateManyMutationInput, PhysicalBookingUncheckedUpdateManyInput>
+    /**
+     * Filter which PhysicalBookings to update
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * Limit how many PhysicalBookings to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PhysicalBooking upsert
+   */
+  export type PhysicalBookingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PhysicalBooking to update in case it exists.
+     */
+    where: PhysicalBookingWhereUniqueInput
+    /**
+     * In case the PhysicalBooking found by the `where` argument doesn't exist, create a new PhysicalBooking with this data.
+     */
+    create: XOR<PhysicalBookingCreateInput, PhysicalBookingUncheckedCreateInput>
+    /**
+     * In case the PhysicalBooking was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PhysicalBookingUpdateInput, PhysicalBookingUncheckedUpdateInput>
+  }
+
+  /**
+   * PhysicalBooking delete
+   */
+  export type PhysicalBookingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
+    /**
+     * Filter which PhysicalBooking to delete.
+     */
+    where: PhysicalBookingWhereUniqueInput
+  }
+
+  /**
+   * PhysicalBooking deleteMany
+   */
+  export type PhysicalBookingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PhysicalBookings to delete
+     */
+    where?: PhysicalBookingWhereInput
+    /**
+     * Limit how many PhysicalBookings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PhysicalBooking.user
+   */
+  export type PhysicalBooking$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * PhysicalBooking without action
+   */
+  export type PhysicalBookingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PhysicalBooking
+     */
+    select?: PhysicalBookingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PhysicalBooking
+     */
+    omit?: PhysicalBookingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PhysicalBookingInclude<ExtArgs> | null
   }
 
 
@@ -28297,12 +29794,37 @@ export namespace Prisma {
     features: 'features',
     isPopular: 'isPopular',
     isActive: 'isActive',
+    type: 'type',
     sortOrder: 'sortOrder',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type PackageScalarFieldEnum = (typeof PackageScalarFieldEnum)[keyof typeof PackageScalarFieldEnum]
+
+
+  export const PhysicalBookingScalarFieldEnum: {
+    id: 'id',
+    bookingReference: 'bookingReference',
+    userId: 'userId',
+    packageId: 'packageId',
+    customerName: 'customerName',
+    customerEmail: 'customerEmail',
+    customerPhone: 'customerPhone',
+    bookingDate: 'bookingDate',
+    bookingTime: 'bookingTime',
+    amount: 'amount',
+    currency: 'currency',
+    paymentStatus: 'paymentStatus',
+    paymentReference: 'paymentReference',
+    paymentMethod: 'paymentMethod',
+    status: 'status',
+    notes: 'notes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PhysicalBookingScalarFieldEnum = (typeof PhysicalBookingScalarFieldEnum)[keyof typeof PhysicalBookingScalarFieldEnum]
 
 
   export const SubscriptionScalarFieldEnum: {
@@ -28706,6 +30228,48 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'PackageType'
+   */
+  export type EnumPackageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PackageType'>
+    
+
+
+  /**
+   * Reference to a field of type 'PackageType[]'
+   */
+  export type ListEnumPackageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PackageType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentStatus'
+   */
+  export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentStatus[]'
+   */
+  export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'BookingStatus'
+   */
+  export type EnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'BookingStatus[]'
+   */
+  export type ListEnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'SubscriptionStatus'
    */
   export type EnumSubscriptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionStatus'>
@@ -28730,20 +30294,6 @@ export namespace Prisma {
    * Reference to a field of type 'PaymentProvider[]'
    */
   export type ListEnumPaymentProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentProvider[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'PaymentStatus'
-   */
-  export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus'>
-    
-
-
-  /**
-   * Reference to a field of type 'PaymentStatus[]'
-   */
-  export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
     
 
 
@@ -28838,6 +30388,7 @@ export namespace Prisma {
     notifications?: NotificationListRelationFilter
     passwordResetTokens?: PasswordResetTokenListRelationFilter
     verificationTokens?: VerificationTokenListRelationFilter
+    physicalBookings?: PhysicalBookingListRelationFilter
     requestedInteractions?: MatchInteractionListRelationFilter
     targetInteractions?: MatchInteractionListRelationFilter
   }
@@ -28857,6 +30408,7 @@ export namespace Prisma {
     notifications?: NotificationOrderByRelationAggregateInput
     passwordResetTokens?: PasswordResetTokenOrderByRelationAggregateInput
     verificationTokens?: VerificationTokenOrderByRelationAggregateInput
+    physicalBookings?: PhysicalBookingOrderByRelationAggregateInput
     requestedInteractions?: MatchInteractionOrderByRelationAggregateInput
     targetInteractions?: MatchInteractionOrderByRelationAggregateInput
   }
@@ -28879,6 +30431,7 @@ export namespace Prisma {
     notifications?: NotificationListRelationFilter
     passwordResetTokens?: PasswordResetTokenListRelationFilter
     verificationTokens?: VerificationTokenListRelationFilter
+    physicalBookings?: PhysicalBookingListRelationFilter
     requestedInteractions?: MatchInteractionListRelationFilter
     targetInteractions?: MatchInteractionListRelationFilter
   }, "id" | "email">
@@ -29261,11 +30814,13 @@ export namespace Prisma {
     features?: StringNullableListFilter<"Package">
     isPopular?: BoolFilter<"Package"> | boolean
     isActive?: BoolFilter<"Package"> | boolean
+    type?: EnumPackageTypeFilter<"Package"> | $Enums.PackageType
     sortOrder?: IntFilter<"Package"> | number
     createdAt?: DateTimeFilter<"Package"> | Date | string
     updatedAt?: DateTimeFilter<"Package"> | Date | string
     subscriptions?: SubscriptionListRelationFilter
     payments?: PaymentListRelationFilter
+    physicalBookings?: PhysicalBookingListRelationFilter
   }
 
   export type PackageOrderByWithRelationInput = {
@@ -29280,11 +30835,13 @@ export namespace Prisma {
     features?: SortOrder
     isPopular?: SortOrder
     isActive?: SortOrder
+    type?: SortOrder
     sortOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     subscriptions?: SubscriptionOrderByRelationAggregateInput
     payments?: PaymentOrderByRelationAggregateInput
+    physicalBookings?: PhysicalBookingOrderByRelationAggregateInput
   }
 
   export type PackageWhereUniqueInput = Prisma.AtLeast<{
@@ -29302,11 +30859,13 @@ export namespace Prisma {
     features?: StringNullableListFilter<"Package">
     isPopular?: BoolFilter<"Package"> | boolean
     isActive?: BoolFilter<"Package"> | boolean
+    type?: EnumPackageTypeFilter<"Package"> | $Enums.PackageType
     sortOrder?: IntFilter<"Package"> | number
     createdAt?: DateTimeFilter<"Package"> | Date | string
     updatedAt?: DateTimeFilter<"Package"> | Date | string
     subscriptions?: SubscriptionListRelationFilter
     payments?: PaymentListRelationFilter
+    physicalBookings?: PhysicalBookingListRelationFilter
   }, "id" | "slug">
 
   export type PackageOrderByWithAggregationInput = {
@@ -29321,6 +30880,7 @@ export namespace Prisma {
     features?: SortOrder
     isPopular?: SortOrder
     isActive?: SortOrder
+    type?: SortOrder
     sortOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -29346,9 +30906,135 @@ export namespace Prisma {
     features?: StringNullableListFilter<"Package">
     isPopular?: BoolWithAggregatesFilter<"Package"> | boolean
     isActive?: BoolWithAggregatesFilter<"Package"> | boolean
+    type?: EnumPackageTypeWithAggregatesFilter<"Package"> | $Enums.PackageType
     sortOrder?: IntWithAggregatesFilter<"Package"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Package"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Package"> | Date | string
+  }
+
+  export type PhysicalBookingWhereInput = {
+    AND?: PhysicalBookingWhereInput | PhysicalBookingWhereInput[]
+    OR?: PhysicalBookingWhereInput[]
+    NOT?: PhysicalBookingWhereInput | PhysicalBookingWhereInput[]
+    id?: StringFilter<"PhysicalBooking"> | string
+    bookingReference?: StringFilter<"PhysicalBooking"> | string
+    userId?: StringNullableFilter<"PhysicalBooking"> | string | null
+    packageId?: StringFilter<"PhysicalBooking"> | string
+    customerName?: StringFilter<"PhysicalBooking"> | string
+    customerEmail?: StringFilter<"PhysicalBooking"> | string
+    customerPhone?: StringFilter<"PhysicalBooking"> | string
+    bookingDate?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    bookingTime?: StringFilter<"PhysicalBooking"> | string
+    amount?: DecimalFilter<"PhysicalBooking"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"PhysicalBooking"> | string
+    paymentStatus?: EnumPaymentStatusFilter<"PhysicalBooking"> | $Enums.PaymentStatus
+    paymentReference?: StringNullableFilter<"PhysicalBooking"> | string | null
+    paymentMethod?: StringNullableFilter<"PhysicalBooking"> | string | null
+    status?: EnumBookingStatusFilter<"PhysicalBooking"> | $Enums.BookingStatus
+    notes?: StringNullableFilter<"PhysicalBooking"> | string | null
+    createdAt?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    updatedAt?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
+  }
+
+  export type PhysicalBookingOrderByWithRelationInput = {
+    id?: SortOrder
+    bookingReference?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    packageId?: SortOrder
+    customerName?: SortOrder
+    customerEmail?: SortOrder
+    customerPhone?: SortOrder
+    bookingDate?: SortOrder
+    bookingTime?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    paymentStatus?: SortOrder
+    paymentReference?: SortOrderInput | SortOrder
+    paymentMethod?: SortOrderInput | SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    package?: PackageOrderByWithRelationInput
+  }
+
+  export type PhysicalBookingWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    bookingReference?: string
+    AND?: PhysicalBookingWhereInput | PhysicalBookingWhereInput[]
+    OR?: PhysicalBookingWhereInput[]
+    NOT?: PhysicalBookingWhereInput | PhysicalBookingWhereInput[]
+    userId?: StringNullableFilter<"PhysicalBooking"> | string | null
+    packageId?: StringFilter<"PhysicalBooking"> | string
+    customerName?: StringFilter<"PhysicalBooking"> | string
+    customerEmail?: StringFilter<"PhysicalBooking"> | string
+    customerPhone?: StringFilter<"PhysicalBooking"> | string
+    bookingDate?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    bookingTime?: StringFilter<"PhysicalBooking"> | string
+    amount?: DecimalFilter<"PhysicalBooking"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"PhysicalBooking"> | string
+    paymentStatus?: EnumPaymentStatusFilter<"PhysicalBooking"> | $Enums.PaymentStatus
+    paymentReference?: StringNullableFilter<"PhysicalBooking"> | string | null
+    paymentMethod?: StringNullableFilter<"PhysicalBooking"> | string | null
+    status?: EnumBookingStatusFilter<"PhysicalBooking"> | $Enums.BookingStatus
+    notes?: StringNullableFilter<"PhysicalBooking"> | string | null
+    createdAt?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    updatedAt?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    package?: XOR<PackageScalarRelationFilter, PackageWhereInput>
+  }, "id" | "bookingReference">
+
+  export type PhysicalBookingOrderByWithAggregationInput = {
+    id?: SortOrder
+    bookingReference?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    packageId?: SortOrder
+    customerName?: SortOrder
+    customerEmail?: SortOrder
+    customerPhone?: SortOrder
+    bookingDate?: SortOrder
+    bookingTime?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    paymentStatus?: SortOrder
+    paymentReference?: SortOrderInput | SortOrder
+    paymentMethod?: SortOrderInput | SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PhysicalBookingCountOrderByAggregateInput
+    _avg?: PhysicalBookingAvgOrderByAggregateInput
+    _max?: PhysicalBookingMaxOrderByAggregateInput
+    _min?: PhysicalBookingMinOrderByAggregateInput
+    _sum?: PhysicalBookingSumOrderByAggregateInput
+  }
+
+  export type PhysicalBookingScalarWhereWithAggregatesInput = {
+    AND?: PhysicalBookingScalarWhereWithAggregatesInput | PhysicalBookingScalarWhereWithAggregatesInput[]
+    OR?: PhysicalBookingScalarWhereWithAggregatesInput[]
+    NOT?: PhysicalBookingScalarWhereWithAggregatesInput | PhysicalBookingScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    bookingReference?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    userId?: StringNullableWithAggregatesFilter<"PhysicalBooking"> | string | null
+    packageId?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    customerName?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    customerEmail?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    customerPhone?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    bookingDate?: DateTimeWithAggregatesFilter<"PhysicalBooking"> | Date | string
+    bookingTime?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    amount?: DecimalWithAggregatesFilter<"PhysicalBooking"> | Decimal | DecimalJsLike | number | string
+    currency?: StringWithAggregatesFilter<"PhysicalBooking"> | string
+    paymentStatus?: EnumPaymentStatusWithAggregatesFilter<"PhysicalBooking"> | $Enums.PaymentStatus
+    paymentReference?: StringNullableWithAggregatesFilter<"PhysicalBooking"> | string | null
+    paymentMethod?: StringNullableWithAggregatesFilter<"PhysicalBooking"> | string | null
+    status?: EnumBookingStatusWithAggregatesFilter<"PhysicalBooking"> | $Enums.BookingStatus
+    notes?: StringNullableWithAggregatesFilter<"PhysicalBooking"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PhysicalBooking"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PhysicalBooking"> | Date | string
   }
 
   export type SubscriptionWhereInput = {
@@ -30678,6 +32364,7 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -30697,6 +32384,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -30716,6 +32404,7 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -30735,6 +32424,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -31181,11 +32871,13 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptions?: SubscriptionCreateNestedManyWithoutPackageInput
     payments?: PaymentCreateNestedManyWithoutPackageInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateInput = {
@@ -31200,11 +32892,13 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutPackageInput
     payments?: PaymentUncheckedCreateNestedManyWithoutPackageInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUpdateInput = {
@@ -31219,11 +32913,13 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUpdateManyWithoutPackageNestedInput
     payments?: PaymentUpdateManyWithoutPackageNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateInput = {
@@ -31238,11 +32934,13 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutPackageNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutPackageNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageCreateManyInput = {
@@ -31257,6 +32955,7 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31274,6 +32973,7 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31291,7 +32991,153 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhysicalBookingCreateInput = {
+    id?: string
+    bookingReference: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutPhysicalBookingsInput
+    package: PackageCreateNestedOneWithoutPhysicalBookingsInput
+  }
+
+  export type PhysicalBookingUncheckedCreateInput = {
+    id?: string
+    bookingReference: string
+    userId?: string | null
+    packageId: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PhysicalBookingUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutPhysicalBookingsNestedInput
+    package?: PackageUpdateOneRequiredWithoutPhysicalBookingsNestedInput
+  }
+
+  export type PhysicalBookingUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    packageId?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhysicalBookingCreateManyInput = {
+    id?: string
+    bookingReference: string
+    userId?: string | null
+    packageId: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PhysicalBookingUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhysicalBookingUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    packageId?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32861,6 +34707,12 @@ export namespace Prisma {
     none?: VerificationTokenWhereInput
   }
 
+  export type PhysicalBookingListRelationFilter = {
+    every?: PhysicalBookingWhereInput
+    some?: PhysicalBookingWhereInput
+    none?: PhysicalBookingWhereInput
+  }
+
   export type MatchInteractionListRelationFilter = {
     every?: MatchInteractionWhereInput
     some?: MatchInteractionWhereInput
@@ -32889,6 +34741,10 @@ export namespace Prisma {
   }
 
   export type VerificationTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PhysicalBookingOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -33296,6 +35152,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumPackageTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PackageType | EnumPackageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPackageTypeFilter<$PrismaModel> | $Enums.PackageType
+  }
+
   export type PackageCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -33308,6 +35171,7 @@ export namespace Prisma {
     features?: SortOrder
     isPopular?: SortOrder
     isActive?: SortOrder
+    type?: SortOrder
     sortOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33331,6 +35195,7 @@ export namespace Prisma {
     matchAllowance?: SortOrder
     isPopular?: SortOrder
     isActive?: SortOrder
+    type?: SortOrder
     sortOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33347,6 +35212,7 @@ export namespace Prisma {
     matchAllowance?: SortOrder
     isPopular?: SortOrder
     isActive?: SortOrder
+    type?: SortOrder
     sortOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33375,16 +35241,136 @@ export namespace Prisma {
     _max?: NestedDecimalFilter<$PrismaModel>
   }
 
-  export type EnumSubscriptionStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.SubscriptionStatus | EnumSubscriptionStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.SubscriptionStatus[] | ListEnumSubscriptionStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.SubscriptionStatus[] | ListEnumSubscriptionStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumSubscriptionStatusFilter<$PrismaModel> | $Enums.SubscriptionStatus
+  export type EnumPackageTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PackageType | EnumPackageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPackageTypeWithAggregatesFilter<$PrismaModel> | $Enums.PackageType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPackageTypeFilter<$PrismaModel>
+    _max?: NestedEnumPackageTypeFilter<$PrismaModel>
+  }
+
+  export type EnumPaymentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
+  }
+
+  export type EnumBookingStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BookingStatus | EnumBookingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBookingStatusFilter<$PrismaModel> | $Enums.BookingStatus
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
   }
 
   export type PackageScalarRelationFilter = {
     is?: PackageWhereInput
     isNot?: PackageWhereInput
+  }
+
+  export type PhysicalBookingCountOrderByAggregateInput = {
+    id?: SortOrder
+    bookingReference?: SortOrder
+    userId?: SortOrder
+    packageId?: SortOrder
+    customerName?: SortOrder
+    customerEmail?: SortOrder
+    customerPhone?: SortOrder
+    bookingDate?: SortOrder
+    bookingTime?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    paymentStatus?: SortOrder
+    paymentReference?: SortOrder
+    paymentMethod?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PhysicalBookingAvgOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type PhysicalBookingMaxOrderByAggregateInput = {
+    id?: SortOrder
+    bookingReference?: SortOrder
+    userId?: SortOrder
+    packageId?: SortOrder
+    customerName?: SortOrder
+    customerEmail?: SortOrder
+    customerPhone?: SortOrder
+    bookingDate?: SortOrder
+    bookingTime?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    paymentStatus?: SortOrder
+    paymentReference?: SortOrder
+    paymentMethod?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PhysicalBookingMinOrderByAggregateInput = {
+    id?: SortOrder
+    bookingReference?: SortOrder
+    userId?: SortOrder
+    packageId?: SortOrder
+    customerName?: SortOrder
+    customerEmail?: SortOrder
+    customerPhone?: SortOrder
+    bookingDate?: SortOrder
+    bookingTime?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    paymentStatus?: SortOrder
+    paymentReference?: SortOrder
+    paymentMethod?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PhysicalBookingSumOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type EnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PaymentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
+    _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BookingStatus | EnumBookingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBookingStatusWithAggregatesFilter<$PrismaModel> | $Enums.BookingStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBookingStatusFilter<$PrismaModel>
+    _max?: NestedEnumBookingStatusFilter<$PrismaModel>
+  }
+
+  export type EnumSubscriptionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubscriptionStatus | EnumSubscriptionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubscriptionStatus[] | ListEnumSubscriptionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubscriptionStatus[] | ListEnumSubscriptionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubscriptionStatusFilter<$PrismaModel> | $Enums.SubscriptionStatus
   }
 
   export type SubscriptionCountOrderByAggregateInput = {
@@ -33449,13 +35435,6 @@ export namespace Prisma {
     in?: $Enums.PaymentProvider[] | ListEnumPaymentProviderFieldRefInput<$PrismaModel>
     notIn?: $Enums.PaymentProvider[] | ListEnumPaymentProviderFieldRefInput<$PrismaModel>
     not?: NestedEnumPaymentProviderFilter<$PrismaModel> | $Enums.PaymentProvider
-  }
-
-  export type EnumPaymentStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -33562,16 +35541,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPaymentProviderFilter<$PrismaModel>
     _max?: NestedEnumPaymentProviderFilter<$PrismaModel>
-  }
-
-  export type EnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PaymentStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
-    _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -34269,6 +36238,13 @@ export namespace Prisma {
     connect?: VerificationTokenWhereUniqueInput | VerificationTokenWhereUniqueInput[]
   }
 
+  export type PhysicalBookingCreateNestedManyWithoutUserInput = {
+    create?: XOR<PhysicalBookingCreateWithoutUserInput, PhysicalBookingUncheckedCreateWithoutUserInput> | PhysicalBookingCreateWithoutUserInput[] | PhysicalBookingUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutUserInput | PhysicalBookingCreateOrConnectWithoutUserInput[]
+    createMany?: PhysicalBookingCreateManyUserInputEnvelope
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+  }
+
   export type MatchInteractionCreateNestedManyWithoutRequesterInput = {
     create?: XOR<MatchInteractionCreateWithoutRequesterInput, MatchInteractionUncheckedCreateWithoutRequesterInput> | MatchInteractionCreateWithoutRequesterInput[] | MatchInteractionUncheckedCreateWithoutRequesterInput[]
     connectOrCreate?: MatchInteractionCreateOrConnectWithoutRequesterInput | MatchInteractionCreateOrConnectWithoutRequesterInput[]
@@ -34322,6 +36298,13 @@ export namespace Prisma {
     connectOrCreate?: VerificationTokenCreateOrConnectWithoutUserInput | VerificationTokenCreateOrConnectWithoutUserInput[]
     createMany?: VerificationTokenCreateManyUserInputEnvelope
     connect?: VerificationTokenWhereUniqueInput | VerificationTokenWhereUniqueInput[]
+  }
+
+  export type PhysicalBookingUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PhysicalBookingCreateWithoutUserInput, PhysicalBookingUncheckedCreateWithoutUserInput> | PhysicalBookingCreateWithoutUserInput[] | PhysicalBookingUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutUserInput | PhysicalBookingCreateOrConnectWithoutUserInput[]
+    createMany?: PhysicalBookingCreateManyUserInputEnvelope
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
   }
 
   export type MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput = {
@@ -34438,6 +36421,20 @@ export namespace Prisma {
     deleteMany?: VerificationTokenScalarWhereInput | VerificationTokenScalarWhereInput[]
   }
 
+  export type PhysicalBookingUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PhysicalBookingCreateWithoutUserInput, PhysicalBookingUncheckedCreateWithoutUserInput> | PhysicalBookingCreateWithoutUserInput[] | PhysicalBookingUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutUserInput | PhysicalBookingCreateOrConnectWithoutUserInput[]
+    upsert?: PhysicalBookingUpsertWithWhereUniqueWithoutUserInput | PhysicalBookingUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PhysicalBookingCreateManyUserInputEnvelope
+    set?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    disconnect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    delete?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    update?: PhysicalBookingUpdateWithWhereUniqueWithoutUserInput | PhysicalBookingUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PhysicalBookingUpdateManyWithWhereWithoutUserInput | PhysicalBookingUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PhysicalBookingScalarWhereInput | PhysicalBookingScalarWhereInput[]
+  }
+
   export type MatchInteractionUpdateManyWithoutRequesterNestedInput = {
     create?: XOR<MatchInteractionCreateWithoutRequesterInput, MatchInteractionUncheckedCreateWithoutRequesterInput> | MatchInteractionCreateWithoutRequesterInput[] | MatchInteractionUncheckedCreateWithoutRequesterInput[]
     connectOrCreate?: MatchInteractionCreateOrConnectWithoutRequesterInput | MatchInteractionCreateOrConnectWithoutRequesterInput[]
@@ -34544,6 +36541,20 @@ export namespace Prisma {
     update?: VerificationTokenUpdateWithWhereUniqueWithoutUserInput | VerificationTokenUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: VerificationTokenUpdateManyWithWhereWithoutUserInput | VerificationTokenUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: VerificationTokenScalarWhereInput | VerificationTokenScalarWhereInput[]
+  }
+
+  export type PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PhysicalBookingCreateWithoutUserInput, PhysicalBookingUncheckedCreateWithoutUserInput> | PhysicalBookingCreateWithoutUserInput[] | PhysicalBookingUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutUserInput | PhysicalBookingCreateOrConnectWithoutUserInput[]
+    upsert?: PhysicalBookingUpsertWithWhereUniqueWithoutUserInput | PhysicalBookingUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PhysicalBookingCreateManyUserInputEnvelope
+    set?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    disconnect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    delete?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    update?: PhysicalBookingUpdateWithWhereUniqueWithoutUserInput | PhysicalBookingUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PhysicalBookingUpdateManyWithWhereWithoutUserInput | PhysicalBookingUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PhysicalBookingScalarWhereInput | PhysicalBookingScalarWhereInput[]
   }
 
   export type MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput = {
@@ -34742,6 +36753,13 @@ export namespace Prisma {
     connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
   }
 
+  export type PhysicalBookingCreateNestedManyWithoutPackageInput = {
+    create?: XOR<PhysicalBookingCreateWithoutPackageInput, PhysicalBookingUncheckedCreateWithoutPackageInput> | PhysicalBookingCreateWithoutPackageInput[] | PhysicalBookingUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutPackageInput | PhysicalBookingCreateOrConnectWithoutPackageInput[]
+    createMany?: PhysicalBookingCreateManyPackageInputEnvelope
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+  }
+
   export type SubscriptionUncheckedCreateNestedManyWithoutPackageInput = {
     create?: XOR<SubscriptionCreateWithoutPackageInput, SubscriptionUncheckedCreateWithoutPackageInput> | SubscriptionCreateWithoutPackageInput[] | SubscriptionUncheckedCreateWithoutPackageInput[]
     connectOrCreate?: SubscriptionCreateOrConnectWithoutPackageInput | SubscriptionCreateOrConnectWithoutPackageInput[]
@@ -34756,6 +36774,13 @@ export namespace Prisma {
     connect?: PaymentWhereUniqueInput | PaymentWhereUniqueInput[]
   }
 
+  export type PhysicalBookingUncheckedCreateNestedManyWithoutPackageInput = {
+    create?: XOR<PhysicalBookingCreateWithoutPackageInput, PhysicalBookingUncheckedCreateWithoutPackageInput> | PhysicalBookingCreateWithoutPackageInput[] | PhysicalBookingUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutPackageInput | PhysicalBookingCreateOrConnectWithoutPackageInput[]
+    createMany?: PhysicalBookingCreateManyPackageInputEnvelope
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+  }
+
   export type DecimalFieldUpdateOperationsInput = {
     set?: Decimal | DecimalJsLike | number | string
     increment?: Decimal | DecimalJsLike | number | string
@@ -34767,6 +36792,10 @@ export namespace Prisma {
   export type PackageUpdatefeaturesInput = {
     set?: string[]
     push?: string | string[]
+  }
+
+  export type EnumPackageTypeFieldUpdateOperationsInput = {
+    set?: $Enums.PackageType
   }
 
   export type SubscriptionUpdateManyWithoutPackageNestedInput = {
@@ -34797,6 +36826,20 @@ export namespace Prisma {
     deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
   }
 
+  export type PhysicalBookingUpdateManyWithoutPackageNestedInput = {
+    create?: XOR<PhysicalBookingCreateWithoutPackageInput, PhysicalBookingUncheckedCreateWithoutPackageInput> | PhysicalBookingCreateWithoutPackageInput[] | PhysicalBookingUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutPackageInput | PhysicalBookingCreateOrConnectWithoutPackageInput[]
+    upsert?: PhysicalBookingUpsertWithWhereUniqueWithoutPackageInput | PhysicalBookingUpsertWithWhereUniqueWithoutPackageInput[]
+    createMany?: PhysicalBookingCreateManyPackageInputEnvelope
+    set?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    disconnect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    delete?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    update?: PhysicalBookingUpdateWithWhereUniqueWithoutPackageInput | PhysicalBookingUpdateWithWhereUniqueWithoutPackageInput[]
+    updateMany?: PhysicalBookingUpdateManyWithWhereWithoutPackageInput | PhysicalBookingUpdateManyWithWhereWithoutPackageInput[]
+    deleteMany?: PhysicalBookingScalarWhereInput | PhysicalBookingScalarWhereInput[]
+  }
+
   export type SubscriptionUncheckedUpdateManyWithoutPackageNestedInput = {
     create?: XOR<SubscriptionCreateWithoutPackageInput, SubscriptionUncheckedCreateWithoutPackageInput> | SubscriptionCreateWithoutPackageInput[] | SubscriptionUncheckedCreateWithoutPackageInput[]
     connectOrCreate?: SubscriptionCreateOrConnectWithoutPackageInput | SubscriptionCreateOrConnectWithoutPackageInput[]
@@ -34823,6 +36866,58 @@ export namespace Prisma {
     update?: PaymentUpdateWithWhereUniqueWithoutPackageInput | PaymentUpdateWithWhereUniqueWithoutPackageInput[]
     updateMany?: PaymentUpdateManyWithWhereWithoutPackageInput | PaymentUpdateManyWithWhereWithoutPackageInput[]
     deleteMany?: PaymentScalarWhereInput | PaymentScalarWhereInput[]
+  }
+
+  export type PhysicalBookingUncheckedUpdateManyWithoutPackageNestedInput = {
+    create?: XOR<PhysicalBookingCreateWithoutPackageInput, PhysicalBookingUncheckedCreateWithoutPackageInput> | PhysicalBookingCreateWithoutPackageInput[] | PhysicalBookingUncheckedCreateWithoutPackageInput[]
+    connectOrCreate?: PhysicalBookingCreateOrConnectWithoutPackageInput | PhysicalBookingCreateOrConnectWithoutPackageInput[]
+    upsert?: PhysicalBookingUpsertWithWhereUniqueWithoutPackageInput | PhysicalBookingUpsertWithWhereUniqueWithoutPackageInput[]
+    createMany?: PhysicalBookingCreateManyPackageInputEnvelope
+    set?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    disconnect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    delete?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    connect?: PhysicalBookingWhereUniqueInput | PhysicalBookingWhereUniqueInput[]
+    update?: PhysicalBookingUpdateWithWhereUniqueWithoutPackageInput | PhysicalBookingUpdateWithWhereUniqueWithoutPackageInput[]
+    updateMany?: PhysicalBookingUpdateManyWithWhereWithoutPackageInput | PhysicalBookingUpdateManyWithWhereWithoutPackageInput[]
+    deleteMany?: PhysicalBookingScalarWhereInput | PhysicalBookingScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutPhysicalBookingsInput = {
+    create?: XOR<UserCreateWithoutPhysicalBookingsInput, UserUncheckedCreateWithoutPhysicalBookingsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPhysicalBookingsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type PackageCreateNestedOneWithoutPhysicalBookingsInput = {
+    create?: XOR<PackageCreateWithoutPhysicalBookingsInput, PackageUncheckedCreateWithoutPhysicalBookingsInput>
+    connectOrCreate?: PackageCreateOrConnectWithoutPhysicalBookingsInput
+    connect?: PackageWhereUniqueInput
+  }
+
+  export type EnumPaymentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PaymentStatus
+  }
+
+  export type EnumBookingStatusFieldUpdateOperationsInput = {
+    set?: $Enums.BookingStatus
+  }
+
+  export type UserUpdateOneWithoutPhysicalBookingsNestedInput = {
+    create?: XOR<UserCreateWithoutPhysicalBookingsInput, UserUncheckedCreateWithoutPhysicalBookingsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPhysicalBookingsInput
+    upsert?: UserUpsertWithoutPhysicalBookingsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPhysicalBookingsInput, UserUpdateWithoutPhysicalBookingsInput>, UserUncheckedUpdateWithoutPhysicalBookingsInput>
+  }
+
+  export type PackageUpdateOneRequiredWithoutPhysicalBookingsNestedInput = {
+    create?: XOR<PackageCreateWithoutPhysicalBookingsInput, PackageUncheckedCreateWithoutPhysicalBookingsInput>
+    connectOrCreate?: PackageCreateOrConnectWithoutPhysicalBookingsInput
+    upsert?: PackageUpsertWithoutPhysicalBookingsInput
+    connect?: PackageWhereUniqueInput
+    update?: XOR<XOR<PackageUpdateToOneWithWhereWithoutPhysicalBookingsInput, PackageUpdateWithoutPhysicalBookingsInput>, PackageUncheckedUpdateWithoutPhysicalBookingsInput>
   }
 
   export type UserCreateNestedOneWithoutSubscriptionsInput = {
@@ -34885,10 +36980,6 @@ export namespace Prisma {
 
   export type EnumPaymentProviderFieldUpdateOperationsInput = {
     set?: $Enums.PaymentProvider
-  }
-
-  export type EnumPaymentStatusFieldUpdateOperationsInput = {
-    set?: $Enums.PaymentStatus
   }
 
   export type UserUpdateOneRequiredWithoutPaymentsNestedInput = {
@@ -35308,6 +37399,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type NestedEnumPackageTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PackageType | EnumPackageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPackageTypeFilter<$PrismaModel> | $Enums.PackageType
+  }
+
   export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -35322,6 +37420,50 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPackageTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PackageType | EnumPackageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PackageType[] | ListEnumPackageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPackageTypeWithAggregatesFilter<$PrismaModel> | $Enums.PackageType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPackageTypeFilter<$PrismaModel>
+    _max?: NestedEnumPackageTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPaymentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
+  }
+
+  export type NestedEnumBookingStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BookingStatus | EnumBookingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBookingStatusFilter<$PrismaModel> | $Enums.BookingStatus
+  }
+
+  export type NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PaymentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
+    _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumBookingStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BookingStatus | EnumBookingStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BookingStatus[] | ListEnumBookingStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBookingStatusWithAggregatesFilter<$PrismaModel> | $Enums.BookingStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBookingStatusFilter<$PrismaModel>
+    _max?: NestedEnumBookingStatusFilter<$PrismaModel>
   }
 
   export type NestedEnumSubscriptionStatusFilter<$PrismaModel = never> = {
@@ -35348,13 +37490,6 @@ export namespace Prisma {
     not?: NestedEnumPaymentProviderFilter<$PrismaModel> | $Enums.PaymentProvider
   }
 
-  export type NestedEnumPaymentStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
-  }
-
   export type NestedEnumPaymentProviderWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.PaymentProvider | EnumPaymentProviderFieldRefInput<$PrismaModel>
     in?: $Enums.PaymentProvider[] | ListEnumPaymentProviderFieldRefInput<$PrismaModel>
@@ -35363,16 +37498,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPaymentProviderFilter<$PrismaModel>
     _max?: NestedEnumPaymentProviderFilter<$PrismaModel>
-  }
-
-  export type NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PaymentStatus | EnumPaymentStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumPaymentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PaymentStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
-    _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -35686,6 +37811,56 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PhysicalBookingCreateWithoutUserInput = {
+    id?: string
+    bookingReference: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    package: PackageCreateNestedOneWithoutPhysicalBookingsInput
+  }
+
+  export type PhysicalBookingUncheckedCreateWithoutUserInput = {
+    id?: string
+    bookingReference: string
+    packageId: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PhysicalBookingCreateOrConnectWithoutUserInput = {
+    where: PhysicalBookingWhereUniqueInput
+    create: XOR<PhysicalBookingCreateWithoutUserInput, PhysicalBookingUncheckedCreateWithoutUserInput>
+  }
+
+  export type PhysicalBookingCreateManyUserInputEnvelope = {
+    data: PhysicalBookingCreateManyUserInput | PhysicalBookingCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type MatchInteractionCreateWithoutRequesterInput = {
     id?: string
     status?: $Enums.InteractionStatus
@@ -35982,6 +38157,46 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"VerificationToken"> | Date | string
   }
 
+  export type PhysicalBookingUpsertWithWhereUniqueWithoutUserInput = {
+    where: PhysicalBookingWhereUniqueInput
+    update: XOR<PhysicalBookingUpdateWithoutUserInput, PhysicalBookingUncheckedUpdateWithoutUserInput>
+    create: XOR<PhysicalBookingCreateWithoutUserInput, PhysicalBookingUncheckedCreateWithoutUserInput>
+  }
+
+  export type PhysicalBookingUpdateWithWhereUniqueWithoutUserInput = {
+    where: PhysicalBookingWhereUniqueInput
+    data: XOR<PhysicalBookingUpdateWithoutUserInput, PhysicalBookingUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PhysicalBookingUpdateManyWithWhereWithoutUserInput = {
+    where: PhysicalBookingScalarWhereInput
+    data: XOR<PhysicalBookingUpdateManyMutationInput, PhysicalBookingUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PhysicalBookingScalarWhereInput = {
+    AND?: PhysicalBookingScalarWhereInput | PhysicalBookingScalarWhereInput[]
+    OR?: PhysicalBookingScalarWhereInput[]
+    NOT?: PhysicalBookingScalarWhereInput | PhysicalBookingScalarWhereInput[]
+    id?: StringFilter<"PhysicalBooking"> | string
+    bookingReference?: StringFilter<"PhysicalBooking"> | string
+    userId?: StringNullableFilter<"PhysicalBooking"> | string | null
+    packageId?: StringFilter<"PhysicalBooking"> | string
+    customerName?: StringFilter<"PhysicalBooking"> | string
+    customerEmail?: StringFilter<"PhysicalBooking"> | string
+    customerPhone?: StringFilter<"PhysicalBooking"> | string
+    bookingDate?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    bookingTime?: StringFilter<"PhysicalBooking"> | string
+    amount?: DecimalFilter<"PhysicalBooking"> | Decimal | DecimalJsLike | number | string
+    currency?: StringFilter<"PhysicalBooking"> | string
+    paymentStatus?: EnumPaymentStatusFilter<"PhysicalBooking"> | $Enums.PaymentStatus
+    paymentReference?: StringNullableFilter<"PhysicalBooking"> | string | null
+    paymentMethod?: StringNullableFilter<"PhysicalBooking"> | string | null
+    status?: EnumBookingStatusFilter<"PhysicalBooking"> | $Enums.BookingStatus
+    notes?: StringNullableFilter<"PhysicalBooking"> | string | null
+    createdAt?: DateTimeFilter<"PhysicalBooking"> | Date | string
+    updatedAt?: DateTimeFilter<"PhysicalBooking"> | Date | string
+  }
+
   export type MatchInteractionUpsertWithWhereUniqueWithoutRequesterInput = {
     where: MatchInteractionWhereUniqueInput
     update: XOR<MatchInteractionUpdateWithoutRequesterInput, MatchInteractionUncheckedUpdateWithoutRequesterInput>
@@ -36042,6 +38257,7 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -36060,6 +38276,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -36149,6 +38366,7 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -36167,6 +38385,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -36628,6 +38847,56 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PhysicalBookingCreateWithoutPackageInput = {
+    id?: string
+    bookingReference: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutPhysicalBookingsInput
+  }
+
+  export type PhysicalBookingUncheckedCreateWithoutPackageInput = {
+    id?: string
+    bookingReference: string
+    userId?: string | null
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PhysicalBookingCreateOrConnectWithoutPackageInput = {
+    where: PhysicalBookingWhereUniqueInput
+    create: XOR<PhysicalBookingCreateWithoutPackageInput, PhysicalBookingUncheckedCreateWithoutPackageInput>
+  }
+
+  export type PhysicalBookingCreateManyPackageInputEnvelope = {
+    data: PhysicalBookingCreateManyPackageInput | PhysicalBookingCreateManyPackageInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SubscriptionUpsertWithWhereUniqueWithoutPackageInput = {
     where: SubscriptionWhereUniqueInput
     update: XOR<SubscriptionUpdateWithoutPackageInput, SubscriptionUncheckedUpdateWithoutPackageInput>
@@ -36660,6 +38929,210 @@ export namespace Prisma {
     data: XOR<PaymentUpdateManyMutationInput, PaymentUncheckedUpdateManyWithoutPackageInput>
   }
 
+  export type PhysicalBookingUpsertWithWhereUniqueWithoutPackageInput = {
+    where: PhysicalBookingWhereUniqueInput
+    update: XOR<PhysicalBookingUpdateWithoutPackageInput, PhysicalBookingUncheckedUpdateWithoutPackageInput>
+    create: XOR<PhysicalBookingCreateWithoutPackageInput, PhysicalBookingUncheckedCreateWithoutPackageInput>
+  }
+
+  export type PhysicalBookingUpdateWithWhereUniqueWithoutPackageInput = {
+    where: PhysicalBookingWhereUniqueInput
+    data: XOR<PhysicalBookingUpdateWithoutPackageInput, PhysicalBookingUncheckedUpdateWithoutPackageInput>
+  }
+
+  export type PhysicalBookingUpdateManyWithWhereWithoutPackageInput = {
+    where: PhysicalBookingScalarWhereInput
+    data: XOR<PhysicalBookingUpdateManyMutationInput, PhysicalBookingUncheckedUpdateManyWithoutPackageInput>
+  }
+
+  export type UserCreateWithoutPhysicalBookingsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    lastLoginAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ProfileCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    payments?: PaymentCreateNestedManyWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
+    targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
+  }
+
+  export type UserUncheckedCreateWithoutPhysicalBookingsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    role?: $Enums.UserRole
+    isActive?: boolean
+    lastLoginAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ProfileUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
+    targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
+  }
+
+  export type UserCreateOrConnectWithoutPhysicalBookingsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPhysicalBookingsInput, UserUncheckedCreateWithoutPhysicalBookingsInput>
+  }
+
+  export type PackageCreateWithoutPhysicalBookingsInput = {
+    id?: string
+    name: string
+    slug: string
+    description: string
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    durationDays?: number
+    matchAllowance?: number
+    features?: PackageCreatefeaturesInput | string[]
+    isPopular?: boolean
+    isActive?: boolean
+    type?: $Enums.PackageType
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: SubscriptionCreateNestedManyWithoutPackageInput
+    payments?: PaymentCreateNestedManyWithoutPackageInput
+  }
+
+  export type PackageUncheckedCreateWithoutPhysicalBookingsInput = {
+    id?: string
+    name: string
+    slug: string
+    description: string
+    price: Decimal | DecimalJsLike | number | string
+    currency?: string
+    durationDays?: number
+    matchAllowance?: number
+    features?: PackageCreatefeaturesInput | string[]
+    isPopular?: boolean
+    isActive?: boolean
+    type?: $Enums.PackageType
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutPackageInput
+    payments?: PaymentUncheckedCreateNestedManyWithoutPackageInput
+  }
+
+  export type PackageCreateOrConnectWithoutPhysicalBookingsInput = {
+    where: PackageWhereUniqueInput
+    create: XOR<PackageCreateWithoutPhysicalBookingsInput, PackageUncheckedCreateWithoutPhysicalBookingsInput>
+  }
+
+  export type UserUpsertWithoutPhysicalBookingsInput = {
+    update: XOR<UserUpdateWithoutPhysicalBookingsInput, UserUncheckedUpdateWithoutPhysicalBookingsInput>
+    create: XOR<UserCreateWithoutPhysicalBookingsInput, UserUncheckedCreateWithoutPhysicalBookingsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPhysicalBookingsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPhysicalBookingsInput, UserUncheckedUpdateWithoutPhysicalBookingsInput>
+  }
+
+  export type UserUpdateWithoutPhysicalBookingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ProfileUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    payments?: PaymentUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
+    targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPhysicalBookingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ProfileUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
+    targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
+  }
+
+  export type PackageUpsertWithoutPhysicalBookingsInput = {
+    update: XOR<PackageUpdateWithoutPhysicalBookingsInput, PackageUncheckedUpdateWithoutPhysicalBookingsInput>
+    create: XOR<PackageCreateWithoutPhysicalBookingsInput, PackageUncheckedCreateWithoutPhysicalBookingsInput>
+    where?: PackageWhereInput
+  }
+
+  export type PackageUpdateToOneWithWhereWithoutPhysicalBookingsInput = {
+    where?: PackageWhereInput
+    data: XOR<PackageUpdateWithoutPhysicalBookingsInput, PackageUncheckedUpdateWithoutPhysicalBookingsInput>
+  }
+
+  export type PackageUpdateWithoutPhysicalBookingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    durationDays?: IntFieldUpdateOperationsInput | number
+    matchAllowance?: IntFieldUpdateOperationsInput | number
+    features?: PackageUpdatefeaturesInput | string[]
+    isPopular?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUpdateManyWithoutPackageNestedInput
+    payments?: PaymentUpdateManyWithoutPackageNestedInput
+  }
+
+  export type PackageUncheckedUpdateWithoutPhysicalBookingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    durationDays?: IntFieldUpdateOperationsInput | number
+    matchAllowance?: IntFieldUpdateOperationsInput | number
+    features?: PackageUpdatefeaturesInput | string[]
+    isPopular?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutPackageNestedInput
+    payments?: PaymentUncheckedUpdateManyWithoutPackageNestedInput
+  }
+
   export type UserCreateWithoutSubscriptionsInput = {
     id?: string
     email: string
@@ -36674,6 +39147,7 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -36692,6 +39166,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -36713,10 +39188,12 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     payments?: PaymentCreateNestedManyWithoutPackageInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateWithoutSubscriptionsInput = {
@@ -36731,10 +39208,12 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     payments?: PaymentUncheckedCreateNestedManyWithoutPackageInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageCreateOrConnectWithoutSubscriptionsInput = {
@@ -36767,6 +39246,7 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -36785,6 +39265,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -36812,10 +39293,12 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     payments?: PaymentUpdateManyWithoutPackageNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateWithoutSubscriptionsInput = {
@@ -36830,10 +39313,12 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     payments?: PaymentUncheckedUpdateManyWithoutPackageNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type UserCreateWithoutPaymentsInput = {
@@ -36850,6 +39335,7 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -36868,6 +39354,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -36889,10 +39376,12 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptions?: SubscriptionCreateNestedManyWithoutPackageInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutPackageInput
   }
 
   export type PackageUncheckedCreateWithoutPaymentsInput = {
@@ -36907,10 +39396,12 @@ export namespace Prisma {
     features?: PackageCreatefeaturesInput | string[]
     isPopular?: boolean
     isActive?: boolean
+    type?: $Enums.PackageType
     sortOrder?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutPackageInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutPackageInput
   }
 
   export type PackageCreateOrConnectWithoutPaymentsInput = {
@@ -36967,6 +39458,7 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -36985,6 +39477,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -37012,10 +39505,12 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUpdateManyWithoutPackageNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutPackageNestedInput
   }
 
   export type PackageUncheckedUpdateWithoutPaymentsInput = {
@@ -37030,10 +39525,12 @@ export namespace Prisma {
     features?: PackageUpdatefeaturesInput | string[]
     isPopular?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    type?: EnumPackageTypeFieldUpdateOperationsInput | $Enums.PackageType
     sortOrder?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutPackageNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutPackageNestedInput
   }
 
   export type PaymentEventUpsertWithWhereUniqueWithoutPaymentInput = {
@@ -37170,6 +39667,7 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
 
@@ -37188,6 +39686,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
 
@@ -37211,6 +39710,7 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
   }
 
@@ -37229,6 +39729,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
   }
 
@@ -37263,6 +39764,7 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
 
@@ -37281,6 +39783,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
 
@@ -37310,6 +39813,7 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
   }
 
@@ -37328,6 +39832,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
   }
 
@@ -37345,6 +39850,7 @@ export namespace Prisma {
     payments?: PaymentCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -37363,6 +39869,7 @@ export namespace Prisma {
     payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -37397,6 +39904,7 @@ export namespace Prisma {
     payments?: PaymentUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -37415,6 +39923,7 @@ export namespace Prisma {
     payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -37433,6 +39942,7 @@ export namespace Prisma {
     payments?: PaymentCreateNestedManyWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -37451,6 +39961,7 @@ export namespace Prisma {
     payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     verificationTokens?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -37485,6 +39996,7 @@ export namespace Prisma {
     payments?: PaymentUpdateManyWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -37503,6 +40015,7 @@ export namespace Prisma {
     payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     verificationTokens?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -37521,6 +40034,7 @@ export namespace Prisma {
     payments?: PaymentCreateNestedManyWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionCreateNestedManyWithoutTargetInput
   }
@@ -37539,6 +40053,7 @@ export namespace Prisma {
     payments?: PaymentUncheckedCreateNestedManyWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    physicalBookings?: PhysicalBookingUncheckedCreateNestedManyWithoutUserInput
     requestedInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutRequesterInput
     targetInteractions?: MatchInteractionUncheckedCreateNestedManyWithoutTargetInput
   }
@@ -37573,6 +40088,7 @@ export namespace Prisma {
     payments?: PaymentUpdateManyWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUpdateManyWithoutTargetNestedInput
   }
@@ -37591,6 +40107,7 @@ export namespace Prisma {
     payments?: PaymentUncheckedUpdateManyWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    physicalBookings?: PhysicalBookingUncheckedUpdateManyWithoutUserNestedInput
     requestedInteractions?: MatchInteractionUncheckedUpdateManyWithoutRequesterNestedInput
     targetInteractions?: MatchInteractionUncheckedUpdateManyWithoutTargetNestedInput
   }
@@ -37783,6 +40300,26 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type PhysicalBookingCreateManyUserInput = {
+    id?: string
+    bookingReference: string
+    packageId: string
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type MatchInteractionCreateManyRequesterInput = {
     id?: string
     targetId: string
@@ -37970,6 +40507,66 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PhysicalBookingUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    package?: PackageUpdateOneRequiredWithoutPhysicalBookingsNestedInput
+  }
+
+  export type PhysicalBookingUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    packageId?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhysicalBookingUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    packageId?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MatchInteractionUpdateWithoutRequesterInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumInteractionStatusFieldUpdateOperationsInput | $Enums.InteractionStatus
@@ -38092,6 +40689,26 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type PhysicalBookingCreateManyPackageInput = {
+    id?: string
+    bookingReference: string
+    userId?: string | null
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    bookingDate: Date | string
+    bookingTime: string
+    amount: Decimal | DecimalJsLike | number | string
+    currency?: string
+    paymentStatus?: $Enums.PaymentStatus
+    paymentReference?: string | null
+    paymentMethod?: string | null
+    status?: $Enums.BookingStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SubscriptionUpdateWithoutPackageInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
@@ -38180,6 +40797,66 @@ export namespace Prisma {
     approvedByAdminId?: NullableStringFieldUpdateOperationsInput | string | null
     approvalNote?: NullableStringFieldUpdateOperationsInput | string | null
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhysicalBookingUpdateWithoutPackageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutPhysicalBookingsNestedInput
+  }
+
+  export type PhysicalBookingUncheckedUpdateWithoutPackageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PhysicalBookingUncheckedUpdateManyWithoutPackageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingReference?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerEmail?: StringFieldUpdateOperationsInput | string
+    customerPhone?: StringFieldUpdateOperationsInput | string
+    bookingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    bookingTime?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    currency?: StringFieldUpdateOperationsInput | string
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentReference?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

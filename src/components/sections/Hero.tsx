@@ -81,7 +81,7 @@ export default function Hero() {
               {...fadeUp(0.45)}
             >
               <Button
-                href="/register"
+                href="/matchmaking/experience"
                 variant="primary"
                 size="md"
                 className="col-span-1 gap-1.5 sm:gap-2 !px-2.5 sm:!px-4 !text-[11px] sm:!text-xs lg:!text-sm justify-center whitespace-nowrap"

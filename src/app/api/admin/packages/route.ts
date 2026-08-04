@@ -48,6 +48,8 @@ export async function POST(req: NextRequest) {
       features: Array.isArray(body.features) ? body.features : [],
       isPopular: Boolean(body.isPopular),
       isActive: body.isActive !== undefined ? Boolean(body.isActive) : true,
+      type: body.type === "PHYSICAL" ? "PHYSICAL" : "ONLINE",
+      sortOrder: Number(body.sortOrder || 0),
     });
 
     return NextResponse.json({ success: true, package: created });

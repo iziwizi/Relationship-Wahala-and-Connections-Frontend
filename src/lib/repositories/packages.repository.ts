@@ -18,17 +18,21 @@ export interface PackageInput {
   features: string[];
   isPopular?: boolean;
   isActive?: boolean;
+  type?: "ONLINE" | "PHYSICAL";
   sortOrder?: number;
 }
 
-export async function getActivePackages(): Promise<PackageRecord[]> {
+export async function getActivePackages(type?: "ONLINE" | "PHYSICAL"): Promise<PackageRecord[]> {
   if (!isDatabaseMode()) {
-    return demoPackages.filter((p) => p.isActive);
+    return demoPackages.filter((p) => p.isActive && (!type || p.type === type));
   }
 
   const { prisma } = await import("@/lib/db/prisma");
   const dbPkgs = await prisma.package.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      ...(type && { type }),
+    },
     orderBy: { sortOrder: "asc" },
   });
 
@@ -44,13 +48,19 @@ export async function getActivePackages(): Promise<PackageRecord[]> {
     features: p.features,
     isPopular: p.isPopular,
     isActive: p.isActive,
+    type: p.type as "ONLINE" | "PHYSICAL",
   }));
 }
 
-export async function getAllPackages(): Promise<PackageRecord[]> {
-  if (!isDatabaseMode()) return demoPackages;
+export async function getAllPackages(type?: "ONLINE" | "PHYSICAL"): Promise<PackageRecord[]> {
+  if (!isDatabaseMode()) {
+    return demoPackages.filter((p) => !type || p.type === type);
+  }
   const { prisma } = await import("@/lib/db/prisma");
   const dbPkgs = await prisma.package.findMany({
+    where: {
+      ...(type && { type }),
+    },
     orderBy: { sortOrder: "asc" },
   });
   return dbPkgs.map((p) => ({
@@ -65,6 +75,7 @@ export async function getAllPackages(): Promise<PackageRecord[]> {
     features: p.features,
     isPopular: p.isPopular,
     isActive: p.isActive,
+    type: p.type as "ONLINE" | "PHYSICAL",
   }));
 }
 
@@ -87,6 +98,7 @@ export async function getPackageBySlug(slug: string): Promise<PackageRecord | nu
     features: p.features,
     isPopular: p.isPopular,
     isActive: p.isActive,
+    type: p.type as "ONLINE" | "PHYSICAL",
   };
 }
 
@@ -109,6 +121,7 @@ export async function getPackageById(id: string): Promise<PackageRecord | null> 
     features: p.features,
     isPopular: p.isPopular,
     isActive: p.isActive,
+    type: p.type as "ONLINE" | "PHYSICAL",
   };
 }
 
@@ -128,6 +141,7 @@ export async function updatePackage(id: string, data: Partial<PackageInput>) {
       ...(data.features && { features: data.features }),
       ...(data.isPopular !== undefined && { isPopular: data.isPopular }),
       ...(data.isActive !== undefined && { isActive: data.isActive }),
+      ...(data.type && { type: data.type }),
       ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
     },
   });
@@ -149,7 +163,14 @@ export async function createPackage(data: PackageInput) {
       features: data.features,
       isPopular: data.isPopular || false,
       isActive: data.isActive !== undefined ? data.isActive : true,
+      type: data.type || "ONLINE",
       sortOrder: data.sortOrder || 0,
     },
   });
+}
+
+export async function deletePackage(id: string) {
+  if (!isDatabaseMode()) return null;
+  const { prisma } = await import("@/lib/db/prisma");
+  return prisma.package.delete({ where: { id } });
 }

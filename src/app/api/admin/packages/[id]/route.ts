@@ -1,10 +1,12 @@
 // src/app/api/admin/packages/[id]/route.ts
-// GET & PUT package editing endpoint (SUPER_ADMIN authorized)
+// GET, PUT & DELETE package editing endpoint (SUPER_ADMIN authorized)
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth/session";
-import { getPackageById, updatePackage } from "@/lib/repositories/packages.repository";
+import { getPackageById, updatePackage, deletePackage } from "@/lib/repositories/packages.repository";
 import { revalidatePath } from "next/cache";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   req: NextRequest,
@@ -57,6 +59,8 @@ export async function PUT(
       ...(body.features && { features: Array.isArray(body.features) ? body.features : [] }),
       ...(body.isPopular !== undefined && { isPopular: Boolean(body.isPopular) }),
       ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
+      ...(body.type && { type: body.type }),
+      ...(body.sortOrder !== undefined && { sortOrder: Number(body.sortOrder) }),
     });
 
     if (!updated) {
@@ -70,5 +74,30 @@ export async function PUT(
   } catch (error) {
     console.error("[Admin Package PUT ID API] Error:", error);
     return NextResponse.json({ error: "Failed to update package." }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const token = req.cookies.get(SESSION_COOKIE)?.value;
+    const session = token ? await verifySession(token) : null;
+
+    if (!session || session.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Unauthorized. Admin privileges required." }, { status: 401 });
+    }
+
+    const { id } = await params;
+    await deletePackage(id);
+
+    revalidatePath("/pricing");
+    revalidatePath("/admin/packages");
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[Admin Package DELETE ID API] Error:", error);
+    return NextResponse.json({ error: "Failed to delete package." }, { status: 500 });
   }
 }

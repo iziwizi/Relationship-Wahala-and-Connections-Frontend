@@ -19,7 +19,7 @@ function formatNGN(amount: number) {
 }
 
 export default async function PricingPage() {
-  const activePackages = await getActivePackages();
+  const activePackages = await getActivePackages("ONLINE");
 
   return (
     <>
@@ -35,8 +35,14 @@ export default async function PricingPage() {
                 Invest in Your Marital Journey
               </h1>
               <p className="font-sans text-white/80 text-base leading-relaxed">
-                Choose the matchmaking tier that aligns with your timeline, preferences, and guided support needs.
+                Choose the online or physical matchmaking tier that aligns with your timeline, preferences, and guided support needs.
               </p>
+
+              <div className="mt-8 flex justify-center gap-4">
+                <Button href="/matchmaking/experience" variant="gold" size="md">
+                  Explore Physical vs Online Options
+                </Button>
+              </div>
             </div>
           </Container>
         </section>

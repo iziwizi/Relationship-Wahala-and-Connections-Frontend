@@ -13,6 +13,7 @@ export interface MatchmakingPackage {
   features: string[];
   isPopular?: boolean;
   isActive: boolean;
+  type?: "ONLINE" | "PHYSICAL";
 }
 
 export const demoPackages: MatchmakingPackage[] = [

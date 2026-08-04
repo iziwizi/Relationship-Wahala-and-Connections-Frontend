@@ -185,79 +185,104 @@ async function main() {
   console.log(`✅ Second test member seeded: ${aminaMember.email}`);
 
   // ─── 4. Packages ──────────────────────────────────────────
-  const standardPkg = await prisma.package.upsert({
-    where: { slug: "standard-matchmaking" },
-    update: {},
-    create: {
+  const onlinePackages = [
+    {
       name: "Standard Matchmaking",
-      slug: "standard-matchmaking",
-      description: "Ideal for intentional singles starting their guided matchmaking journey.",
-      price: 45000.0,
+      slug: "online-standard",
+      description: "Online matchmaking service with access to 20 potential matches.",
+      price: 12000,
       currency: "NGN",
       durationDays: 30,
-      matchAllowance: 5,
+      matchAllowance: 20,
+      features: ["20 potential matches", "30 Days access", "Direct contact details"],
+      isPopular: false,
+      isActive: true,
+      type: "ONLINE" as const,
       sortOrder: 1,
+    },
+    {
+      name: "Premium Matchmaking Service",
+      slug: "online-premium",
+      description: "Expanded online matchmaking service with 30 potential matches.",
+      price: 17000,
+      currency: "NGN",
+      durationDays: 30,
+      matchAllowance: 30,
+      features: ["30 potential matches", "30 Days access", "Direct contact details"],
+      isPopular: true,
+      isActive: true,
+      type: "ONLINE" as const,
+      sortOrder: 2,
+    },
+    {
+      name: "Unlimited Matchmaking Service",
+      slug: "online-unlimited",
+      description: "Comprehensive 1-year online matchmaking with unlimited match access.",
+      price: 100000,
+      currency: "NGN",
+      durationDays: 365,
+      matchAllowance: 9999,
+      features: ["Unlimited matches", "One year access", "Direct contact details"],
+      isPopular: false,
+      isActive: true,
+      type: "ONLINE" as const,
+      sortOrder: 3,
+    },
+  ];
+
+  const physicalPackages = [
+    {
+      name: "Standard Matchmaking",
+      slug: "physical-standard",
+      description: "In-person consultation and curated introductions with full vetting.",
+      price: 30000,
+      currency: "NGN",
+      durationDays: 30,
+      matchAllowance: 3,
       features: [
-        "Vetted Profile Verification",
-        "Up to 5 Handpicked Compatible Matches/Month",
-        "Basic Personality & Values Alignment",
-        "Direct Match Communication",
-        "Access to Video Podcast Education",
+        "Registration & Profile Creation",
+        "In-depth consultation",
+        "Background screening",
+        "Multiple curated introductions (three introductions)",
+        "Coaching and feedbacks",
+        "Limited follow-up",
       ],
       isPopular: false,
       isActive: true,
+      type: "PHYSICAL" as const,
+      sortOrder: 1,
     },
-  });
-
-  const epmsPkg = await prisma.package.upsert({
-    where: { slug: "epms-premium" },
-    update: {},
-    create: {
-      name: "Executive Physical Matchmaking (EPMS)",
-      slug: "epms-premium",
-      description: "Personalised, highly confidential executive matchmaking for discerning individuals.",
-      price: 150000.0,
+    {
+      name: "Premium Matchmaking",
+      slug: "physical-premium",
+      description: "Dedicated matchmaker, concierge-style service, high privacy, and ongoing support.",
+      price: 120000,
       currency: "NGN",
       durationDays: 90,
-      matchAllowance: 15,
-      sortOrder: 2,
+      matchAllowance: 10,
       features: [
-        "1-on-1 Private Relationship Consultant",
-        "In-Depth Personality & Incompatibility Assessment",
-        "Comprehensive Background & Identity Verification",
-        "Physical / Virtual Hosted First Date Coordination",
-        "Pre-Marital Relationship Readiness Coaching",
-        "Ongoing Match Advice & Consultation",
+        "Dedicated matchmaker",
+        "Multiple introductions (as many as possible)",
+        "Extensive vetting",
+        "Ongoing support",
+        "Concierge-style service and high privacy",
       ],
       isPopular: true,
       isActive: true,
+      type: "PHYSICAL" as const,
+      sortOrder: 2,
     },
-  });
+  ];
 
-  await prisma.package.upsert({
-    where: { slug: "global-vip" },
-    update: {},
-    create: {
-      name: "Global Diaspora VIP",
-      slug: "global-vip",
-      description: "Dedicated international matchmaking connecting singles across Nigeria, UK, US, and Diaspora.",
-      price: 350000.0,
-      currency: "NGN",
-      durationDays: 180,
-      matchAllowance: 30,
-      sortOrder: 3,
-      features: [
-        "Priority Global & Diaspora Matchmaking",
-        "Dedicated Senior Matchmaker & Relationship Coach",
-        "Discreet & Confidential Profile Protection",
-        "Unlimited Match Review & Feedback Sessions",
-        "Pre-Marital Counseling Package (4 Sessions Included)",
-        "24/7 Relationship Support Access",
-      ],
-      isPopular: false,
-      isActive: true,
-    },
-  });
+  let standardPkg;
+  for (const pkg of [...onlinePackages, ...physicalPackages]) {
+    const upserted = await prisma.package.upsert({
+      where: { slug: pkg.slug },
+      update: pkg,
+      create: pkg,
+    });
+    if (pkg.slug === "online-standard") standardPkg = upserted;
+  }
   console.log(`✅ Packages seeded`);
 
   // ─── 5. Subscription ──────────────────────────────────────

@@ -22,6 +22,7 @@ const mainAdminItems: AdminSidebarItem[] = [
   { label: "User Management", href: "/admin/users", icon: Users },
   { label: "Profile Verification", href: "/admin/profiles", icon: UserCheck },
   { label: "Matchmaking Control", href: "/admin/matches", icon: Heart },
+  { label: "Physical Bookings", href: "/admin/bookings", icon: Calendar },
   { label: "Packages Management", href: "/admin/packages", icon: Package },
   { label: "Payment Logs", href: "/admin/payments", icon: CreditCard },
   { label: "Contact Enquiries", href: "/admin/enquiries", icon: MessageSquare },

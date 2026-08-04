@@ -68,6 +68,18 @@ enum ContentStatus {
   ARCHIVED
 }
 
+enum PackageType {
+  ONLINE
+  PHYSICAL
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
 // ─── Core Models ──────────────────────────────────────────
 
 model User {
@@ -86,6 +98,7 @@ model User {
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
   verificationTokens  VerificationToken[]
+  physicalBookings    PhysicalBooking[]
 
   requestedInteractions MatchInteraction[] @relation("Requester")
   targetInteractions    MatchInteraction[] @relation("Target")
@@ -164,25 +177,55 @@ model Photo {
 // ─── Packages & Subscriptions ─────────────────────────────
 
 model Package {
-  id             String   @id @default(cuid())
+  id             String      @id @default(cuid())
   name           String
-  slug           String   @unique
-  description    String   @db.Text
-  price          Decimal  @db.Decimal(12, 2)
-  currency       String   @default("NGN")
-  durationDays   Int      @default(30)
-  matchAllowance Int      @default(5)
+  slug           String      @unique
+  description    String      @db.Text
+  price          Decimal     @db.Decimal(12, 2)
+  currency       String      @default("NGN")
+  durationDays   Int         @default(30)
+  matchAllowance Int         @default(5)
   features       String[]
-  isPopular      Boolean  @default(false)
-  isActive       Boolean  @default(true)
-  sortOrder      Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isPopular      Boolean     @default(false)
+  isActive       Boolean     @default(true)
+  type           PackageType @default(ONLINE)
+  sortOrder      Int         @default(0)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
-  subscriptions Subscription[]
-  payments      Payment[]
+  subscriptions    Subscription[]
+  payments         Payment[]
+  physicalBookings PhysicalBooking[]
 
   @@index([isActive])
+  @@index([type])
+}
+
+model PhysicalBooking {
+  id               String        @id @default(cuid())
+  bookingReference String        @unique
+  userId           String?
+  user             User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  packageId        String
+  package          Package       @relation(fields: [packageId], references: [id])
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  bookingDate      DateTime
+  bookingTime      String
+  amount           Decimal       @db.Decimal(12, 2)
+  currency         String        @default("NGN")
+  paymentStatus    PaymentStatus @default(PENDING)
+  paymentReference String?
+  paymentMethod    String?       @default("PAYSTACK")
+  status           BookingStatus @default(PENDING)
+  notes            String?       @db.Text
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([customerEmail])
+  @@index([bookingDate])
+  @@index([status])
 }
 
 model Subscription {

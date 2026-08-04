@@ -3,7 +3,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useState, useEffect } from "react";
 import { MatchmakingPackage } from "@/data/demo/packages";
-import { Plus, CheckCircle2, Star, Edit3, Loader2 } from "lucide-react";
+import { Plus, CheckCircle2, Star, Edit3, Loader2, Trash2, Filter, Laptop, Users } from "lucide-react";
 import Link from "next/link";
 
 function formatNGN(amount: number) {
@@ -15,18 +15,21 @@ export default function AdminPackagesPage() {
   const [loading, setLoading] = useState(true);
   const [showNewModal, setShowNewModal] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [typeFilter, setTypeFilter] = useState<"ALL" | "ONLINE" | "PHYSICAL">("ALL");
+  const [actionId, setActionId] = useState<string | null>(null);
 
   // New package form state
   const [newPkg, setNewPkg] = useState<Partial<MatchmakingPackage>>({
     name: "",
     description: "",
-    price: 50000,
+    price: 30000,
     currency: "NGN",
     durationDays: 30,
     matchAllowance: 5,
     features: ["Profile Verification", "Handpicked Matches"],
     isPopular: false,
     isActive: true,
+    type: "ONLINE",
   });
 
   useEffect(() => {
@@ -51,6 +54,7 @@ export default function AdminPackagesPage() {
   }
 
   const toggleActive = async (id: string, currentActive: boolean) => {
+    setActionId(id);
     try {
       const res = await fetch(`/api/admin/packages/${id}`, {
         method: "PUT",
@@ -64,10 +68,13 @@ export default function AdminPackagesPage() {
       }
     } catch (err) {
       console.error("Error toggling package status:", err);
+    } finally {
+      setActionId(null);
     }
   };
 
   const togglePopular = async (id: string, currentPopular: boolean) => {
+    setActionId(id);
     try {
       const res = await fetch(`/api/admin/packages/${id}`, {
         method: "PUT",
@@ -81,6 +88,25 @@ export default function AdminPackagesPage() {
       }
     } catch (err) {
       console.error("Error toggling featured status:", err);
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const handleDeletePackage = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this package from PostgreSQL?")) return;
+    setActionId(id);
+    try {
+      const res = await fetch(`/api/admin/packages/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setPackages((prev) => prev.filter((p) => p.id !== id));
+      }
+    } catch (err) {
+      console.error("Error deleting package:", err);
+    } finally {
+      setActionId(null);
     }
   };
 
@@ -101,13 +127,14 @@ export default function AdminPackagesPage() {
           setNewPkg({
             name: "",
             description: "",
-            price: 50000,
+            price: 30000,
             currency: "NGN",
             durationDays: 30,
             matchAllowance: 5,
             features: ["Profile Verification", "Handpicked Matches"],
             isPopular: false,
             isActive: true,
+            type: "ONLINE",
           });
         }
       }
@@ -118,16 +145,21 @@ export default function AdminPackagesPage() {
     }
   };
 
+  const filteredPackages = packages.filter((p) => {
+    if (typeFilter === "ALL") return true;
+    return p.type === typeFilter;
+  });
+
   const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2 text-xs font-sans text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]";
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="font-serif text-2xl font-bold text-[#1a1a1a]">Package &amp; Subscription Management</h1>
             <p className="font-sans text-xs text-gray-500 mt-1">
-              Create, edit, price, and manage matchmaking subscription packages dynamically.
+              Create, edit, price, and manage Online &amp; Physical matchmaking packages directly in PostgreSQL.
             </p>
           </div>
           <button
@@ -138,14 +170,37 @@ export default function AdminPackagesPage() {
           </button>
         </div>
 
+        {/* Category Filter Tabs */}
+        <div className="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-2">
+          <Filter size={14} className="text-gray-400 ml-2" />
+          <span className="font-sans text-xs font-bold text-gray-500 uppercase mr-2">Filter Type:</span>
+          {(["ALL", "ONLINE", "PHYSICAL"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTypeFilter(t)}
+              className={`px-4 py-1.5 rounded-xl font-sans text-xs font-bold transition-all ${
+                typeFilter === t
+                  ? "bg-[#7b1d2a] text-white shadow-sm"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {t === "ALL" ? "All Packages" : t === "ONLINE" ? "Online Packages" : "Physical Packages"}
+            </button>
+          ))}
+        </div>
+
         {loading ? (
           <div className="p-12 flex items-center justify-center gap-2 text-gray-500 font-sans text-xs bg-white rounded-2xl border border-gray-200">
             <Loader2 size={18} className="animate-spin text-[#7b1d2a]" />
             Loading subscription packages from PostgreSQL...
           </div>
+        ) : filteredPackages.length === 0 ? (
+          <div className="p-12 text-center text-gray-500 font-sans text-sm bg-white rounded-2xl border border-gray-200">
+            No packages found matching current filter.
+          </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {packages.map((pkg) => (
+            {filteredPackages.map((pkg) => (
               <div
                 key={pkg.id}
                 className={`bg-white rounded-2xl border p-6 flex flex-col justify-between shadow-sm relative ${
@@ -160,7 +215,17 @@ export default function AdminPackagesPage() {
 
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="font-serif font-bold text-base text-[#1a1a1a]">{pkg.name}</h3>
+                    <div>
+                      <span className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mb-1 ${
+                        pkg.type === "PHYSICAL"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}>
+                        {pkg.type === "PHYSICAL" ? <Users size={10} /> : <Laptop size={10} />}
+                        {pkg.type || "ONLINE"}
+                      </span>
+                      <h3 className="font-serif font-bold text-base text-[#1a1a1a]">{pkg.name}</h3>
+                    </div>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${pkg.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}>
                       {pkg.isActive ? "Active" : "Inactive"}
                     </span>
@@ -169,11 +234,11 @@ export default function AdminPackagesPage() {
                   <p className="font-serif text-2xl font-bold text-[#7b1d2a] mb-2">
                     {formatNGN(pkg.price)}
                   </p>
-                  <p className="font-sans text-xs text-gray-500 mb-4">{pkg.description}</p>
+                  <p className="font-sans text-xs text-gray-500 mb-4 line-clamp-2">{pkg.description}</p>
 
                   <div className="bg-gray-50 p-3 rounded-lg text-xs font-sans space-y-1 mb-4">
                     <p><span className="font-semibold text-gray-700">Duration:</span> {pkg.durationDays} Days</p>
-                    <p><span className="font-semibold text-gray-700">Match Allowance:</span> {pkg.matchAllowance} Matches</p>
+                    <p><span className="font-semibold text-gray-700">Match Allowance:</span> {pkg.matchAllowance === 9999 ? "Unlimited" : `${pkg.matchAllowance} Matches`}</p>
                   </div>
 
                   <ul className="space-y-1.5 mb-6">
@@ -186,7 +251,7 @@ export default function AdminPackagesPage() {
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+                <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-2 flex-wrap">
                   <Link
                     href={`/admin/packages/${pkg.id}/edit`}
                     className="inline-flex items-center gap-1 text-[11px] font-bold font-sans px-3 py-1 bg-[#7b1d2a] text-white rounded hover:bg-[#5c1520]"
@@ -194,10 +259,11 @@ export default function AdminPackagesPage() {
                     <Edit3 size={12} /> Edit
                   </Link>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => togglePopular(pkg.id, Boolean(pkg.isPopular))}
-                      className={`text-[11px] font-bold font-sans px-2.5 py-1 rounded border ${
+                      disabled={actionId === pkg.id}
+                      className={`text-[11px] font-bold font-sans px-2 py-1 rounded border ${
                         pkg.isPopular ? "border-[#c9962c] text-[#c9962c]" : "border-gray-200 text-gray-500"
                       }`}
                     >
@@ -206,11 +272,21 @@ export default function AdminPackagesPage() {
 
                     <button
                       onClick={() => toggleActive(pkg.id, Boolean(pkg.isActive))}
-                      className={`text-[11px] font-bold font-sans px-3 py-1 rounded text-white ${
+                      disabled={actionId === pkg.id}
+                      className={`text-[11px] font-bold font-sans px-2.5 py-1 rounded text-white ${
                         pkg.isActive ? "bg-amber-600 hover:bg-amber-700" : "bg-green-600 hover:bg-green-700"
                       }`}
                     >
-                      {pkg.isActive ? "Deactivate" : "Activate"}
+                      {pkg.isActive ? "Hide" : "Activate"}
+                    </button>
+
+                    <button
+                      onClick={() => handleDeletePackage(pkg.id)}
+                      disabled={actionId === pkg.id}
+                      className="p-1 text-gray-400 hover:text-red-600 rounded"
+                      title="Delete Package"
+                    >
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
@@ -222,131 +298,141 @@ export default function AdminPackagesPage() {
         {/* Create Modal */}
         {showNewModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="font-serif text-lg font-bold text-[#1a1a1a]">Create New Package</h2>
-            </div>
-            <div className="overflow-y-auto flex-1 p-6 space-y-4">
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Package Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. EPMS Premium Gold"
-                  value={newPkg.name}
-                  onChange={(e) => setNewPkg((p) => ({ ...p, name: e.target.value }))}
-                  className={inputClass}
-                />
+            <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h2 className="font-serif text-lg font-bold text-[#1a1a1a]">Create New Package</h2>
               </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
-                <textarea
-                  rows={2}
-                  placeholder="Package summary..."
-                  value={newPkg.description}
-                  onChange={(e) => setNewPkg((p) => ({ ...p, description: e.target.value }))}
-                  className={inputClass}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="overflow-y-auto flex-1 p-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Price (NGN)</label>
-                  <input
-                    type="number"
-                    value={newPkg.price}
-                    onChange={(e) => setNewPkg((p) => ({ ...p, price: Number(e.target.value) }))}
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Package Type</label>
+                  <select
+                    value={newPkg.type || "ONLINE"}
+                    onChange={(e) => setNewPkg((p) => ({ ...p, type: e.target.value as "ONLINE" | "PHYSICAL" }))}
                     className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Duration (Days)</label>
-                  <input
-                    type="number"
-                    value={newPkg.durationDays}
-                    onChange={(e) => setNewPkg((p) => ({ ...p, durationDays: Number(e.target.value) }))}
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Match Allowance</label>
-                <input
-                  type="number"
-                  value={newPkg.matchAllowance}
-                  onChange={(e) => setNewPkg((p) => ({ ...p, matchAllowance: Number(e.target.value) }))}
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Dynamic Features Section */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold text-gray-700 uppercase">Included Features</label>
-                  <button
-                    type="button"
-                    onClick={() => setNewPkg((p) => ({ ...p, features: [...(p.features || []), ""] }))}
-                    className="text-[11px] font-bold text-[#7b1d2a] hover:underline"
                   >
-                    + Add Feature
-                  </button>
+                    <option value="ONLINE">Online Matchmaking</option>
+                    <option value="PHYSICAL">Physical Matchmaking</option>
+                  </select>
                 </div>
 
-                <div className="space-y-2 max-h-36 overflow-y-auto p-1">
-                  {(newPkg.features || []).map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="Feature description..."
-                        value={feat}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setNewPkg((p) => {
-                            const updated = [...(p.features || [])];
-                            updated[idx] = val;
-                            return { ...p, features: updated };
-                          });
-                        }}
-                        className={inputClass}
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setNewPkg((p) => ({
-                            ...p,
-                            features: (p.features || []).filter((_, i) => i !== idx),
-                          }))
-                        }
-                        className="p-1.5 text-gray-400 hover:text-red-600 rounded"
-                        title="Remove Feature"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Package Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Standard Matchmaking"
+                    value={newPkg.name}
+                    onChange={(e) => setNewPkg((p) => ({ ...p, name: e.target.value }))}
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Package summary..."
+                    value={newPkg.description}
+                    onChange={(e) => setNewPkg((p) => ({ ...p, description: e.target.value }))}
+                    className={inputClass}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Price (NGN)</label>
+                    <input
+                      type="number"
+                      value={newPkg.price}
+                      onChange={(e) => setNewPkg((p) => ({ ...p, price: Number(e.target.value) }))}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Duration (Days)</label>
+                    <input
+                      type="number"
+                      value={newPkg.durationDays}
+                      onChange={(e) => setNewPkg((p) => ({ ...p, durationDays: Number(e.target.value) }))}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Match Allowance</label>
+                  <input
+                    type="number"
+                    value={newPkg.matchAllowance}
+                    onChange={(e) => setNewPkg((p) => ({ ...p, matchAllowance: Number(e.target.value) }))}
+                    className={inputClass}
+                  />
+                </div>
+
+                {/* Dynamic Features Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-gray-700 uppercase">Included Features</label>
+                    <button
+                      type="button"
+                      onClick={() => setNewPkg((p) => ({ ...p, features: [...(p.features || []), ""] }))}
+                      className="text-[11px] font-bold text-[#7b1d2a] hover:underline"
+                    >
+                      + Add Feature
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 max-h-36 overflow-y-auto p-1">
+                    {(newPkg.features || []).map((feat, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Feature description..."
+                          value={feat}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setNewPkg((p) => {
+                              const updated = [...(p.features || [])];
+                              updated[idx] = val;
+                              return { ...p, features: updated };
+                            });
+                          }}
+                          className={inputClass}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setNewPkg((p) => ({
+                              ...p,
+                              features: (p.features || []).filter((_, i) => i !== idx),
+                            }))
+                          }
+                          className="p-1.5 text-gray-400 hover:text-red-600 rounded"
+                          title="Remove Feature"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-
+              <div className="flex gap-3 justify-end p-4 border-t border-gray-100 bg-white rounded-b-2xl">
+                <button
+                  onClick={() => setShowNewModal(false)}
+                  className="px-4 py-2 text-xs font-semibold text-gray-600 border rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddPackage}
+                  disabled={creating}
+                  className="px-4 py-2 text-xs font-bold text-white bg-[#7b1d2a] rounded-lg hover:bg-[#5c1520] flex items-center gap-1"
+                >
+                  {creating ? <Loader2 size={14} className="animate-spin" /> : null}
+                  <span>Save Package</span>
+                </button>
+              </div>
             </div>
-            <div className="flex gap-3 justify-end p-4 border-t border-gray-100 bg-white rounded-b-2xl">
-              <button
-                onClick={() => setShowNewModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-gray-600 border rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddPackage}
-                disabled={creating}
-                className="px-4 py-2 text-xs font-bold text-white bg-[#7b1d2a] rounded-lg hover:bg-[#5c1520] flex items-center gap-1"
-              >
-                {creating ? <Loader2 size={14} className="animate-spin" /> : null}
-                <span>Save Package</span>
-              </button>
-            </div>
-          </div>
           </div>
         )}
       </div>

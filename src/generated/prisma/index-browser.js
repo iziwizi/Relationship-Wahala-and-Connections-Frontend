@@ -199,7 +199,29 @@ exports.Prisma.PackageScalarFieldEnum = {
   features: 'features',
   isPopular: 'isPopular',
   isActive: 'isActive',
+  type: 'type',
   sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PhysicalBookingScalarFieldEnum = {
+  id: 'id',
+  bookingReference: 'bookingReference',
+  userId: 'userId',
+  packageId: 'packageId',
+  customerName: 'customerName',
+  customerEmail: 'customerEmail',
+  customerPhone: 'customerPhone',
+  bookingDate: 'bookingDate',
+  bookingTime: 'bookingTime',
+  amount: 'amount',
+  currency: 'currency',
+  paymentStatus: 'paymentStatus',
+  paymentReference: 'paymentReference',
+  paymentMethod: 'paymentMethod',
+  status: 'status',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -455,6 +477,28 @@ exports.ProfileStatus = exports.$Enums.ProfileStatus = {
   SUSPENDED: 'SUSPENDED'
 };
 
+exports.PackageType = exports.$Enums.PackageType = {
+  ONLINE: 'ONLINE',
+  PHYSICAL: 'PHYSICAL'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SUCCESSFUL: 'SUCCESSFUL',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  REJECTED: 'REJECTED'
+};
+
+exports.BookingStatus = exports.$Enums.BookingStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
   ACTIVE: 'ACTIVE',
   EXPIRED: 'EXPIRED',
@@ -466,16 +510,6 @@ exports.PaymentProvider = exports.$Enums.PaymentProvider = {
   PAYSTACK: 'PAYSTACK',
   FLUTTERWAVE: 'FLUTTERWAVE',
   BANK_TRANSFER: 'BANK_TRANSFER'
-};
-
-exports.PaymentStatus = exports.$Enums.PaymentStatus = {
-  PENDING: 'PENDING',
-  PROCESSING: 'PROCESSING',
-  SUCCESSFUL: 'SUCCESSFUL',
-  FAILED: 'FAILED',
-  CANCELLED: 'CANCELLED',
-  PENDING_REVIEW: 'PENDING_REVIEW',
-  REJECTED: 'REJECTED'
 };
 
 exports.InteractionStatus = exports.$Enums.InteractionStatus = {
@@ -503,6 +537,7 @@ exports.Prisma.ModelName = {
   MatchPreference: 'MatchPreference',
   Photo: 'Photo',
   Package: 'Package',
+  PhysicalBooking: 'PhysicalBooking',
   Subscription: 'Subscription',
   Payment: 'Payment',
   PaymentEvent: 'PaymentEvent',

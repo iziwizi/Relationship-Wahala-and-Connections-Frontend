@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import useRouter from "next/navigation";
 import Link from "next/link";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from "lucide-react";
@@ -18,6 +17,7 @@ interface PackageData {
   features: string[];
   isPopular: boolean;
   isActive: boolean;
+  type?: "ONLINE" | "PHYSICAL";
 }
 
 export default function EditPackagePage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,6 +37,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
     features: [],
     isPopular: false,
     isActive: true,
+    type: "ONLINE",
   });
 
   useEffect(() => {
@@ -113,7 +114,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
             </Link>
             <div>
               <h1 className="font-serif text-2xl font-bold text-[#1a1a1a]">Edit Matchmaking Package</h1>
-              <p className="font-sans text-xs text-gray-500">Update pricing, included features, duration, and visibility.</p>
+              <p className="font-sans text-xs text-gray-500">Update pricing, included features, duration, type, and visibility.</p>
             </div>
           </div>
         </div>
@@ -125,7 +126,19 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
           </div>
         ) : (
           <form onSubmit={handleSave} className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 space-y-6 shadow-sm">
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Package Type</label>
+                <select
+                  value={formData.type || "ONLINE"}
+                  onChange={(e) => setFormData((p) => ({ ...p, type: e.target.value as "ONLINE" | "PHYSICAL" }))}
+                  className={inputClass}
+                >
+                  <option value="ONLINE">Online Matchmaking</option>
+                  <option value="PHYSICAL">Physical Matchmaking</option>
+                </select>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">Package Name</label>
                 <input
