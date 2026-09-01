@@ -478,7 +478,7 @@ export const demoFAQs: DemoFAQ[] = [
   {
     id: "faq-10",
     question: "How can I contact customer support or schedule a private consultation?",
-    answer: "You can submit an enquiry via our Contact page, email us directly at support@relationshipwahala.com, or call our customer line at +234 801 234 5678.",
+    answer: "You can submit an enquiry via our Contact page, email us directly at support@relationshipwahalaandconnections.com, or call our customer line at 08066689080.",
     category: "General",
     sortOrder: 10,
   },

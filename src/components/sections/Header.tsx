@@ -135,7 +135,7 @@ export default function Header() {
             <Button href="/login" variant="outline" size="sm" className="!text-gray-700 !border-gray-300 !bg-transparent hover:!bg-gray-50">
               Sign In
             </Button>
-            <Button href="/register" variant="primary" size="sm">
+            <Button href="/matchmaking/experience" variant="primary" size="sm">
               Get Started
             </Button>
           </div>
@@ -216,7 +216,7 @@ export default function Header() {
               <Button href="/login" variant="outline" size="md" className="!text-gray-700 !border-gray-300 !bg-transparent w-full">
                 Sign In
               </Button>
-              <Button href="/register" variant="primary" size="md" className="w-full">
+              <Button href="/matchmaking/experience" variant="primary" size="md" className="w-full">
                 Get Started
               </Button>
             </div>

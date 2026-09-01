@@ -65,8 +65,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-serif font-bold text-sm text-[#1a1a1a]">Email Us</h3>
-                    <a href="mailto:hello@relationshipwahala.com" className="font-sans text-xs text-[#7b1d2a] font-semibold mt-1 block">
-                      hello@relationshipwahala.com
+                    <a href="mailto:hello@relationshipwahalaandconnections.com" className="font-sans text-xs text-[#7b1d2a] font-semibold mt-1 block">
+                      hello@relationshipwahalaandconnections.com
                     </a>
                   </div>
                 </div>
@@ -77,8 +77,9 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-serif font-bold text-sm text-[#1a1a1a]">Call / WhatsApp</h3>
-                    <p className="font-sans text-xs text-gray-600 mt-1">+234 801 234 5678</p>
-                    <p className="font-sans text-xs text-gray-600">+234 909 876 5432</p>
+                    <a href="tel:08066689080" className="font-sans text-xs text-gray-700 font-semibold mt-1 block hover:text-[#7b1d2a]">
+                      08066689080
+                    </a>
                   </div>
                 </div>
               </div>
@@ -137,7 +138,7 @@ export default function ContactPage() {
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="+234 800 000 0000"
+                          placeholder="08066689080"
                           className={inputClass}
                         />
                       </div>

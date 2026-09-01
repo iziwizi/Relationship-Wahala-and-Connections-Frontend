@@ -397,7 +397,7 @@ function BookPhysicalAppointmentContent() {
                         <input
                           type="tel"
                           required
-                          placeholder="+234 800 000 0000"
+                          placeholder="08066689080"
                           value={customerPhone}
                           onChange={(e) => setCustomerPhone(e.target.value)}
                           className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl font-sans text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#7b1d2a]"

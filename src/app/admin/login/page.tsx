@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
-import { Lock, Mail, AlertCircle, Info, ArrowRight, ShieldAlert } from "lucide-react";
+import { Lock, Mail, AlertCircle, ShieldAlert } from "lucide-react";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -40,12 +40,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  const autoFill = () => {
-    setEmail("admin@relationshipwahala.com");
-    setPassword("Admin@123");
-    setError(null);
-  };
-
   return (
     <div className="min-h-screen bg-[#111111] text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
@@ -64,28 +58,9 @@ export default function AdminLoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-[#1a1a1a] py-8 px-6 border border-white/10 rounded-2xl sm:px-10 shadow-2xl">
-          {/* Demo Admin Info */}
-          <div className="mb-6 p-4 bg-[#c9962c]/10 border border-[#c9962c]/30 rounded-xl">
-            <div className="flex items-start gap-3">
-              <Info size={18} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-sans text-xs font-bold text-[#c9962c] uppercase">Super Admin Test Credentials</p>
-                <p className="font-sans text-xs text-white/80 mt-1">Email: admin@relationshipwahala.com</p>
-                <p className="font-sans text-xs text-white/80">Password: Admin@123</p>
-                <button
-                  type="button"
-                  onClick={autoFill}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#c9962c] underline"
-                >
-                  Auto-fill admin credentials <ArrowRight size={12} />
-                </button>
-              </div>
-            </div>
-          </div>
-
           {error && (
             <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-xl flex items-start gap-3 text-red-200 text-xs font-sans">
-              <AlertCircle size={18} className="text-red-400 flex-shrink-0" />
+              <AlertCircle size={18} className="text-red-400 flex-shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
           )}
@@ -102,7 +77,7 @@ export default function AdminLoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@relationshipwahala.com"
+                  placeholder="admin@relationshipwahalaandconnections.com"
                   className="block w-full pl-10 pr-3 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-white/40 font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#c9962c]"
                 />
               </div>

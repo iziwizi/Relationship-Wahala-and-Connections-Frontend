@@ -187,7 +187,7 @@ function BookingConfirmationContent() {
               {/* Contact Action Buttons */}
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
                 <a
-                  href="tel:+2348012345678"
+                  href="tel:08066689080"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#7b1d2a] text-white font-sans text-xs font-bold px-6 py-3 rounded-xl hover:bg-[#5c1520] transition-colors"
                 >
                   <Phone size={16} />
@@ -195,7 +195,7 @@ function BookingConfirmationContent() {
                 </a>
 
                 <a
-                  href="https://wa.me/2348012345678?text=Hello%20Relationship%20Wahala%20Team%2C%20I%20have%20completed%20a%20physical%20matchmaking%20booking."
+                  href="https://wa.me/2348066689080?text=Hello%20Relationship%20Wahala%20Team%2C%20I%20have%20completed%20a%20physical%20matchmaking%20booking."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-green-600 text-white font-sans text-xs font-bold px-6 py-3 rounded-xl hover:bg-green-700 transition-colors"

@@ -4,7 +4,8 @@
 import { Resend } from "resend";
 
 const resendApiKey = process.env.RESEND_API_KEY;
-const fromEmail = process.env.EMAIL_FROM || "Relationship Wahala <no-reply@relationshipwahala.com>";
+const fromEmail = process.env.EMAIL_FROM || "Relationship Wahala <no-reply@relationshipwahalaandconnections.com>";
+const defaultBaseUrl = process.env.NEXTAUTH_URL || "https://www.relationshipwahalaandconnections.com";
 
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
@@ -68,7 +69,8 @@ function emailWrapper(contentHtml: string): string {
         </div>
         <div class="footer">
           &copy; ${new Date().getFullYear()} Relationship Wahala &amp; Connections. All rights reserved.<br/>
-          Lagos, Nigeria | Intentional Matchmaking &amp; Relationship Guidance
+          Lagos, Nigeria | Intentional Matchmaking &amp; Relationship Guidance<br/>
+          <a href="https://www.relationshipwahalaandconnections.com" style="color: #7b1d2a; text-decoration: underline;">www.relationshipwahalaandconnections.com</a>
         </div>
       </div>
     </body>
@@ -84,16 +86,16 @@ export async function sendWelcomeEmail(to: string, name: string) {
       <h2>Welcome, ${name}! 🎉</h2>
       <p>Thank you for joining Nigeria's premier knowledge-based relationship and matchmaking platform.</p>
       <p>Your journey towards building a healthy, intentional, and lasting marriage begins today.</p>
-      <p><a href="${process.env.NEXTAUTH_URL || "https://relationshipwahala.com"}/dashboard" class="button">Go to My Dashboard</a></p>
+      <p><a href="${defaultBaseUrl}/dashboard" class="button">Go to My Dashboard</a></p>
     `),
   });
 }
 
 export async function sendVerificationEmail(to: string, name: string, token: string) {
-  const verifyUrl = `${process.env.NEXTAUTH_URL || "https://relationshipwahala.com"}/verify-email?token=${token}`;
+  const verifyUrl = `${defaultBaseUrl}/verify-email?token=${token}`;
   return sendEmail({
     to,
-    subject: "Verify Your Email Address — Relationship Wahala",
+    subject: "Verify Your Email Address — Relationship Wahala & Connections",
     html: emailWrapper(`
       <h2>Verify Your Email, ${name}</h2>
       <p>Please confirm your email address to activate your account and complete your profile setup.</p>
@@ -104,13 +106,13 @@ export async function sendVerificationEmail(to: string, name: string, token: str
 }
 
 export async function sendPasswordResetEmail(to: string, name: string, token: string) {
-  const resetUrl = `${process.env.NEXTAUTH_URL || "https://relationshipwahala.com"}/reset-password?token=${token}`;
+  const resetUrl = `${defaultBaseUrl}/reset-password?token=${token}`;
   return sendEmail({
     to,
-    subject: "Password Reset Instructions — Relationship Wahala",
+    subject: "Password Reset Instructions — Relationship Wahala & Connections",
     html: emailWrapper(`
       <h2>Reset Your Password, ${name}</h2>
-      <p>We received a request to reset your Relationship Wahala account password.</p>
+      <p>We received a request to reset your Relationship Wahala & Connections account password.</p>
       <p><a href="${resetUrl}" class="button">Reset Password</a></p>
       <p style="font-size: 12px; color: #666;">This link expires in 1 hour.</p>
     `),
@@ -120,12 +122,12 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
 export async function sendProfileApprovedEmail(to: string, name: string) {
   return sendEmail({
     to,
-    subject: "Profile Approved! 🎉 — Relationship Wahala",
+    subject: "Profile Approved! 🎉 — Relationship Wahala & Connections",
     html: emailWrapper(`
       <h2>Great news, ${name}!</h2>
       <p>Your profile has been verified and approved by our moderation team.</p>
       <p>You can now view intentional candidate matches and initiate connections.</p>
-      <p><a href="${process.env.NEXTAUTH_URL || "https://relationshipwahala.com"}/dashboard/matches" class="button">View My Matches</a></p>
+      <p><a href="${defaultBaseUrl}/dashboard/matches" class="button">View My Matches</a></p>
     `),
   });
 }
@@ -133,13 +135,13 @@ export async function sendProfileApprovedEmail(to: string, name: string) {
 export async function sendPaymentConfirmationEmail(to: string, name: string, amount: string, reference: string) {
   return sendEmail({
     to,
-    subject: `Payment Confirmed (${reference}) — Relationship Wahala`,
+    subject: `Payment Confirmed (${reference}) — Relationship Wahala & Connections`,
     html: emailWrapper(`
       <h2>Payment Confirmation</h2>
       <p>Dear ${name},</p>
       <p>We have successfully received and verified your payment of <strong>${amount}</strong> (Ref: ${reference}).</p>
       <p>Your subscription features are now active.</p>
-      <p><a href="${process.env.NEXTAUTH_URL || "https://relationshipwahala.com"}/dashboard/subscription" class="button">View Subscription</a></p>
+      <p><a href="${defaultBaseUrl}/dashboard/subscription" class="button">View Subscription</a></p>
     `),
   });
 }

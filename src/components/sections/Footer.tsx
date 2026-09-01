@@ -181,28 +181,20 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <Mail size={16} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
                 <a
-                  href="mailto:hello@relationshipwahala.com"
+                  href="mailto:hello@relationshipwahalaandconnections.com"
                   className="font-sans text-white/70 text-sm hover:text-[#c9962c] transition-colors duration-200 break-all"
                 >
-                  hello@relationshipwahala.com
+                  hello@relationshipwahalaandconnections.com
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <Phone size={16} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <a
-                    href="tel:+2348012345678"
-                    className="block font-sans text-white/70 text-sm hover:text-[#c9962c] transition-colors duration-200"
-                  >
-                    +234 801 234 5678
-                  </a>
-                  <a
-                    href="tel:+2349098765432"
-                    className="block font-sans text-white/70 text-sm hover:text-[#c9962c] transition-colors duration-200"
-                  >
-                    +234 909 876 5432
-                  </a>
-                </div>
+                <a
+                  href="tel:08066689080"
+                  className="block font-sans text-white/70 text-sm hover:text-[#c9962c] transition-colors duration-200"
+                >
+                  08066689080
+                </a>
               </li>
             </ul>
           </div>

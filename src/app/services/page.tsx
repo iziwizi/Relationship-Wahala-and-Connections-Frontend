@@ -26,7 +26,7 @@ const mainServices = [
     ],
     icon: Users,
     ctaText: "Start Matchmaking",
-    ctaHref: "/register",
+    ctaHref: "/matchmaking/experience",
     bg: "bg-white",
   },
   {
@@ -88,16 +88,16 @@ export default function ServicesPage() {
       <Header />
       <main className="pt-20 bg-white">
         {/* Services Hero */}
-        <section className="py-20 bg-[#7b1d2a] text-white">
+        <section className="py-20 lg:py-24 bg-[#7b1d2a] text-white">
           <Container>
             <div className="max-w-3xl mx-auto text-center">
-              <span className="font-sans text-xs font-bold uppercase tracking-widest text-[#c9962c] bg-white/10 px-3.5 py-1 rounded-full">
+              <span className="font-sans text-xs sm:text-sm font-bold uppercase tracking-widest text-[#c9962c] bg-white/10 px-4 py-1.5 rounded-full">
                 OUR COMPREHENSIVE SERVICES
               </span>
               <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mt-4 mb-6 leading-tight">
                 Everything You Need for a Healthy Relationship &amp; Marriage Journey
               </h1>
-              <p className="font-sans text-white/80 text-base sm:text-lg leading-relaxed">
+              <p className="font-sans text-white/90 text-base sm:text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto">
                 From guided matchmaking and pre-marital counseling to educational resources and video podcast media.
               </p>
             </div>
@@ -105,9 +105,9 @@ export default function ServicesPage() {
         </section>
 
         {/* Services List */}
-        <section className="py-16">
+        <section className="py-20 bg-[#fbf5ec]">
           <Container>
-            <div className="space-y-12">
+            <div className="space-y-12 max-w-5xl mx-auto">
               {mainServices.map((srv) => {
                 const Icon = srv.icon;
 
@@ -115,34 +115,34 @@ export default function ServicesPage() {
                   <div
                     key={srv.id}
                     id={srv.id}
-                    className={`p-8 sm:p-10 rounded-2xl border border-[#e8e0d4] shadow-sm ${srv.bg}`}
+                    className={`p-8 sm:p-12 rounded-3xl border border-[#e8e0d4] shadow-md hover:shadow-lg transition-shadow ${srv.bg}`}
                   >
                     <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
                       <div className="flex-1">
-                        <div className="w-12 h-12 bg-[#7b1d2a] text-white rounded-xl flex items-center justify-center mb-4">
-                          <Icon size={24} />
+                        <div className="w-14 h-14 bg-[#7b1d2a] text-white rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+                          <Icon size={26} />
                         </div>
-                        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-2">
+                        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-2 leading-snug">
                           {srv.title}
                         </h2>
-                        <p className="font-sans text-[#7b1d2a] font-semibold text-sm mb-4">
+                        <p className="font-sans text-[#7b1d2a] font-semibold text-base sm:text-lg mb-4">
                           {srv.tagline}
                         </p>
-                        <p className="font-sans text-gray-600 text-sm leading-relaxed mb-6">
+                        <p className="font-sans text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
                           {srv.description}
                         </p>
 
-                        <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                        <div className="grid sm:grid-cols-2 gap-4 mb-8">
                           {srv.bullets.map((b) => (
-                            <div key={b} className="flex items-start gap-2">
-                              <CheckCircle2 size={16} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
-                              <span className="font-sans text-xs text-gray-700 font-medium">{b}</span>
+                            <div key={b} className="flex items-start gap-3">
+                              <CheckCircle2 size={20} className="text-[#c9962c] flex-shrink-0 mt-0.5" />
+                              <span className="font-sans text-sm sm:text-base text-gray-800 font-medium">{b}</span>
                             </div>
                           ))}
                         </div>
 
-                        <Button href={srv.ctaHref} variant="primary" size="md">
-                          {srv.ctaText} <ArrowRight size={16} />
+                        <Button href={srv.ctaHref} variant="primary" size="lg" className="!px-6 !py-3.5 text-sm sm:text-base font-bold shadow-md">
+                          {srv.ctaText} <ArrowRight size={18} />
                         </Button>
                       </div>
                     </div>

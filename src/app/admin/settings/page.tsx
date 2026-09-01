@@ -14,9 +14,9 @@ export default function AdminSettingsPage() {
 
   const [settings, setSettings] = useState({
     platformName: "Relationship Wahala & Connections",
-    contactEmail: "hello@relationshipwahala.com",
-    contactPhone1: "+234 801 234 5678",
-    contactPhone2: "+234 909 876 5432",
+    contactEmail: "hello@relationshipwahalaandconnections.com",
+    contactPhone1: "08066689080",
+    contactPhone2: "+234 806 668 9080",
     address: "Lagos, Nigeria",
     requireVerificationBeforeMatching: true,
     currency: "NGN",

@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.relationshipwahalaandconnections.com"),
   title: "Relationship Wahala & Connections | Nigeria's Premier Matchmaking Platform",
   description:
     "Nigeria's knowledge-based relationship and intentional matchmaking platform helping singles and couples build healthy, lasting relationships.",
@@ -14,12 +15,13 @@ export const metadata: Metadata = {
     "marriage counseling Nigeria",
     "relationship education",
     "relationship wahala",
+    "relationship wahala and connections",
   ],
   openGraph: {
     title: "Relationship Wahala & Connections",
     description:
       "Nigeria's premier knowledge-based relationship and matchmaking platform, helping intentional singles and couples build healthy, lasting relationships.",
-    url: "https://www.relationshipwahala.com",
+    url: "https://www.relationshipwahalaandconnections.com",
     siteName: "Relationship Wahala & Connections",
     locale: "en_NG",
     type: "website",

@@ -312,7 +312,7 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => updateField("phone", e.target.value)}
-                  placeholder="+234 801 234 5678"
+                  placeholder="08066689080"
                   className={inputClass("phone")}
                 />
                 {errors.phone && <p className="font-sans text-xs text-red-600 mt-1">{errors.phone}</p>}
