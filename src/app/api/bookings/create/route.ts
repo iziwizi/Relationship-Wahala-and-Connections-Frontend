@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isDatabaseMode } from "@/lib/db/mode";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth/session";
+import { sendBookingConfirmationEmail, sendEmail } from "@/lib/email/email.service";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Strict Saturday & Sunday only validation (check both UTC and local interpretations to prevent timezone mismatches)
+    const utcDay = dateObj.getUTCDay(); // 0 is Sunday, 6 is Saturday
+    const localDay = dateObj.getDay();
+    const isWeekend = utcDay === 0 || utcDay === 6 || localDay === 0 || localDay === 6;
+
+    if (!isWeekend) {
+      return NextResponse.json(
+        { error: "Bookings are only available on Saturdays and Sundays." },
+        { status: 400 }
+      );
+    }
+
     // Get current logged-in user if available
     let userId: string | null = null;
     try {
@@ -61,7 +74,27 @@ export async function POST(req: NextRequest) {
     const bookingReference = generateBookingRef();
 
     if (!isDatabaseMode()) {
-      // Demo response
+      // Demo response with email dispatch
+      try {
+        await sendBookingConfirmationEmail({
+          to: customerEmail,
+          customerName,
+          bookingReference,
+          packageName: "Physical Matchmaking Package",
+          bookingDate: dateObj.toDateString(),
+          bookingTime,
+          amount: 30000,
+          paymentMethod: paymentMethod || "BANK_TRANSFER",
+          bankDetails: {
+            bankName: "First Bank of Nigeria",
+            accountName: "Relationship Wahala and Connections Services",
+            accountNumber: "2049581735",
+          },
+        });
+      } catch (err) {
+        console.error("[Demo Booking Email Error]:", err);
+      }
+
       return NextResponse.json({
         success: true,
         booking: {
@@ -100,8 +133,8 @@ export async function POST(req: NextRequest) {
         bookingTime,
         amount: pkg.price,
         currency: pkg.currency || "NGN",
-        paymentStatus: "SUCCESSFUL", // Marked as completed for booking flow
-        paymentMethod: paymentMethod || "PAYSTACK",
+        paymentStatus: "SUCCESSFUL",
+        paymentMethod: paymentMethod || "BANK_TRANSFER",
         paymentReference: `PAY-${Date.now()}`,
         status: "CONFIRMED",
         notes: notes || undefined,
@@ -113,7 +146,6 @@ export async function POST(req: NextRequest) {
 
     // 1. Create notification for Admin in Database
     try {
-      // Find all super admins
       const superAdmins = await prisma.user.findMany({
         where: { role: "SUPER_ADMIN" },
         select: { id: true },
@@ -133,9 +165,53 @@ export async function POST(req: NextRequest) {
       console.error("[Booking Notif Error]:", notifErr);
     }
 
-    // 2. Log confirmation for Customer & Admin email
-    console.log(`[EMAIL DISPATCH] Sent booking confirmation email to customer ${customerEmail} (Ref: ${bookingReference})`);
-    console.log(`[ADMIN EMAIL DISPATCH] Sent booking notification email to Admin (Customer: ${customerName}, Date: ${dateObj.toDateString()} ${bookingTime})`);
+    // 2. Dispatch real booking confirmation email to customer
+    try {
+      await sendBookingConfirmationEmail({
+        to: customerEmail,
+        customerName,
+        bookingReference,
+        packageName: pkg.name,
+        bookingDate: dateObj.toDateString(),
+        bookingTime,
+        amount: Number(booking.amount),
+        paymentMethod: paymentMethod || "BANK_TRANSFER",
+        bankDetails: {
+          bankName: "First Bank of Nigeria",
+          accountName: "Relationship Wahala and Connections Services",
+          accountNumber: "2049581735",
+        },
+      });
+      console.log(`[EMAIL DISPATCH] Successfully sent booking confirmation email to customer ${customerEmail} (Ref: ${bookingReference})`);
+    } catch (emailErr) {
+      console.error("[Booking Email Error]:", emailErr);
+    }
+
+    // 3. Dispatch notification email to Admin
+    try {
+      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "hello@relationshipwahalaandconnections.com";
+      await sendEmail({
+        to: adminEmail,
+        subject: `New Physical Consultation Booking (${bookingReference}) — ${customerName}`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px;">
+            <h2 style="color: #7b1d2a;">New Physical Consultation Booking Received</h2>
+            <p><strong>Customer Name:</strong> ${customerName}</p>
+            <p><strong>Email:</strong> ${customerEmail}</p>
+            <p><strong>Phone:</strong> ${customerPhone}</p>
+            <p><strong>Package:</strong> ${pkg.name}</p>
+            <p><strong>Scheduled Date:</strong> ${dateObj.toDateString()} at ${bookingTime}</p>
+            <p><strong>Amount:</strong> ₦${Number(booking.amount).toLocaleString()}</p>
+            <p><strong>Booking Reference:</strong> ${bookingReference}</p>
+            <p><strong>Payment Method:</strong> ${paymentMethod || "BANK_TRANSFER"}</p>
+            <p><strong>Notes:</strong> ${notes || "None provided"}</p>
+          </div>
+        `,
+      });
+      console.log(`[ADMIN EMAIL DISPATCH] Sent booking notification email to Admin for ${customerName}`);
+    } catch (adminEmailErr) {
+      console.error("[Admin Email Error]:", adminEmailErr);
+    }
 
     return NextResponse.json({
       success: true,

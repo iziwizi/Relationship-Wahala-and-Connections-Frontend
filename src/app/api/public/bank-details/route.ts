@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     let bankName = "First Bank of Nigeria";
-    let accountName = "Relationship Wahala & Connections Ltd";
-    let accountNumber = "3012345678";
-    let instructions = "Please include your full name in transfer narration.";
+    let accountName = "Relationship Wahala and Connections Services";
+    let accountNumber = "2049581735";
+    let instructions = "Please include your booking reference number in transfer narration.";
 
     if (isDatabaseMode()) {
       const { PrismaClient } = await import("@/generated/prisma");

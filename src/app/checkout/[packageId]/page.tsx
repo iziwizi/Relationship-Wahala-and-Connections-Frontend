@@ -22,8 +22,8 @@ interface BankDetails {
 
 const DEMO_BANK: BankDetails = {
   bankName: "First Bank of Nigeria",
-  accountName: "Relationship Wahala & Connections Ltd",
-  accountNumber: "3012345678",
+  accountName: "Relationship Wahala and Connections Services",
+  accountNumber: "2049581735",
   instructions: "Please include your full name and email in the transfer narration.",
 };
 
@@ -39,6 +39,7 @@ export default function CheckoutPage() {
   const [pkg, setPkg] = useState<MatchmakingPackage | null>(
     demoPackages.find((p) => p.slug === slug) ?? null
   );
+  const [bankDetails, setBankDetails] = useState<BankDetails>(DEMO_BANK);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [loading, setLoading] = useState(false);
   const [bankTransferRef, setBankTransferRef] = useState("");
@@ -64,6 +65,28 @@ export default function CheckoutPage() {
     }
     loadLivePackage();
   }, [slug]);
+
+  React.useEffect(() => {
+    async function loadLiveBankDetails() {
+      try {
+        const res = await fetch("/api/public/bank-details");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.bankName && data.accountNumber) {
+            setBankDetails({
+              bankName: data.bankName,
+              accountName: data.accountName,
+              accountNumber: data.accountNumber,
+              instructions: data.instructions || DEMO_BANK.instructions,
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load live bank details for checkout:", err);
+      }
+    }
+    loadLiveBankDetails();
+  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -334,9 +357,9 @@ export default function CheckoutPage() {
                   <div className="bg-[#fbf5ec] rounded-xl p-4 space-y-2.5">
                     <p className="font-sans text-xs font-bold text-gray-600 uppercase tracking-wider">Transfer Details</p>
                     {[
-                      { label: "Bank Name", value: DEMO_BANK.bankName },
-                      { label: "Account Name", value: DEMO_BANK.accountName },
-                      { label: "Account Number", value: DEMO_BANK.accountNumber },
+                      { label: "Bank Name", value: bankDetails.bankName },
+                      { label: "Account Name", value: bankDetails.accountName },
+                      { label: "Account Number", value: bankDetails.accountNumber },
                       { label: "Amount", value: formatNGN(pkg.price) },
                     ].map(({ label, value }) => (
                       <div key={label} className="flex items-center justify-between">
@@ -350,7 +373,7 @@ export default function CheckoutPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="font-sans text-xs text-gray-500">{DEMO_BANK.instructions}</p>
+                  <p className="font-sans text-xs text-gray-500">{bankDetails.instructions}</p>
 
                   <input
                     type="text"

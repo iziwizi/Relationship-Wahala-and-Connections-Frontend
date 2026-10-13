@@ -53,9 +53,9 @@ interface BankDetails {
 
 const DEFAULT_BANK_DETAILS: BankDetails = {
   bankName: "First Bank of Nigeria",
-  accountName: "Relationship Wahala & Connections Ltd",
-  accountNumber: "3012345678",
-  instructions: "Please include your full name or booking reference in transfer narration.",
+  accountName: "Relationship Wahala and Connections Services",
+  accountNumber: "2049581735",
+  instructions: "Please include your booking reference number in transfer narration.",
 };
 
 function BookPhysicalAppointmentContent() {
@@ -173,12 +173,12 @@ function BookPhysicalAppointmentContent() {
     return days;
   }, [currentMonth]);
 
-  // Preselect the first available upcoming date if none selected
+  // Preselect the first available upcoming weekend date if none selected
   useEffect(() => {
     if (!selectedDate) {
-      const firstAvailable = calendarDays.find((d) => d.isCurrentMonth && !d.isPast);
-      if (firstAvailable) {
-        setSelectedDate(firstAvailable.date);
+      const firstWeekend = calendarDays.find((d) => d.isCurrentMonth && d.isWeekend && !d.isPast);
+      if (firstWeekend) {
+        setSelectedDate(firstWeekend.date);
       }
     }
   }, [calendarDays, selectedDate]);
@@ -202,7 +202,7 @@ function BookPhysicalAppointmentContent() {
     setErrorMsg("");
 
     if (!selectedDate) {
-      setErrorMsg("Please select an appointment date.");
+      setErrorMsg("Please select an appointment date on Saturday or Sunday.");
       return;
     }
 
@@ -280,7 +280,7 @@ function BookPhysicalAppointmentContent() {
             <form onSubmit={handleSubmitBooking} className="grid lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: Calendar & Time Slots & Form */}
               <div className="lg:col-span-8 space-y-8">
-                {/* 1. Date Selection — All Future Dates Available */}
+                {/* 1. Date Selection — Saturdays & Sundays Only */}
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e0d4] shadow-sm">
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-gray-100">
                     <div className="flex items-center gap-2 text-[#7b1d2a]">
@@ -290,7 +290,7 @@ function BookPhysicalAppointmentContent() {
                       </h2>
                     </div>
                     <span className="text-[11px] font-sans font-bold text-[#c9962c] bg-[#fbf5ec] px-3 py-1 rounded-full uppercase tracking-wider">
-                      Weekdays &amp; Weekends Available
+                      Saturdays &amp; Sundays Only
                     </span>
                   </div>
 
@@ -331,7 +331,7 @@ function BookPhysicalAppointmentContent() {
                   {/* Calendar Days Grid */}
                   <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                     {calendarDays.map((item, index) => {
-                      const isSelectable = item.isCurrentMonth && !item.isPast;
+                      const isSelectable = item.isCurrentMonth && item.isWeekend && !item.isPast;
                       const isSelected =
                         selectedDate &&
                         item.date.toDateString() === selectedDate.toDateString();
@@ -351,9 +351,7 @@ function BookPhysicalAppointmentContent() {
                             isSelected
                               ? "bg-[#7b1d2a] text-white shadow-md scale-105"
                               : isSelectable
-                              ? item.isWeekend
-                                ? "bg-[#fbf5ec] text-[#1a1a1a] hover:bg-[#c9962c]/20 border border-[#c9962c]/40 font-bold"
-                                : "bg-white text-gray-800 hover:bg-gray-100 border border-gray-200"
+                              ? "bg-[#fbf5ec] text-[#1a1a1a] hover:bg-[#c9962c]/20 border border-[#c9962c]/40 font-bold"
                               : "bg-gray-50 text-gray-300 cursor-not-allowed border border-gray-100"
                           }`}
                         >
@@ -364,7 +362,7 @@ function BookPhysicalAppointmentContent() {
                   </div>
 
                   <p className="font-sans text-[11px] text-gray-500 mt-4 text-center italic">
-                    Note: Consultations are held throughout the week and weekends at our private executive suites.
+                    Note: In-person consultation sessions take place exclusively on Saturdays and Sundays.
                   </p>
                 </div>
 

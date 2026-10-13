@@ -45,8 +45,8 @@ interface BankDetails {
 
 const DEFAULT_BANK_DETAILS: BankDetails = {
   bankName: "First Bank of Nigeria",
-  accountName: "Relationship Wahala & Connections Ltd",
-  accountNumber: "3012345678",
+  accountName: "Relationship Wahala and Connections Services",
+  accountNumber: "2049581735",
   instructions: "Please include your booking reference number in your transfer description.",
 };
 
