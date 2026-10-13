@@ -1,5 +1,6 @@
 // src/app/api/upload/route.ts
 // Server-side media upload handler — uploads to Supabase Storage with graceful fallback
+// Allows profile-photos & avatars during onboarding/registration even if not logged in yet
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth/session";
@@ -9,16 +10,21 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get(SESSION_COOKIE)?.value;
-    const session = token ? await verifySession(token) : null;
-
-    if (!session) {
-      return NextResponse.json({ error: "Authentication required to upload media." }, { status: 401 });
-    }
-
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const bucket = (formData.get("bucket") as BucketName) || "cms-media";
+    const bucket = (formData.get("bucket") as BucketName) || "profile-photos";
+
+    // Check auth for admin / CMS buckets, but allow registration profile-photos / avatars
+    const isPublicAllowedBucket = bucket === "profile-photos" || bucket === "avatars";
+
+    if (!isPublicAllowedBucket) {
+      const token = req.cookies.get(SESSION_COOKIE)?.value;
+      const session = token ? await verifySession(token) : null;
+
+      if (!session) {
+        return NextResponse.json({ error: "Authentication required to upload media." }, { status: 401 });
+      }
+    }
 
     if (!file) {
       return NextResponse.json({ error: "No file provided." }, { status: 400 });

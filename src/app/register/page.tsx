@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/ui/Button";
 import {
   ArrowRight, ArrowLeft, Eye, EyeOff,
-  CheckCircle2, Upload, Sparkles
+  CheckCircle2, Upload, Sparkles, AlertCircle, Loader2, X, RefreshCw, Camera
 } from "lucide-react";
 
 interface RegisterFormData {
@@ -97,7 +96,7 @@ const initialFormData: RegisterFormData = {
   prefEducation: "Bachelor's Degree",
   prefGoal: "Marriage within 1-2 years",
   prefRelocation: "Open to relocation",
-  photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+  photoUrl: "",
 };
 
 const steps = [
@@ -111,14 +110,74 @@ const steps = [
   "Review & Submit",
 ];
 
+const STORAGE_KEY = "rwc_registration_draft_v2";
+
 export default function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<RegisterFormData>(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { login } = useAuth();
+  // Photo upload states
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const router = useRouter();
+
+  // 1. Hydrate saved registration progress from storage on initial mount
+  useEffect(() => {
+    try {
+      const savedData = sessionStorage.getItem(STORAGE_KEY) || localStorage.getItem(STORAGE_KEY);
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        if (parsed.formData) {
+          setFormData((prev) => ({ ...prev, ...parsed.formData }));
+        }
+        if (parsed.currentStep && parsed.currentStep >= 1 && parsed.currentStep <= steps.length) {
+          setCurrentStep(parsed.currentStep);
+        }
+      }
+    } catch (e) {
+      console.warn("Could not restore registration progress:", e);
+    }
+  }, []);
+
+  // 2. Persist state on change to prevent data loss on refresh or navigation
+  useEffect(() => {
+    try {
+      const payload = JSON.stringify({ formData, currentStep });
+      sessionStorage.setItem(STORAGE_KEY, payload);
+      localStorage.setItem(STORAGE_KEY, payload);
+    } catch (e) {
+      console.warn("Could not save registration draft:", e);
+    }
+  }, [formData, currentStep]);
+
+  // 3. Handle Browser Back Button / History navigation
+  // Ensures hardware/browser Back moves backwards through steps 8 -> 7 -> 6 ... -> 1
+  // rather than unmounting the page and losing filled progress
+  useEffect(() => {
+    // Push current step into history state if not already there
+    const url = new URL(window.location.href);
+    url.searchParams.set("step", currentStep.toString());
+    window.history.replaceState({ step: currentStep }, "", url.toString());
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && typeof event.state.step === "number") {
+        setCurrentStep(event.state.step);
+      } else {
+        // Fallback: decrement if > 1
+        setCurrentStep((prev) => Math.max(prev - 1, 1));
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [currentStep]);
 
   const updateField = (field: keyof RegisterFormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -140,7 +199,7 @@ export default function RegisterPage() {
       if (!formData.email.trim()) errs.email = "Email address is required";
       if (!formData.phone.trim()) errs.phone = "Phone number is required";
       if (!formData.password) errs.password = "Password is required";
-      if (formData.password.length < 6) errs.password = "Password must be at least 6 characters";
+      else if (formData.password.length < 8) errs.password = "Password must be at least 8 characters";
       if (formData.password !== formData.confirmPassword) errs.confirmPassword = "Passwords do not match";
       if (!formData.termsAgreed) errs.termsAgreed = "You must agree to the Terms of Use and Privacy Policy";
     }
@@ -165,22 +224,155 @@ export default function RegisterPage() {
     return Object.keys(errs).length === 0;
   };
 
+  const goToStep = (nextStep: number) => {
+    const target = Math.min(Math.max(nextStep, 1), steps.length);
+    const url = new URL(window.location.href);
+    url.searchParams.set("step", target.toString());
+    window.history.pushState({ step: target }, "", url.toString());
+    setCurrentStep(target);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      goToStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (currentStep > 1) {
+      goToStep(currentStep - 1);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleResetForm = () => {
+    if (confirm("Are you sure you want to clear your filled information and start over?")) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
+      setFormData(initialFormData);
+      setCurrentStep(1);
+      setErrors({});
+      setSubmitError(null);
+    }
+  };
+
+  // 4. File picker & Upload Logic
+  const handleFileProcess = useCallback(async (file: File) => {
+    setPhotoUploadError(null);
+
+    // Validate type
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      setPhotoUploadError("Please select a valid image file (JPEG, PNG, WebP).");
+      return;
+    }
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoUploadError("Image size must be less than 5MB.");
+      return;
+    }
+
+    setUploadingPhoto(true);
+
+    try {
+      // 1. Immediately read file as Data URL to preview without delay
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const previewUrl = e.target?.result as string;
+        updateField("photoUrl", previewUrl);
+      };
+      reader.readAsDataURL(file);
+
+      // 2. Upload to server API /api/upload
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+      uploadFormData.append("bucket", "profile-photos");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.url) {
+        updateField("photoUrl", data.url);
+      }
+    } catch (err) {
+      console.warn("Upload request failed, preview retained locally:", err);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }, []);
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileProcess(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    login("demo@relationshipwahala.com", "Demo@123");
-    router.push("/dashboard");
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleFileProcess(file);
+    }
+  };
+
+  // 5. Submit Registration to Database
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError(null);
+
+    // Final validation
+    if (!validateStep(1)) {
+      goToStep(1);
+      return;
+    }
+    if (!validateStep(2)) {
+      goToStep(2);
+      return;
+    }
+    if (!validateStep(3)) {
+      goToStep(3);
+      return;
+    }
+    if (!validateStep(5)) {
+      goToStep(5);
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Clear saved registration draft upon successful submission
+        sessionStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEY);
+
+        // Redirect to member dashboard
+        window.location.assign("/dashboard");
+      } else {
+        setSubmitError(data.error || "Registration failed. Please check your information and try again.");
+        if (data.error?.toLowerCase().includes("email")) {
+          goToStep(1);
+        }
+      }
+    } catch {
+      setSubmitError("Network connection error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = (field?: keyof RegisterFormData) =>
@@ -206,12 +398,22 @@ export default function RegisterPage() {
         </Link>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a]">Join Our Intentional Community</h1>
         <p className="font-sans text-xs sm:text-sm text-gray-600 mt-1">Start your guided journey to a meaningful marriage.</p>
-        <p className="font-sans text-xs text-gray-600 mt-2">
-          Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-[#7b1d2a] hover:underline">
-            Sign In
-          </Link>
-        </p>
+        <div className="flex items-center justify-center gap-4 mt-2">
+          <p className="font-sans text-xs text-gray-600">
+            Already have an account?{" "}
+            <Link href="/login" className="font-semibold text-[#7b1d2a] hover:underline">
+              Sign In
+            </Link>
+          </p>
+          <span className="text-gray-300">|</span>
+          <button
+            type="button"
+            onClick={handleResetForm}
+            className="font-sans text-xs text-gray-500 hover:text-red-600 inline-flex items-center gap-1 transition-colors"
+          >
+            <RefreshCw size={11} /> Clear Draft
+          </button>
+        </div>
       </div>
 
       {/* Main Container */}
@@ -240,7 +442,7 @@ export default function RegisterPage() {
                 <button
                   key={s}
                   type="button"
-                  onClick={() => { if (isDone) setCurrentStep(stepNum); }}
+                  onClick={() => { if (isDone) goToStep(stepNum); }}
                   className={`flex flex-col items-center gap-1 group text-left ${isDone ? "cursor-pointer" : "cursor-default"}`}
                 >
                   <div
@@ -249,12 +451,16 @@ export default function RegisterPage() {
                         ? "bg-green-500 text-white"
                         : isCurrent
                         ? "bg-[#7b1d2a] text-white ring-4 ring-[#7b1d2a]/20"
-                        : "bg-gray-100 text-gray-400"
+                        : "bg-gray-100 text-gray-400 group-hover:bg-gray-200"
                     }`}
                   >
-                    {isDone ? "✓" : stepNum}
+                    {isDone ? <CheckCircle2 size={16} /> : stepNum}
                   </div>
-                  <span className={`font-sans text-[10px] hidden md:block ${isCurrent ? "text-[#7b1d2a] font-bold" : "text-gray-400"}`}>
+                  <span
+                    className={`text-[10px] font-sans font-medium hidden md:block max-w-[65px] text-center truncate ${
+                      isCurrent ? "text-[#7b1d2a] font-bold" : "text-gray-500"
+                    }`}
+                  >
                     {s}
                   </span>
                 </button>
@@ -263,11 +469,20 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Step Form Content */}
-        <form onSubmit={currentStep === steps.length ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }}>
+        {submitError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-800 text-xs sm:text-sm font-sans">
+            <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold">Registration Alert</p>
+              <p>{submitError}</p>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
           {/* STEP 1: Account */}
           {currentStep === 1 && (
-            <div className="space-y-5">
+            <div className="space-y-4">
               <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Account Credentials</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -300,7 +515,7 @@ export default function RegisterPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => updateField("email", e.target.value)}
-                  placeholder="daniel@example.com"
+                  placeholder="name@example.com"
                   className={inputClass("email")}
                 />
                 {errors.email && <p className="font-sans text-xs text-red-600 mt-1">{errors.email}</p>}
@@ -342,7 +557,7 @@ export default function RegisterPage() {
                 <div>
                   <label className={labelClass}>Confirm Password *</label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={(e) => updateField("confirmPassword", e.target.value)}
                     placeholder="••••••••"
@@ -352,26 +567,33 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 pt-2">
+              <label className="flex items-start gap-2 pt-2 cursor-pointer font-sans text-xs text-gray-600">
                 <input
-                  id="terms"
                   type="checkbox"
                   checked={formData.termsAgreed}
                   onChange={(e) => updateField("termsAgreed", e.target.checked)}
-                  className="mt-1 h-4 w-4 text-[#7b1d2a] border-gray-300 rounded"
+                  className="mt-0.5 rounded text-[#7b1d2a] focus:ring-[#7b1d2a]"
                 />
-                <label htmlFor="terms" className="font-sans text-xs text-gray-600 leading-relaxed">
-                  I agree to the <Link href="/terms" className="text-[#7b1d2a] font-semibold underline">Terms of Use</Link> and <Link href="/privacy" className="text-[#7b1d2a] font-semibold underline">Privacy Policy</Link>. My data remains 100% confidential.
-                </label>
-              </div>
-              {errors.termsAgreed && <p className="font-sans text-xs text-red-600 mt-1">{errors.termsAgreed}</p>}
+                <span>
+                  I agree to the{" "}
+                  <Link href="/terms" target="_blank" className="text-[#7b1d2a] underline font-medium">
+                    Terms of Use
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" target="_blank" className="text-[#7b1d2a] underline font-medium">
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+              </label>
+              {errors.termsAgreed && <p className="font-sans text-xs text-red-600">{errors.termsAgreed}</p>}
             </div>
           )}
 
           {/* STEP 2: Basic Info */}
           {currentStep === 2 && (
-            <div className="space-y-5">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Basic Information</h2>
+            <div className="space-y-4">
+              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Personal Details</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Date of Birth *</label>
@@ -406,10 +628,11 @@ export default function RegisterPage() {
                     onChange={(e) => updateField("maritalStatus", e.target.value)}
                     className={inputClass("maritalStatus")}
                   >
-                    <option value="">Select Status</option>
+                    <option value="">Select Marital Status</option>
                     <option value="Single (Never Married)">Single (Never Married)</option>
                     <option value="Divorced">Divorced</option>
                     <option value="Widowed">Widowed</option>
+                    <option value="Annulled">Annulled</option>
                   </select>
                   {errors.maritalStatus && <p className="font-sans text-xs text-red-600 mt-1">{errors.maritalStatus}</p>}
                 </div>
@@ -426,6 +649,17 @@ export default function RegisterPage() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
+                  <label className={labelClass}>Current City / State *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Ikeja, Lagos"
+                    value={formData.currentStateCity}
+                    onChange={(e) => updateField("currentStateCity", e.target.value)}
+                    className={inputClass("currentStateCity")}
+                  />
+                  {errors.currentStateCity && <p className="font-sans text-xs text-red-600 mt-1">{errors.currentStateCity}</p>}
+                </div>
+                <div>
                   <label className={labelClass}>Current Country</label>
                   <input
                     type="text"
@@ -434,51 +668,51 @@ export default function RegisterPage() {
                     className={inputClass()}
                   />
                 </div>
-                <div>
-                  <label className={labelClass}>Current City / State *</label>
-                  <input
-                    type="text"
-                    value={formData.currentStateCity}
-                    onChange={(e) => updateField("currentStateCity", e.target.value)}
-                    placeholder="e.g. Lekki, Lagos"
-                    className={inputClass("currentStateCity")}
-                  />
-                  {errors.currentStateCity && <p className="font-sans text-xs text-red-600 mt-1">{errors.currentStateCity}</p>}
-                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>State of Origin (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Anambra State"
+                  value={formData.stateOfOrigin}
+                  onChange={(e) => updateField("stateOfOrigin", e.target.value)}
+                  className={inputClass()}
+                />
               </div>
             </div>
           )}
 
           {/* STEP 3: Background */}
           {currentStep === 3 && (
-            <div className="space-y-5">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Education & Professional Background</h2>
+            <div className="space-y-4">
+              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Educational & Career Background</h2>
               <div>
-                <label className={labelClass}>Highest Level of Education *</label>
+                <label className={labelClass}>Education Level *</label>
                 <select
                   value={formData.educationLevel}
                   onChange={(e) => updateField("educationLevel", e.target.value)}
                   className={inputClass("educationLevel")}
                 >
-                  <option value="">Select Education Level</option>
-                  <option value="Secondary School">Secondary School</option>
+                  <option value="">Select Highest Level</option>
+                  <option value="High School / Secondary">High School / Secondary</option>
                   <option value="Diploma / OND / HND">Diploma / OND / HND</option>
                   <option value="Bachelor's Degree">Bachelor&apos;s Degree</option>
                   <option value="Master's Degree">Master&apos;s Degree</option>
-                  <option value="Doctorate / PhD">Doctorate / PhD</option>
-                  <option value="Professional Qualification">Professional Qualification</option>
+                  <option value="Doctorate (PhD / DBA)">Doctorate (PhD / DBA)</option>
+                  <option value="Professional Certification">Professional Certification</option>
                 </select>
                 {errors.educationLevel && <p className="font-sans text-xs text-red-600 mt-1">{errors.educationLevel}</p>}
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Profession / Occupation *</label>
+                  <label className={labelClass}>Profession / Career *</label>
                   <input
                     type="text"
+                    placeholder="e.g. Financial Analyst, Medical Doctor"
                     value={formData.profession}
                     onChange={(e) => updateField("profession", e.target.value)}
-                    placeholder="e.g. Technology Consultant"
                     className={inputClass("profession")}
                   />
                   {errors.profession && <p className="font-sans text-xs text-red-600 mt-1">{errors.profession}</p>}
@@ -490,9 +724,12 @@ export default function RegisterPage() {
                     onChange={(e) => updateField("employmentStatus", e.target.value)}
                     className={inputClass()}
                   >
-                    <option value="Full-Time Employed">Full-Time Employed</option>
+                    <option value="">Select Status</option>
+                    <option value="Employed Full-time">Employed Full-time</option>
                     <option value="Self-Employed / Business Owner">Self-Employed / Business Owner</option>
-                    <option value="Contract / Freelance">Contract / Freelance</option>
+                    <option value="Executive / Partner">Executive / Partner</option>
+                    <option value="Consultant / Freelancer">Consultant / Freelancer</option>
+                    <option value="Civil Servant">Civil Servant</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -517,7 +754,7 @@ export default function RegisterPage() {
           {/* STEP 4: Lifestyle */}
           {currentStep === 4 && (
             <div className="space-y-5">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Lifestyle & Expectations</h2>
+              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Lifestyle &amp; Expectations</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Do you smoke?</label>
@@ -599,6 +836,17 @@ export default function RegisterPage() {
               </div>
 
               <div>
+                <label className={labelClass}>Interests &amp; Hobbies</label>
+                <input
+                  type="text"
+                  value={formData.interestsHobbies}
+                  onChange={(e) => updateField("interestsHobbies", e.target.value)}
+                  placeholder="e.g. Travel, Reading, Fine Dining, Sports"
+                  className={inputClass()}
+                />
+              </div>
+
+              <div>
                 <label className={labelClass}>What I Am Looking For in a Partner</label>
                 <textarea
                   rows={3}
@@ -658,27 +906,123 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* STEP 7: Photos */}
+          {/* STEP 7: Photos — Fully Functional File Picker & Upload */}
           {currentStep === 7 && (
-            <div className="space-y-5">
-              <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Profile Photography</h2>
-              <p className="font-sans text-xs text-gray-500">
-                Please upload clear, recent photographs of yourself. Photos are shown only to verified matches.
-              </p>
-
-              <div className="border-2 border-dashed border-[#e8e0d4] rounded-2xl p-8 text-center bg-[#fbf5ec]/40 hover:bg-[#fbf5ec] transition-colors">
-                <div className="w-16 h-16 bg-[#7b1d2a]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Upload size={28} className="text-[#7b1d2a]" />
-                </div>
-                <p className="font-serif font-bold text-[#1a1a1a] text-sm">Upload Profile Photo</p>
-                <p className="font-sans text-xs text-gray-500 mt-1 mb-4">PNG, JPG or WEBP up to 5MB</p>
-                <button
-                  type="button"
-                  className="bg-[#7b1d2a] text-white font-sans text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-[#5c1520] transition-colors"
-                >
-                  Choose File
-                </button>
+            <div className="space-y-6">
+              <div>
+                <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Profile Photography</h2>
+                <p className="font-sans text-xs text-gray-500 mt-1">
+                  Please upload clear, recent photographs of yourself. Photos are shown only to verified matches.
+                </p>
               </div>
+
+              {photoUploadError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-xs font-sans">
+                  <AlertCircle size={15} className="flex-shrink-0" />
+                  <span>{photoUploadError}</span>
+                </div>
+              )}
+
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/png,image/jpeg,image/webp,image/jpg"
+                onChange={handleFileInputChange}
+                className="hidden"
+              />
+
+              {formData.photoUrl ? (
+                /* Uploaded Photo Preview Card */
+                <div className="border border-green-200 bg-green-50/40 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6">
+                  <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-white shadow-md flex-shrink-0 bg-gray-100">
+                    <img
+                      src={formData.photoUrl}
+                      alt="Uploaded profile photo"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-1 shadow">
+                      <CheckCircle2 size={14} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-center sm:text-left flex-1">
+                    <div className="flex items-center gap-2 justify-center sm:justify-start">
+                      <CheckCircle2 size={16} className="text-green-600" />
+                      <span className="font-sans text-xs font-bold text-green-800 uppercase tracking-wider">
+                        Photo Ready for Profile
+                      </span>
+                    </div>
+                    <p className="font-sans text-xs text-gray-600">
+                      Your photo has been attached and will be displayed on your verified matchmaking profile.
+                    </p>
+                    <div className="flex items-center gap-3 pt-2 justify-center sm:justify-start">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingPhoto}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#7b1d2a] text-white rounded-lg text-xs font-bold hover:bg-[#5c1520] transition-colors"
+                      >
+                        <Camera size={14} /> Change Photo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateField("photoUrl", "")}
+                        className="inline-flex items-center gap-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-100 transition-colors"
+                      >
+                        <X size={14} /> Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Clickable File Picker Dropzone */
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center cursor-pointer transition-all ${
+                    isDragOver
+                      ? "border-[#7b1d2a] bg-[#7b1d2a]/5 scale-[1.01]"
+                      : "border-[#e8e0d4] bg-[#fbf5ec]/40 hover:bg-[#fbf5ec] hover:border-[#7b1d2a]/50"
+                  }`}
+                >
+                  <div className="w-16 h-16 bg-[#7b1d2a]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#7b1d2a]">
+                    {uploadingPhoto ? <Loader2 size={28} className="animate-spin" /> : <Upload size={28} />}
+                  </div>
+
+                  <p className="font-serif font-bold text-[#1a1a1a] text-base mb-1">
+                    {uploadingPhoto ? "Processing Photo..." : "Choose or Drag Your Profile Photo"}
+                  </p>
+
+                  <p className="font-sans text-xs text-gray-500 mb-5">
+                    Click anywhere here to pick from your camera roll or files · PNG, JPG or WEBP up to 5MB
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    disabled={uploadingPhoto}
+                    className="bg-[#7b1d2a] text-white font-sans text-xs font-bold px-6 py-3 rounded-xl hover:bg-[#5c1520] transition-colors shadow-sm inline-flex items-center gap-2"
+                  >
+                    {uploadingPhoto ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Camera size={14} />
+                        <span>Browse Files &amp; Photos</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -686,27 +1030,51 @@ export default function RegisterPage() {
           {currentStep === 8 && (
             <div className="space-y-6">
               <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Review Your Profile</h2>
-              <div className="bg-[#fbf5ec] border border-[#e8e0d4] rounded-xl p-5 space-y-4 text-sm font-sans text-gray-800">
-                <div>
-                  <span className="font-bold text-[#7b1d2a]">Name:</span> {formData.firstName} {formData.lastName}
-                </div>
-                <div>
-                  <span className="font-bold text-[#7b1d2a]">Email / Phone:</span> {formData.email} · {formData.phone}
-                </div>
-                <div>
-                  <span className="font-bold text-[#7b1d2a]">Location:</span> {formData.currentStateCity}, {formData.currentCountry}
-                </div>
-                <div>
-                  <span className="font-bold text-[#7b1d2a]">Education &amp; Profession:</span> {formData.educationLevel} · {formData.profession}
-                </div>
-                <div>
-                  <span className="font-bold text-[#7b1d2a]">Relationship Goal:</span> {formData.relationshipGoal}
+
+              <div className="bg-[#fbf5ec] border border-[#e8e0d4] rounded-2xl p-6 space-y-4 text-sm font-sans text-gray-800">
+                {formData.photoUrl && (
+                  <div className="flex items-center gap-4 pb-4 border-b border-[#e8e0d4]">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 border border-white shadow-sm flex-shrink-0">
+                      <img src={formData.photoUrl} alt="Review profile" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-[#1a1a1a]">Profile Photo Attached</p>
+                      <p className="text-xs text-gray-500">Ready for confidential review by our team.</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="font-bold text-[#7b1d2a] block">Full Name:</span>
+                    <span>{formData.firstName} {formData.lastName}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#7b1d2a] block">Email / Phone:</span>
+                    <span>{formData.email} · {formData.phone}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#7b1d2a] block">Location:</span>
+                    <span>{formData.currentStateCity}, {formData.currentCountry}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#7b1d2a] block">Education &amp; Profession:</span>
+                    <span>{formData.educationLevel} · {formData.profession}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#7b1d2a] block">Relationship Goal:</span>
+                    <span>{formData.relationshipGoal}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#7b1d2a] block">Marital Status &amp; Gender:</span>
+                    <span>{formData.maritalStatus} · {formData.gender}</span>
+                  </div>
                 </div>
               </div>
 
               <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800 text-xs font-sans">
                 <CheckCircle2 size={20} className="text-green-600 flex-shrink-0" />
-                <span>Your profile information is verified and encrypted. Click &quot;Submit Profile&quot; to complete registration and enter your dashboard.</span>
+                <span>Your profile data is encrypted and saved. Click &quot;Submit Profile &amp; Enter Portal&quot; to finalize your registration and access your member dashboard.</span>
               </div>
             </div>
           )}
@@ -728,8 +1096,16 @@ export default function RegisterPage() {
                 Next Step <ArrowRight size={16} />
               </Button>
             ) : (
-              <Button type="submit" variant="gold" size="lg">
-                Submit Profile &amp; Enter Portal <Sparkles size={16} />
+              <Button type="submit" variant="gold" size="lg" disabled={submitting}>
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 size={16} className="animate-spin" /> Submitting...
+                  </span>
+                ) : (
+                  <>
+                    Submit Profile &amp; Enter Portal <Sparkles size={16} />
+                  </>
+                )}
               </Button>
             )}
           </div>

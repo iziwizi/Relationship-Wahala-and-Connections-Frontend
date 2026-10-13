@@ -20,6 +20,9 @@ import {
   Building2,
   Loader2,
   Lock,
+  Copy,
+  CheckCheck,
+  AlertCircle
 } from "lucide-react";
 import { MatchmakingPackage } from "@/data/demo/packages";
 
@@ -31,7 +34,7 @@ function formatNGN(amount: number) {
   }).format(amount);
 }
 
-// Daytime appointment time slots only (no duration exposed)
+// Daytime appointment time slots
 const DAYTIME_TIME_SLOTS = [
   "10:00 AM",
   "11:00 AM",
@@ -40,6 +43,20 @@ const DAYTIME_TIME_SLOTS = [
   "3:00 PM",
   "4:00 PM",
 ];
+
+interface BankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  instructions: string;
+}
+
+const DEFAULT_BANK_DETAILS: BankDetails = {
+  bankName: "First Bank of Nigeria",
+  accountName: "Relationship Wahala & Connections Ltd",
+  accountNumber: "3012345678",
+  instructions: "Please include your full name or booking reference in transfer narration.",
+};
 
 function BookPhysicalAppointmentContent() {
   const searchParams = useSearchParams();
@@ -59,7 +76,11 @@ function BookPhysicalAppointmentContent() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [notes, setNotes] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"PAYSTACK" | "FLUTTERWAVE" | "BANK_TRANSFER">("PAYSTACK");
+  const [paymentMethod, setPaymentMethod] = useState<"PAYSTACK" | "FLUTTERWAVE" | "BANK_TRANSFER">("BANK_TRANSFER");
+
+  // Bank details & copy feedback
+  const [bankDetails, setBankDetails] = useState<BankDetails>(DEFAULT_BANK_DETAILS);
+  const [copiedAccount, setCopiedAccount] = useState(false);
 
   // Submission state
   const [submitting, setSubmitting] = useState(false);
@@ -86,7 +107,30 @@ function BookPhysicalAppointmentContent() {
     loadPackage();
   }, [packageId]);
 
-  // Generate calendar grid for current month
+  // Load bank details for direct deposit
+  useEffect(() => {
+    async function fetchBankInfo() {
+      try {
+        const res = await fetch("/api/public/bank-details");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.bankName && data.accountNumber) {
+            setBankDetails({
+              bankName: data.bankName,
+              accountName: data.accountName,
+              accountNumber: data.accountNumber,
+              instructions: data.instructions || DEFAULT_BANK_DETAILS.instructions,
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("Using default bank info:", e);
+      }
+    }
+    fetchBankInfo();
+  }, []);
+
+  // Generate calendar grid for current month — all future days (Mon-Sun) are bookable
   const calendarDays = useMemo(() => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -104,7 +148,7 @@ function BookPhysicalAppointmentContent() {
 
     // Padding previous month days
     for (let i = 0; i < startingDayOfWeek; i++) {
-      const prevDate = new Date(year, month, -startingDayOfWeek + i + 1);
+      const prevDate = new Date(year, month, -startingDayOfWeek + i + 1, 12, 0, 0);
       const dayNum = prevDate.getDay();
       days.push({
         date: prevDate,
@@ -114,9 +158,9 @@ function BookPhysicalAppointmentContent() {
       });
     }
 
-    // Current month days
+    // Current month days — noon (12:00:00) local time avoids timezone day rollback
     for (let d = 1; d <= totalDays; d++) {
-      const date = new Date(year, month, d);
+      const date = new Date(year, month, d, 12, 0, 0);
       const dayNum = date.getDay();
       days.push({
         date,
@@ -129,12 +173,12 @@ function BookPhysicalAppointmentContent() {
     return days;
   }, [currentMonth]);
 
-  // Preselect the first available upcoming weekend date if none selected
+  // Preselect the first available upcoming date if none selected
   useEffect(() => {
     if (!selectedDate) {
-      const firstWeekend = calendarDays.find((d) => d.isCurrentMonth && d.isWeekend && !d.isPast);
-      if (firstWeekend) {
-        setSelectedDate(firstWeekend.date);
+      const firstAvailable = calendarDays.find((d) => d.isCurrentMonth && !d.isPast);
+      if (firstAvailable) {
+        setSelectedDate(firstAvailable.date);
       }
     }
   }, [calendarDays, selectedDate]);
@@ -147,16 +191,22 @@ function BookPhysicalAppointmentContent() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedAccount(true);
+    setTimeout(() => setCopiedAccount(false), 2000);
+  };
+
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
     if (!selectedDate) {
-      setErrorMsg("Please select an appointment date on Saturday or Sunday.");
+      setErrorMsg("Please select an appointment date.");
       return;
     }
 
-    if (!customerName || !customerEmail || !customerPhone) {
+    if (!customerName.trim() || !customerEmail.trim() || !customerPhone.trim()) {
       setErrorMsg("Please fill in your name, email, and phone number.");
       return;
     }
@@ -169,9 +219,9 @@ function BookPhysicalAppointmentContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           packageId: selectedPackage?.id,
-          customerName,
-          customerEmail,
-          customerPhone,
+          customerName: customerName.trim(),
+          customerEmail: customerEmail.trim(),
+          customerPhone: customerPhone.trim(),
           bookingDate: selectedDate.toISOString(),
           bookingTime: selectedTime,
           notes,
@@ -182,7 +232,7 @@ function BookPhysicalAppointmentContent() {
       const json = await res.json();
 
       if (res.ok && json.success && json.booking) {
-        // Navigate to booking confirmation page
+        // Navigate to booking confirmation page with booking reference
         router.push(`/matchmaking/physical/confirmation?reference=${json.booking.bookingReference}`);
       } else {
         setErrorMsg(json.error || "Failed to complete booking. Please try again.");
@@ -213,7 +263,7 @@ function BookPhysicalAppointmentContent() {
               Book Physical Consultation
             </h1>
             <p className="font-sans text-xs sm:text-sm text-gray-600 mt-1">
-              Select your preferred weekend date, daytime slot, and enter your details to finalize your appointment.
+              Select your preferred consultation date, daytime slot, and enter your details to finalize your appointment.
             </p>
           </div>
 
@@ -230,9 +280,9 @@ function BookPhysicalAppointmentContent() {
             <form onSubmit={handleSubmitBooking} className="grid lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: Calendar & Time Slots & Form */}
               <div className="lg:col-span-8 space-y-8">
-                {/* 1. Date Selection — Weekends Only */}
+                {/* 1. Date Selection — All Future Dates Available */}
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e0d4] shadow-sm">
-                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-gray-100">
                     <div className="flex items-center gap-2 text-[#7b1d2a]">
                       <CalendarIcon size={20} />
                       <h2 className="font-serif font-bold text-lg text-[#1a1a1a]">
@@ -240,7 +290,7 @@ function BookPhysicalAppointmentContent() {
                       </h2>
                     </div>
                     <span className="text-[11px] font-sans font-bold text-[#c9962c] bg-[#fbf5ec] px-3 py-1 rounded-full uppercase tracking-wider">
-                      Saturdays &amp; Sundays Only
+                      Weekdays &amp; Weekends Available
                     </span>
                   </div>
 
@@ -281,7 +331,7 @@ function BookPhysicalAppointmentContent() {
                   {/* Calendar Days Grid */}
                   <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                     {calendarDays.map((item, index) => {
-                      const isSelectable = item.isCurrentMonth && item.isWeekend && !item.isPast;
+                      const isSelectable = item.isCurrentMonth && !item.isPast;
                       const isSelected =
                         selectedDate &&
                         item.date.toDateString() === selectedDate.toDateString();
@@ -292,13 +342,18 @@ function BookPhysicalAppointmentContent() {
                           type="button"
                           disabled={!isSelectable}
                           onClick={() => {
-                            if (isSelectable) setSelectedDate(item.date);
+                            if (isSelectable) {
+                              setSelectedDate(item.date);
+                              setErrorMsg("");
+                            }
                           }}
                           className={`h-10 sm:h-12 rounded-xl text-xs sm:text-sm font-sans font-semibold flex items-center justify-center transition-all ${
                             isSelected
                               ? "bg-[#7b1d2a] text-white shadow-md scale-105"
                               : isSelectable
-                              ? "bg-[#fbf5ec] text-[#1a1a1a] hover:bg-[#c9962c]/20 border border-[#c9962c]/30 font-bold"
+                              ? item.isWeekend
+                                ? "bg-[#fbf5ec] text-[#1a1a1a] hover:bg-[#c9962c]/20 border border-[#c9962c]/40 font-bold"
+                                : "bg-white text-gray-800 hover:bg-gray-100 border border-gray-200"
                               : "bg-gray-50 text-gray-300 cursor-not-allowed border border-gray-100"
                           }`}
                         >
@@ -309,11 +364,11 @@ function BookPhysicalAppointmentContent() {
                   </div>
 
                   <p className="font-sans text-[11px] text-gray-500 mt-4 text-center italic">
-                    Note: In-person consultation sessions take place exclusively on Saturdays and Sundays.
+                    Note: Consultations are held throughout the week and weekends at our private executive suites.
                   </p>
                 </div>
 
-                {/* 2. Daytime Time Slot Selection (Duration Hidden) */}
+                {/* 2. Daytime Time Slot Selection */}
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e0d4] shadow-sm">
                   <div className="flex items-center gap-2 text-[#7b1d2a] mb-6 pb-4 border-b border-gray-100">
                     <Clock size={20} />
@@ -420,16 +475,32 @@ function BookPhysicalAppointmentContent() {
                   </div>
                 </div>
 
-                {/* 4. Payment Method Selection */}
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e0d4] shadow-sm space-y-4">
-                  <div className="flex items-center gap-2 text-[#7b1d2a] mb-4 pb-3 border-b border-gray-100">
+                {/* 4. Payment Method & Account Details */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e0d4] shadow-sm space-y-5">
+                  <div className="flex items-center gap-2 text-[#7b1d2a] mb-2 pb-3 border-b border-gray-100">
                     <CreditCard size={20} />
                     <h2 className="font-serif font-bold text-lg text-[#1a1a1a]">
-                      4. Payment Gateway Selection
+                      4. Choose Payment Method
                     </h2>
                   </div>
 
                   <div className="grid sm:grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("BANK_TRANSFER")}
+                      className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                        paymentMethod === "BANK_TRANSFER"
+                          ? "border-[#7b1d2a] bg-[#fbf5ec] ring-2 ring-[#7b1d2a]"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <Building2 size={22} className="text-[#7b1d2a] mb-2" />
+                      <div>
+                        <p className="font-sans text-xs font-bold text-[#1a1a1a]">Direct Bank Deposit</p>
+                        <p className="font-sans text-[10px] text-gray-500">Official Bank Account Transfer</p>
+                      </div>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("PAYSTACK")}
@@ -439,10 +510,10 @@ function BookPhysicalAppointmentContent() {
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <CreditCard size={20} className="text-[#7b1d2a] mb-2" />
+                      <CreditCard size={22} className="text-[#7b1d2a] mb-2" />
                       <div>
                         <p className="font-sans text-xs font-bold text-[#1a1a1a]">Paystack</p>
-                        <p className="font-sans text-[10px] text-gray-500">Cards &amp; Instant Bank Transfer</p>
+                        <p className="font-sans text-[10px] text-gray-500">Debit Cards &amp; Instant USSD</p>
                       </div>
                     </button>
 
@@ -455,29 +526,69 @@ function BookPhysicalAppointmentContent() {
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <CreditCard size={20} className="text-[#c9962c] mb-2" />
+                      <CreditCard size={22} className="text-[#c9962c] mb-2" />
                       <div>
                         <p className="font-sans text-xs font-bold text-[#1a1a1a]">Flutterwave</p>
-                        <p className="font-sans text-[10px] text-gray-500">Cards &amp; USSD Payment</p>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("BANK_TRANSFER")}
-                      className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${
-                        paymentMethod === "BANK_TRANSFER"
-                          ? "border-[#7b1d2a] bg-[#fbf5ec] ring-2 ring-[#7b1d2a]"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      <Building2 size={20} className="text-gray-700 mb-2" />
-                      <div>
-                        <p className="font-sans text-xs font-bold text-[#1a1a1a]">Direct Bank Deposit</p>
-                        <p className="font-sans text-[10px] text-gray-500">Manual Verification</p>
+                        <p className="font-sans text-[10px] text-gray-500">Cards &amp; Mobile Money</p>
                       </div>
                     </button>
                   </div>
+
+                  {/* Direct Bank Account Details Card */}
+                  {paymentMethod === "BANK_TRANSFER" && (
+                    <div className="bg-[#fbf5ec] border border-[#e8e0d4] rounded-2xl p-5 space-y-3">
+                      <div className="flex items-center justify-between pb-2 border-b border-[#e8e0d4]">
+                        <span className="font-sans text-xs font-bold text-[#7b1d2a] uppercase tracking-wider">
+                          Official Bank Account Details
+                        </span>
+                        <span className="text-[11px] font-sans font-semibold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">
+                          Verified Account
+                        </span>
+                      </div>
+
+                      <div className="grid sm:grid-cols-3 gap-3 text-xs font-sans">
+                        <div className="bg-white p-3 rounded-xl border border-gray-200">
+                          <p className="text-gray-500 text-[11px]">Bank Name</p>
+                          <p className="font-bold text-gray-900 mt-0.5">{bankDetails.bankName}</p>
+                        </div>
+
+                        <div className="bg-white p-3 rounded-xl border border-gray-200 sm:col-span-2">
+                          <p className="text-gray-500 text-[11px]">Account Name</p>
+                          <p className="font-bold text-gray-900 mt-0.5">{bankDetails.accountName}</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-3.5 rounded-xl border border-[#7b1d2a]/30 flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-500 text-[11px] font-sans">Account Number</p>
+                          <p className="font-mono font-bold text-lg text-[#7b1d2a] tracking-wide">
+                            {bankDetails.accountNumber}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(bankDetails.accountNumber)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#7b1d2a] text-white rounded-lg text-xs font-bold hover:bg-[#5c1520] transition-colors"
+                        >
+                          {copiedAccount ? (
+                            <>
+                              <CheckCheck size={14} className="text-green-300" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={14} />
+                              <span>Copy Number</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <p className="font-sans text-[11px] text-gray-600">
+                        {bankDetails.instructions}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -518,6 +629,16 @@ function BookPhysicalAppointmentContent() {
                       <span className="font-semibold text-gray-500">Time Slot:</span>
                       <span className="font-bold text-[#7b1d2a]">{selectedTime}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-gray-500">Payment:</span>
+                      <span className="font-bold text-gray-900">
+                        {paymentMethod === "BANK_TRANSFER"
+                          ? "Direct Bank Deposit"
+                          : paymentMethod === "PAYSTACK"
+                          ? "Paystack Gateway"
+                          : "Flutterwave Gateway"}
+                      </span>
+                    </div>
                   </div>
 
                   <ul className="space-y-2">
@@ -530,8 +651,9 @@ function BookPhysicalAppointmentContent() {
                   </ul>
 
                   {errorMsg && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-sans text-red-600 font-medium">
-                      {errorMsg}
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-sans text-red-600 font-medium flex items-center gap-2">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{errorMsg}</span>
                     </div>
                   )}
 
@@ -545,12 +667,12 @@ function BookPhysicalAppointmentContent() {
                     {submitting ? (
                       <>
                         <Loader2 size={18} className="animate-spin" />
-                        <span>Processing Booking...</span>
+                        <span>Confirming Appointment...</span>
                       </>
                     ) : (
                       <>
                         <Lock size={16} />
-                        <span>Confirm &amp; Pay {formatNGN(selectedPackage.price)}</span>
+                        <span>Confirm &amp; Proceed ({formatNGN(selectedPackage.price)})</span>
                       </>
                     )}
                   </Button>

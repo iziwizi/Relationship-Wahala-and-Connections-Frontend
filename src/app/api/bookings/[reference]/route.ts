@@ -60,6 +60,7 @@ export async function GET(
         amount: Number(booking.amount),
         currency: booking.currency,
         paymentStatus: booking.paymentStatus,
+        paymentMethod: booking.paymentMethod,
         status: booking.status,
         createdAt: booking.createdAt.toISOString(),
       },

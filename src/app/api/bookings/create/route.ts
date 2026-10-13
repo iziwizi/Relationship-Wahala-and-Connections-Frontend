@@ -37,12 +37,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify booking date is Saturday or Sunday
+    // Validate booking date
     const dateObj = new Date(bookingDate);
-    const dayOfWeek = dateObj.getDay(); // 0 is Sunday, 6 is Saturday
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+    if (isNaN(dateObj.getTime())) {
       return NextResponse.json(
-        { error: "Bookings are only available on Saturdays and Sundays." },
+        { error: "Invalid appointment date selected." },
         { status: 400 }
       );
     }

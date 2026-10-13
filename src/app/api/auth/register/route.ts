@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
       prefAgeMin: Number(body.prefAgeMin) || 25,
       prefAgeMax: Number(body.prefAgeMax) || 45,
       prefLocation: body.prefLocation as string | undefined,
+      photoUrl: (body.photoUrl as string) || undefined,
     });
 
     const token = await signSession({

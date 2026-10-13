@@ -31,6 +31,7 @@ export interface CreateUserInput {
   prefAgeMin: number;
   prefAgeMax: number;
   prefLocation?: string;
+  photoUrl?: string;
 }
 
 export async function createUserWithProfile(data: CreateUserInput) {
@@ -70,7 +71,15 @@ export async function createUserWithProfile(data: CreateUserInput) {
           interestsHobbies: data.interestsHobbies,
           relationshipGoal: data.relationshipGoal,
           status: "SUBMITTED",
-          profileCompletion: 70,
+          profileCompletion: 80,
+          photos: data.photoUrl
+            ? {
+                create: {
+                  url: data.photoUrl,
+                  isPrimary: true,
+                },
+              }
+            : undefined,
           preferences: {
             create: {
               ageMin: data.prefAgeMin,
@@ -81,7 +90,7 @@ export async function createUserWithProfile(data: CreateUserInput) {
         },
       },
     },
-    include: { profile: true },
+    include: { profile: { include: { photos: true, preferences: true } } },
   });
 }
 
