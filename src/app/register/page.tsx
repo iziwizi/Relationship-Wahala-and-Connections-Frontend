@@ -115,6 +115,8 @@ const STORAGE_KEY = "rwc_registration_draft_v2";
 export default function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<RegisterFormData>(initialFormData);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [previewPhotoUrl, setPreviewPhotoUrl] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -134,33 +136,61 @@ export default function RegisterPage() {
       const savedData = sessionStorage.getItem(STORAGE_KEY) || localStorage.getItem(STORAGE_KEY);
       if (savedData) {
         const parsed = JSON.parse(savedData);
-        if (parsed.formData) {
+        if (parsed.formData && typeof parsed.formData === "object") {
           setFormData((prev) => ({ ...prev, ...parsed.formData }));
+          if (parsed.formData.photoUrl) {
+            setPreviewPhotoUrl(parsed.formData.photoUrl);
+          }
         }
-        if (parsed.currentStep && parsed.currentStep >= 1 && parsed.currentStep <= steps.length) {
-          setCurrentStep(parsed.currentStep);
+        // Read URL query parameter step first (?step=X), otherwise fall back to saved step
+        const urlParams = new URLSearchParams(window.location.search);
+        const stepParam = urlParams.get("step");
+        const parsedStep = stepParam ? parseInt(stepParam, 10) : parsed.currentStep;
+        if (parsedStep && parsedStep >= 1 && parsedStep <= steps.length) {
+          setCurrentStep(parsedStep);
+        }
+      } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        const stepParam = urlParams.get("step");
+        if (stepParam) {
+          const parsedStep = parseInt(stepParam, 10);
+          if (parsedStep >= 1 && parsedStep <= steps.length) {
+            setCurrentStep(parsedStep);
+          }
         }
       }
     } catch (e) {
       console.warn("Could not restore registration progress:", e);
+    } finally {
+      setIsHydrated(true);
     }
   }, []);
 
   // 2. Persist state on change to prevent data loss on refresh or navigation
+  // CRITICAL: Must not write to storage before initial hydration has completed!
   useEffect(() => {
+    if (!isHydrated) return;
+
     try {
-      const payload = JSON.stringify({ formData, currentStep });
+      // Ensure photoUrl in storage is never an oversized base64 string that exceeds quota
+      const dataToSave = { ...formData };
+      if (dataToSave.photoUrl && dataToSave.photoUrl.startsWith("data:") && dataToSave.photoUrl.length > 200000) {
+        dataToSave.photoUrl = "";
+      }
+      const payload = JSON.stringify({ formData: dataToSave, currentStep });
       sessionStorage.setItem(STORAGE_KEY, payload);
       localStorage.setItem(STORAGE_KEY, payload);
     } catch (e) {
       console.warn("Could not save registration draft:", e);
     }
-  }, [formData, currentStep]);
+  }, [formData, currentStep, isHydrated]);
 
   // 3. Handle Browser Back Button / History navigation
   // Ensures hardware/browser Back moves backwards through steps 8 -> 7 -> 6 ... -> 1
   // rather than unmounting the page and losing filled progress
   useEffect(() => {
+    if (!isHydrated) return;
+
     // Push current step into history state if not already there
     const url = new URL(window.location.href);
     url.searchParams.set("step", currentStep.toString());
@@ -177,7 +207,7 @@ export default function RegisterPage() {
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [currentStep]);
+  }, [currentStep, isHydrated]);
 
   const updateField = (field: keyof RegisterFormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -250,9 +280,13 @@ export default function RegisterPage() {
       sessionStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(STORAGE_KEY);
       setFormData(initialFormData);
+      setPreviewPhotoUrl("");
       setCurrentStep(1);
       setErrors({});
       setSubmitError(null);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("step");
+      window.history.replaceState({ step: 1 }, "", url.toString());
     }
   };
 
@@ -273,18 +307,12 @@ export default function RegisterPage() {
       return;
     }
 
+    // Immediate local object URL for preview without blowing localStorage quota
+    const localBlobUrl = URL.createObjectURL(file);
+    setPreviewPhotoUrl(localBlobUrl);
     setUploadingPhoto(true);
 
     try {
-      // 1. Immediately read file as Data URL to preview without delay
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const previewUrl = e.target?.result as string;
-        updateField("photoUrl", previewUrl);
-      };
-      reader.readAsDataURL(file);
-
-      // 2. Upload to server API /api/upload
       const uploadFormData = new FormData();
       uploadFormData.append("file", file);
       uploadFormData.append("bucket", "profile-photos");
@@ -297,9 +325,13 @@ export default function RegisterPage() {
       const data = await res.json();
       if (res.ok && data.success && data.url) {
         updateField("photoUrl", data.url);
+        setPreviewPhotoUrl(data.url);
+      } else {
+        setPhotoUploadError(data.error || "Failed to upload photo to storage. Please try again.");
       }
     } catch (err) {
-      console.warn("Upload request failed, preview retained locally:", err);
+      console.error("Upload request failed:", err);
+      setPhotoUploadError("Network connection error while uploading photo. Please try again.");
     } finally {
       setUploadingPhoto(false);
     }
@@ -310,6 +342,8 @@ export default function RegisterPage() {
     if (file) {
       handleFileProcess(file);
     }
+    // Reset input so selecting the same file again triggers onChange
+    e.target.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -932,29 +966,38 @@ export default function RegisterPage() {
                 className="hidden"
               />
 
-              {formData.photoUrl ? (
+              {(previewPhotoUrl || formData.photoUrl) ? (
                 /* Uploaded Photo Preview Card */
                 <div className="border border-green-200 bg-green-50/40 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6">
                   <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-white shadow-md flex-shrink-0 bg-gray-100">
                     <img
-                      src={formData.photoUrl}
+                      src={previewPhotoUrl || formData.photoUrl}
                       alt="Uploaded profile photo"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-1 shadow">
-                      <CheckCircle2 size={14} />
-                    </div>
+                    {uploadingPhoto ? (
+                      <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-xs gap-1">
+                        <Loader2 size={20} className="animate-spin text-white" />
+                        <span>Uploading...</span>
+                      </div>
+                    ) : (
+                      <div className="absolute top-2 right-2 bg-green-600 text-white rounded-full p-1 shadow">
+                        <CheckCircle2 size={14} />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2 text-center sm:text-left flex-1">
                     <div className="flex items-center gap-2 justify-center sm:justify-start">
                       <CheckCircle2 size={16} className="text-green-600" />
                       <span className="font-sans text-xs font-bold text-green-800 uppercase tracking-wider">
-                        Photo Ready for Profile
+                        {uploadingPhoto ? "Uploading Photo..." : "Photo Ready for Profile"}
                       </span>
                     </div>
                     <p className="font-sans text-xs text-gray-600">
-                      Your photo has been attached and will be displayed on your verified matchmaking profile.
+                      {uploadingPhoto
+                        ? "Uploading securely to cloud storage..."
+                        : "Your photo has been attached and will be displayed on your verified matchmaking profile."}
                     </p>
                     <div className="flex items-center gap-3 pt-2 justify-center sm:justify-start">
                       <button
@@ -967,7 +1010,11 @@ export default function RegisterPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => updateField("photoUrl", "")}
+                        onClick={() => {
+                          updateField("photoUrl", "");
+                          setPreviewPhotoUrl("");
+                        }}
+                        disabled={uploadingPhoto}
                         className="inline-flex items-center gap-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-100 transition-colors"
                       >
                         <X size={14} /> Remove
@@ -1032,10 +1079,10 @@ export default function RegisterPage() {
               <h2 className="font-serif text-xl font-bold text-[#1a1a1a]">Review Your Profile</h2>
 
               <div className="bg-[#fbf5ec] border border-[#e8e0d4] rounded-2xl p-6 space-y-4 text-sm font-sans text-gray-800">
-                {formData.photoUrl && (
+                {(previewPhotoUrl || formData.photoUrl) && (
                   <div className="flex items-center gap-4 pb-4 border-b border-[#e8e0d4]">
                     <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 border border-white shadow-sm flex-shrink-0">
-                      <img src={formData.photoUrl} alt="Review profile" className="w-full h-full object-cover" />
+                      <img src={previewPhotoUrl || formData.photoUrl} alt="Review profile" className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <p className="font-bold text-[#1a1a1a]">Profile Photo Attached</p>

@@ -1,12 +1,21 @@
 // src/lib/storage/supabase.ts
 // Supabase Storage Helper for handling media uploads (avatars, profile-photos, cms-media)
+// Uses @supabase/storage-js StorageClient for clean, robust HTTP uploads in Node & Browser
 
-import { createClient } from "@supabase/supabase-js";
+import { StorageClient } from "@supabase/storage-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://vfcfqqnyzehjpepwyvpo.supabase.co";
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmY2ZxcW55emVoanBlcHd5dnBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDk0MTEsImV4cCI6MjEwNTU4NTQxMX0.rEzfiQVHhyJrF-ypVOaaeYHpeK4aCvLpM2FkiMAp9m0";
+
+export const storageClient = new StorageClient(`${SUPABASE_URL}/storage/v1`, {
+  apikey: SUPABASE_ANON_KEY,
+  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+});
 
 export type BucketName = "avatars" | "profile-photos" | "cms-media";
 
@@ -19,7 +28,7 @@ export async function uploadMedia(
   try {
     const cleanFileName = `${Date.now()}-${fileName.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await storageClient
       .from(bucket)
       .upload(cleanFileName, file, {
         contentType,
@@ -31,7 +40,7 @@ export async function uploadMedia(
       return { url: null, path: null, error: error.message };
     }
 
-    const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(cleanFileName);
+    const { data: publicUrlData } = storageClient.from(bucket).getPublicUrl(cleanFileName);
 
     return {
       url: publicUrlData.publicUrl,

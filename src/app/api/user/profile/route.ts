@@ -53,14 +53,14 @@ export async function PUT(req: NextRequest) {
     }
 
     const profileData: Record<string, unknown> = {};
-    if (body.firstName) profileData.firstName = body.firstName;
-    if (body.lastName) profileData.lastName = body.lastName;
-    if (body.phone) profileData.phone = body.phone;
-    if (body.profession) profileData.profession = body.profession;
-    if (body.currentCityState) profileData.currentCityState = body.currentCityState;
-    if (body.aboutMe) profileData.aboutMe = body.aboutMe;
-    if (body.relationshipGoal) profileData.relationshipGoal = body.relationshipGoal;
-    if (body.maritalStatus) profileData.maritalStatus = body.maritalStatus;
+    if (typeof body.firstName === "string") profileData.firstName = body.firstName.trim();
+    if (typeof body.lastName === "string") profileData.lastName = body.lastName.trim();
+    if (typeof body.phone === "string") profileData.phone = body.phone.trim();
+    if (typeof body.profession === "string") profileData.profession = body.profession.trim();
+    if (typeof body.currentCityState === "string") profileData.currentCityState = body.currentCityState.trim();
+    if (typeof body.aboutMe === "string") profileData.aboutMe = body.aboutMe.trim();
+    if (typeof body.relationshipGoal === "string") profileData.relationshipGoal = body.relationshipGoal.trim();
+    if (typeof body.maritalStatus === "string") profileData.maritalStatus = body.maritalStatus.trim();
 
     // Handle photo update
     if (body.avatar) {

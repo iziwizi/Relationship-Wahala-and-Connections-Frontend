@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   isLoading: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,35 +19,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const refreshUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setIsAuthenticated(true);
+          setUser((prev) => ({
+            ...demoUser,
+            ...prev,
+            ...data.user,
+            id: data.user.id,
+            email: data.user.email,
+            firstName: data.user.firstName || demoUser.firstName,
+            lastName: data.user.lastName || demoUser.lastName,
+            profileCompletion: data.user.profileCompletion ?? demoUser.profileCompletion,
+            avatar: data.user.avatar || demoUser.avatar,
+          }));
+        } else {
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      }
+    } catch (err) {
+      console.error("[AuthContext refreshUser error]", err);
+    }
+  };
+
   // Sync session on mount via /api/auth/me
   useEffect(() => {
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.user) {
-            setIsAuthenticated(true);
-            setUser((prev) => ({
-              ...demoUser,
-              ...prev,
-              ...data.user,
-              id: data.user.id,
-              email: data.user.email,
-              firstName: data.user.firstName || demoUser.firstName,
-              lastName: data.user.lastName || demoUser.lastName,
-              profileCompletion: data.user.profileCompletion ?? demoUser.profileCompletion,
-              avatar: data.user.avatar || demoUser.avatar,
-            }));
-          } else {
-            setIsAuthenticated(false);
-            setUser(null);
-          }
-        }
-      } catch (err) {
-        console.error("[AuthContext checkSession error]", err);
-        setIsAuthenticated(false);
-        setUser(null);
+        await refreshUser();
       } finally {
         setIsLoading(false);
       }
@@ -93,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

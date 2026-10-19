@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
         avatar: primaryPhoto || null,
         profession: p?.profession || "",
         location: p?.currentCityState || "",
+        aboutMe: p?.aboutMe || "",
       },
     });
   } catch (err) {

@@ -1,5 +1,5 @@
 // src/app/api/upload/route.ts
-// Server-side media upload handler — uploads to Supabase Storage with graceful fallback
+// Server-side media upload handler — uploads directly to Supabase Storage
 // Allows profile-photos & avatars during onboarding/registration even if not logged in yet
 
 import { NextRequest, NextResponse } from "next/server";
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     const bucket = (formData.get("bucket") as BucketName) || "profile-photos";
 
-    // Check auth for admin / CMS buckets, but allow registration profile-photos / avatars
+    // Check auth for admin / CMS buckets, but allow registration profile-photos & avatars
     const isPublicAllowedBucket = bucket === "profile-photos" || bucket === "avatars";
 
     if (!isPublicAllowedBucket) {
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/jpg"];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
         { error: "Invalid image format. Allowed formats: JPEG, PNG, WebP." },
@@ -46,23 +46,17 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Upload to Supabase Storage if configured
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      const result = await uploadMedia(buffer, file.name, bucket, file.type);
-      if (result.url) {
-        return NextResponse.json({ success: true, url: result.url, path: result.path });
-      }
+    // Upload to Supabase Storage
+    const result = await uploadMedia(buffer, file.name, bucket, file.type);
+    if (result.url) {
+      return NextResponse.json({ success: true, url: result.url, path: result.path });
     }
 
-    // Graceful fallback for local development / unconfigured storage
-    const base64 = buffer.toString("base64");
-    const dataUrl = `data:${file.type};base64,${base64}`;
-
-    return NextResponse.json({
-      success: true,
-      url: dataUrl,
-      note: "Stored as inline data image.",
-    });
+    console.error("[Upload API] Supabase storage upload returned error:", result.error);
+    return NextResponse.json(
+      { error: result.error || "Failed to upload photo to storage. Please try again." },
+      { status: 500 }
+    );
   } catch (error) {
     console.error("[Upload API] Error:", error);
     return NextResponse.json({ error: "Failed to upload file." }, { status: 500 });
