@@ -60,8 +60,14 @@ export default function MediaUploader({
       {label && <label className="block text-xs font-bold text-gray-700 uppercase">{label}</label>}
 
       {value ? (
-        <div className="relative group rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 h-48 w-full flex items-center justify-center">
-          <Image src={value} alt="Uploaded media preview" fill className="object-cover" />
+        <div className="relative group rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 h-72 sm:h-80 w-full flex items-center justify-center shadow-sm">
+          <Image
+            src={value}
+            alt="Uploaded media preview"
+            fill
+            className="object-cover object-top transition-transform duration-300"
+            unoptimized={value.startsWith("data:") || value.startsWith("blob:")}
+          />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
             <button
               type="button"

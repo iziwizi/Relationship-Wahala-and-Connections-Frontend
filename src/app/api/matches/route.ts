@@ -31,10 +31,21 @@ export async function GET(req: NextRequest) {
     const currentGender = currentUser?.profile?.gender;
     const oppositeGender = currentGender === "Male" ? "Female" : currentGender === "Female" ? "Male" : undefined;
 
-    // Fetch only verified members excluding self
+    // Exclude self and candidates the user marked as Not Interested (DECLINED) or BLOCKED
+    const dismissedInteractions = await prisma.matchInteraction.findMany({
+      where: {
+        requesterId: session.userId,
+        status: { in: ["DECLINED", "BLOCKED"] },
+      },
+      select: { targetId: true },
+    });
+
+    const excludedUserIds = [session.userId, ...dismissedInteractions.map((i) => i.targetId)];
+
+    // Fetch only verified members excluding self and dismissed profiles
     const matchedUsers = await prisma.user.findMany({
       where: {
-        id: { not: session.userId },
+        id: { notIn: excludedUserIds },
         role: "MEMBER",
         profile: {
           status: "VERIFIED",

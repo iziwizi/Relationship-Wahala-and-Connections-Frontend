@@ -136,7 +136,9 @@ export default function RegisterPage() {
       const savedData = sessionStorage.getItem(STORAGE_KEY) || localStorage.getItem(STORAGE_KEY);
       if (savedData) {
         const parsed = JSON.parse(savedData);
+        let restoredData: Partial<RegisterFormData> | null = null;
         if (parsed.formData && typeof parsed.formData === "object") {
+          restoredData = parsed.formData;
           setFormData((prev) => ({ ...prev, ...parsed.formData }));
           if (parsed.formData.photoUrl) {
             setPreviewPhotoUrl(parsed.formData.photoUrl);
@@ -146,17 +148,26 @@ export default function RegisterPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const stepParam = urlParams.get("step");
         const parsedStep = stepParam ? parseInt(stepParam, 10) : parsed.currentStep;
-        if (parsedStep && parsedStep >= 1 && parsedStep <= steps.length) {
+
+        // Safety guard: if Step 1 required info is missing, do not jump ahead to Step 8 or later
+        const hasStep1Data = Boolean(restoredData?.firstName?.trim() && restoredData?.email?.trim());
+        if (parsedStep && parsedStep > 1 && !hasStep1Data) {
+          setCurrentStep(1);
+          const url = new URL(window.location.href);
+          url.searchParams.set("step", "1");
+          window.history.replaceState({ step: 1 }, "", url.toString());
+        } else if (parsedStep && parsedStep >= 1 && parsedStep <= steps.length) {
           setCurrentStep(parsedStep);
         }
       } else {
+        // No saved draft: always start at Step 1
+        setCurrentStep(1);
         const urlParams = new URLSearchParams(window.location.search);
         const stepParam = urlParams.get("step");
-        if (stepParam) {
-          const parsedStep = parseInt(stepParam, 10);
-          if (parsedStep >= 1 && parsedStep <= steps.length) {
-            setCurrentStep(parsedStep);
-          }
+        if (stepParam && stepParam !== "1") {
+          const url = new URL(window.location.href);
+          url.searchParams.set("step", "1");
+          window.history.replaceState({ step: 1 }, "", url.toString());
         }
       }
     } catch (e) {
@@ -973,7 +984,7 @@ export default function RegisterPage() {
                     <img
                       src={previewPhotoUrl || formData.photoUrl}
                       alt="Uploaded profile photo"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top"
                     />
                     {uploadingPhoto ? (
                       <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-xs gap-1">
@@ -1082,41 +1093,57 @@ export default function RegisterPage() {
                 {(previewPhotoUrl || formData.photoUrl) && (
                   <div className="flex items-center gap-4 pb-4 border-b border-[#e8e0d4]">
                     <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 border border-white shadow-sm flex-shrink-0">
-                      <img src={previewPhotoUrl || formData.photoUrl} alt="Review profile" className="w-full h-full object-cover" />
+                      <img src={previewPhotoUrl || formData.photoUrl} alt="Review profile" className="w-full h-full object-cover object-top" />
                     </div>
                     <div>
                       <p className="font-bold text-[#1a1a1a]">Profile Photo Attached</p>
-                      <p className="text-xs text-gray-500">Ready for confidential review by our team.</p>
+                      <p className="text-xs text-gray-500">Framed and ready for confidential matchmaking review.</p>
                     </div>
                   </div>
                 )}
 
-                <div className="grid sm:grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="font-bold text-[#7b1d2a] block">Full Name:</span>
-                    <span>{formData.firstName} {formData.lastName}</span>
+                {!formData.firstName.trim() ? (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-800 text-xs">
+                    <div>
+                      <p className="font-bold">Required account details are missing.</p>
+                      <p className="text-amber-700">Please start from Step 1 so your name, email, and password can be properly saved.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => goToStep(1)}
+                      className="px-3.5 py-2 bg-[#7b1d2a] text-white rounded-lg font-bold hover:bg-[#5c1520] transition-colors whitespace-nowrap self-start sm:self-auto"
+                    >
+                      Return to Step 1
+                    </button>
                   </div>
-                  <div>
-                    <span className="font-bold text-[#7b1d2a] block">Email / Phone:</span>
-                    <span>{formData.email} · {formData.phone}</span>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <span className="font-bold text-[#7b1d2a] block">Full Name:</span>
+                      <span>{formData.firstName} {formData.lastName}</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#7b1d2a] block">Email / Phone:</span>
+                      <span>{formData.email} {formData.phone ? `· ${formData.phone}` : ""}</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#7b1d2a] block">Location:</span>
+                      <span>{formData.currentStateCity ? `${formData.currentStateCity}, ${formData.currentCountry}` : formData.currentCountry}</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#7b1d2a] block">Education &amp; Profession:</span>
+                      <span>{formData.educationLevel || "Not specified"} · {formData.profession || "Not specified"}</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#7b1d2a] block">Relationship Goal:</span>
+                      <span>{formData.relationshipGoal}</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#7b1d2a] block">Marital Status &amp; Gender:</span>
+                      <span>{formData.maritalStatus || "Not specified"} · {formData.gender || "Not specified"}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-bold text-[#7b1d2a] block">Location:</span>
-                    <span>{formData.currentStateCity}, {formData.currentCountry}</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-[#7b1d2a] block">Education &amp; Profession:</span>
-                    <span>{formData.educationLevel} · {formData.profession}</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-[#7b1d2a] block">Relationship Goal:</span>
-                    <span>{formData.relationshipGoal}</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-[#7b1d2a] block">Marital Status &amp; Gender:</span>
-                    <span>{formData.maritalStatus} · {formData.gender}</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800 text-xs font-sans">

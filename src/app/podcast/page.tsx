@@ -5,6 +5,7 @@ import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
 import VideoCard from "@/components/sections/VideoCard";
+import PromotionalVideoPlayer from "@/components/sections/PromotionalVideoPlayer";
 import { getAllPodcastEpisodes } from "@/lib/repositories/podcast.repository";
 import { Mic, ArrowRight } from "lucide-react";
 
@@ -65,6 +66,14 @@ export default async function PodcastPage() {
             </div>
           </Container>
         </section>
+
+        {/* Featured Promotional Video Presentation */}
+        <PromotionalVideoPlayer
+          eyebrow="OFFICIAL SHOWCASE"
+          title="Watch Our Official Feature Presentation"
+          subtitle="Explore the vision, core values, and expert matchmaking process that make Relationship Wahala & Connections Nigeria's trusted platform for lasting marriages."
+          className="bg-white"
+        />
 
         {/* Video Grid */}
         <section className="py-16 bg-[#fbf5ec]">

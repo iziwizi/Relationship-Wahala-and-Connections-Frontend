@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   CheckCircle2, MapPin, Briefcase, BookOpen,
-  Heart, ArrowLeft, Loader2, AlertCircle
+  Heart, ArrowLeft, Loader2, AlertCircle, X, Sparkles
 } from "lucide-react";
 
 interface MatchProfile {
@@ -44,11 +44,14 @@ interface MatchProfile {
 
 export default function MatchProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const id = params?.id as string;
 
   const [match, setMatch] = useState<MatchProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [interested, setInterested] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchMatch() {
@@ -71,6 +74,34 @@ export default function MatchProfilePage() {
     fetchMatch();
   }, [id]);
 
+  const handleNotInterested = async () => {
+    try {
+      await fetch(`/api/matches/${id}/interact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "DECLINED" }),
+      });
+      router.push("/dashboard/matches");
+    } catch (err) {
+      console.error("[Not Interested] error:", err);
+      router.push("/dashboard/matches");
+    }
+  };
+
+  const handleExpressInterest = async () => {
+    setInterested(true);
+    setFeedback("Interest expressed! Our matchmaking team has received your request.");
+    try {
+      await fetch(`/api/matches/${id}/interact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "ACCEPTED" }),
+      });
+    } catch (err) {
+      console.error("[Express Interest] error:", err);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-3xl mx-auto space-y-5">
@@ -81,6 +112,13 @@ export default function MatchProfilePage() {
           <ArrowLeft size={16} />
           Back to Matches
         </Link>
+
+        {feedback && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800 text-xs sm:text-sm font-sans animate-fadeIn">
+            <CheckCircle2 size={18} className="text-green-600 flex-shrink-0" />
+            <span>{feedback}</span>
+          </div>
+        )}
 
         {loading && (
           <div className="py-16 flex flex-col items-center justify-center gap-3 text-gray-400">
@@ -107,18 +145,22 @@ export default function MatchProfilePage() {
           <>
             {/* Hero Card */}
             <div className="bg-white rounded-2xl border border-[#e8e0d4] shadow-sm overflow-hidden">
-              <div className="relative h-64 sm:h-80 w-full">
+              <div className="relative h-72 sm:h-96 w-full">
                 <Image
                   src={match.primaryPhoto}
                   alt={`${match.firstName}'s profile photo`}
                   fill
                   className="object-cover object-top"
-                  unoptimized={match.primaryPhoto.startsWith("https://images.unsplash.com")}
+                  unoptimized={
+                    match.primaryPhoto.startsWith("https://images.unsplash.com") ||
+                    match.primaryPhoto.startsWith("data:") ||
+                    match.primaryPhoto.startsWith("blob:")
+                  }
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                   <div>
-                    <h1 className="font-serif text-3xl font-bold text-white">
+                    <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white">
                       {match.firstName}, {match.age}
                     </h1>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -130,10 +172,32 @@ export default function MatchProfilePage() {
                       )}
                     </div>
                   </div>
-                  <button className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white font-sans text-xs font-bold px-3 py-2 rounded-xl border border-white/30 hover:bg-white/30 transition-colors">
-                    <Heart size={14} />
-                    Express Interest
-                  </button>
+
+                  {/* Actions in Hero */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleNotInterested}
+                      className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md text-white/90 font-sans text-xs font-bold px-3 py-2 rounded-xl border border-white/20 hover:bg-red-900/60 transition-colors"
+                      title="Dismiss candidate"
+                    >
+                      <X size={14} />
+                      Not Interested
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleExpressInterest}
+                      disabled={interested}
+                      className={`flex items-center gap-1.5 font-sans text-xs font-bold px-3.5 py-2 rounded-xl transition-colors ${
+                        interested
+                          ? "bg-green-600 text-white border border-green-500"
+                          : "bg-white/90 text-[#7b1d2a] hover:bg-white shadow"
+                      }`}
+                    >
+                      {interested ? <CheckCircle2 size={14} /> : <Heart size={14} />}
+                      {interested ? "Interest Sent" : "Express Interest"}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -156,7 +220,7 @@ export default function MatchProfilePage() {
               {/* About */}
               <div className="px-6 py-5">
                 <h2 className="font-serif text-base font-bold text-[#1a1a1a] mb-2">About</h2>
-                <p className="font-sans text-sm text-gray-600 leading-relaxed">{match.aboutMe}</p>
+                <p className="font-sans text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{match.aboutMe}</p>
               </div>
             </div>
 
@@ -187,7 +251,7 @@ export default function MatchProfilePage() {
                 <h3 className="font-serif text-sm font-bold text-[#1a1a1a]">Intentions</h3>
                 <p className="font-sans text-xs text-gray-600 leading-relaxed">{match.relationshipGoal}</p>
 
-                {match.keyValues.length > 0 && (
+                {match.keyValues && match.keyValues.length > 0 && (
                   <div>
                     <p className="font-sans text-[11px] text-gray-400 uppercase tracking-wide mb-2">Core Values</p>
                     <div className="flex flex-wrap gap-1.5">
@@ -200,7 +264,7 @@ export default function MatchProfilePage() {
                   </div>
                 )}
 
-                {match.interestsHobbies.length > 0 && (
+                {match.interestsHobbies && match.interestsHobbies.length > 0 && (
                   <div>
                     <p className="font-sans text-[11px] text-gray-400 uppercase tracking-wide mb-2">Interests</p>
                     <div className="flex flex-wrap gap-1.5">
@@ -212,6 +276,35 @@ export default function MatchProfilePage() {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Bottom Decision Bar */}
+            <div className="bg-white rounded-xl border border-[#e8e0d4] p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+              <span className="font-sans text-xs text-gray-500">
+                Are you interested in connecting with {match.firstName}?
+              </span>
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleNotInterested}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 border border-gray-300 text-gray-600 hover:text-red-700 hover:border-red-300 hover:bg-red-50/50 rounded-lg text-xs font-semibold transition-colors"
+                >
+                  <X size={14} /> Not Interested
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExpressInterest}
+                  disabled={interested}
+                  className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2 rounded-lg text-xs font-bold transition-colors ${
+                    interested
+                      ? "bg-green-600 text-white"
+                      : "bg-[#7b1d2a] text-white hover:bg-[#5c1520] shadow-sm"
+                  }`}
+                >
+                  {interested ? <CheckCircle2 size={14} /> : <Heart size={14} />}
+                  {interested ? "Interest Sent" : "Interested"}
+                </button>
               </div>
             </div>
           </>

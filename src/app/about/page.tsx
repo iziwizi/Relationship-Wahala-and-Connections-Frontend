@@ -4,6 +4,7 @@ import Footer from "@/components/sections/Footer";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
+import PromotionalVideoPlayer from "@/components/sections/PromotionalVideoPlayer";
 import { Globe, Heart, ShieldCheck, BookOpen, Users, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -91,6 +92,14 @@ export default function AboutPage() {
             </div>
           </Container>
         </section>
+
+        {/* Official Video Presentation */}
+        <PromotionalVideoPlayer
+          eyebrow="BRAND DOCUMENTARY"
+          title="Watch How We Bridge Hearts & Build Marriages"
+          subtitle="A behind-the-scenes look at the mission, values, and heart behind Relationship Wahala & Connections."
+          className="bg-white"
+        />
 
         {/* Global Vision */}
         <section className="py-20 bg-white">
