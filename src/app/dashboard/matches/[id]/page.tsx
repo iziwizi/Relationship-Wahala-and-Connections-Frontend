@@ -104,7 +104,7 @@ export default function MatchProfilePage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto space-y-5">
+      <div className="max-w-4xl mx-auto space-y-6">
         <Link
           href="/dashboard/matches"
           className="inline-flex items-center gap-2 font-sans text-sm text-gray-500 hover:text-[#7b1d2a] transition-colors"
@@ -143,84 +143,86 @@ export default function MatchProfilePage() {
 
         {match && !loading && (
           <>
-            {/* Hero Card */}
-            <div className="bg-white rounded-2xl border border-[#e8e0d4] shadow-sm overflow-hidden">
-              <div className="relative h-72 sm:h-96 w-full">
-                <Image
-                  src={match.primaryPhoto}
-                  alt={`${match.firstName}'s profile photo`}
-                  fill
-                  className="object-cover object-top"
-                  unoptimized={
-                    match.primaryPhoto.startsWith("https://images.unsplash.com") ||
-                    match.primaryPhoto.startsWith("data:") ||
-                    match.primaryPhoto.startsWith("blob:")
-                  }
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute bottom-5 left-5 right-5 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+            {/* Hero Profile Card - True Portrait Framing: Head & Face Always 100% Captured on Desktop & Mobile */}
+            <div className="bg-white rounded-2xl border border-[#e8e0d4] shadow-sm p-6 sm:p-8">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
+                {/* Dedicated Portrait Photo Container: 3:4 aspect ratio guarantees head is never zoomed or cut off */}
+                <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-[3/4] rounded-2xl overflow-hidden shadow-md flex-shrink-0 bg-gray-100 border border-[#e8e0d4]">
+                  <Image
+                    src={match.primaryPhoto}
+                    alt={`${match.firstName}'s portrait photo`}
+                    fill
+                    className="object-cover object-[center_15%]"
+                    unoptimized={
+                      match.primaryPhoto.startsWith("https://images.unsplash.com") ||
+                      match.primaryPhoto.startsWith("data:") ||
+                      match.primaryPhoto.startsWith("blob:")
+                    }
+                  />
+                  {match.verified && (
+                    <div className="absolute top-3 left-3 bg-green-600/90 backdrop-blur-sm text-white font-sans text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow">
+                      <CheckCircle2 size={12} />
+                      Verified Profile
+                    </div>
+                  )}
+                </div>
+
+                {/* Identity, Highlights & Action Column */}
+                <div className="flex-1 flex flex-col justify-between self-stretch space-y-4 text-center md:text-left">
                   <div>
-                    <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white">
+                    <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a]">
                       {match.firstName}, {match.age}
                     </h1>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      {match.verified && (
-                        <div className="flex items-center gap-1 bg-green-500/90 text-white font-sans text-xs font-bold px-2.5 py-0.5 rounded-full">
-                          <CheckCircle2 size={11} />
-                          Verified Profile
-                        </div>
-                      )}
+
+                    {/* Quick Badges */}
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-sans text-gray-600 my-3">
+                      <span className="flex items-center gap-1 bg-[#fbf5ec] px-3 py-1.5 rounded-lg border border-[#e8e0d4]">
+                        <MapPin size={13} className="text-[#7b1d2a]" /> {match.location}
+                      </span>
+                      <span className="flex items-center gap-1 bg-[#fbf5ec] px-3 py-1.5 rounded-lg border border-[#e8e0d4]">
+                        <Briefcase size={13} className="text-[#c9962c]" /> {match.profession}
+                      </span>
+                      <span className="flex items-center gap-1 bg-[#fbf5ec] px-3 py-1.5 rounded-lg border border-[#e8e0d4]">
+                        <BookOpen size={13} className="text-[#7b1d2a]" /> {match.educationLevel}
+                      </span>
+                    </div>
+
+                    {/* Personal Summary */}
+                    <div className="bg-[#fbf5ec]/70 rounded-xl p-4 border border-[#e8e0d4] text-left mt-3">
+                      <h3 className="font-serif text-xs font-bold uppercase tracking-wider text-[#7b1d2a] mb-1.5">
+                        About {match.firstName}
+                      </h3>
+                      <p className="font-sans text-xs sm:text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {match.aboutMe}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Actions in Hero */}
-                  <div className="flex items-center gap-2">
+                  {/* Actions: Not Interested & Interested */}
+                  <div className="flex items-center gap-3 pt-2">
                     <button
                       type="button"
                       onClick={handleNotInterested}
-                      className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md text-white/90 font-sans text-xs font-bold px-3 py-2 rounded-xl border border-white/20 hover:bg-red-900/60 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-3 px-4 border border-gray-300 text-gray-700 hover:text-red-700 hover:border-red-300 hover:bg-red-50/60 rounded-xl font-sans text-xs font-bold transition-colors shadow-sm"
                       title="Dismiss candidate"
                     >
-                      <X size={14} />
-                      Not Interested
+                      <X size={15} /> Not Interested
                     </button>
                     <button
                       type="button"
                       onClick={handleExpressInterest}
                       disabled={interested}
-                      className={`flex items-center gap-1.5 font-sans text-xs font-bold px-3.5 py-2 rounded-xl transition-colors ${
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl font-sans text-xs font-bold transition-colors shadow-sm ${
                         interested
                           ? "bg-green-600 text-white border border-green-500"
-                          : "bg-white/90 text-[#7b1d2a] hover:bg-white shadow"
+                          : "bg-[#7b1d2a] text-white hover:bg-[#5c1520]"
                       }`}
                     >
-                      {interested ? <CheckCircle2 size={14} /> : <Heart size={14} />}
+                      {interested ? <CheckCircle2 size={15} /> : <Heart size={15} />}
                       {interested ? "Interest Sent" : "Express Interest"}
                     </button>
                   </div>
                 </div>
-              </div>
-
-              {/* Quick details */}
-              <div className="px-6 py-4 flex flex-wrap gap-4 border-b border-[#f0e8dc]">
-                <span className="flex items-center gap-1.5 font-sans text-xs text-gray-600">
-                  <MapPin size={14} className="text-[#7b1d2a]" />
-                  {match.location}
-                </span>
-                <span className="flex items-center gap-1.5 font-sans text-xs text-gray-600">
-                  <Briefcase size={14} className="text-[#7b1d2a]" />
-                  {match.profession}
-                </span>
-                <span className="flex items-center gap-1.5 font-sans text-xs text-gray-600">
-                  <BookOpen size={14} className="text-[#7b1d2a]" />
-                  {match.educationLevel}
-                </span>
-              </div>
-
-              {/* About */}
-              <div className="px-6 py-5">
-                <h2 className="font-serif text-base font-bold text-[#1a1a1a] mb-2">About</h2>
-                <p className="font-sans text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{match.aboutMe}</p>
               </div>
             </div>
 

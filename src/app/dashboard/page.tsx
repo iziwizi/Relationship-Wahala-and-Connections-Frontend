@@ -101,7 +101,7 @@ export default function DashboardPage() {
                     src={user?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80"}
                     alt="Profile photo"
                     fill
-                    className="object-cover object-top"
+                    className="object-cover object-[center_15%]"
                     unoptimized
                   />
                 </div>
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                           src={match.photo}
                           alt={`${match.firstName}'s profile`}
                           fill
-                          className="object-cover object-top"
+                          className="object-cover object-[center_15%]"
                           unoptimized={match.photo.startsWith("https://images.unsplash.com")}
                         />
                       </div>

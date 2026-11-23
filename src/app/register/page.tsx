@@ -984,7 +984,7 @@ export default function RegisterPage() {
                     <img
                       src={previewPhotoUrl || formData.photoUrl}
                       alt="Uploaded profile photo"
-                      className="w-full h-full object-cover object-top"
+                      className="w-full h-full object-cover object-[center_15%]"
                     />
                     {uploadingPhoto ? (
                       <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-xs gap-1">
@@ -1093,7 +1093,7 @@ export default function RegisterPage() {
                 {(previewPhotoUrl || formData.photoUrl) && (
                   <div className="flex items-center gap-4 pb-4 border-b border-[#e8e0d4]">
                     <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 border border-white shadow-sm flex-shrink-0">
-                      <img src={previewPhotoUrl || formData.photoUrl} alt="Review profile" className="w-full h-full object-cover object-top" />
+                      <img src={previewPhotoUrl || formData.photoUrl} alt="Review profile" className="w-full h-full object-cover object-[center_15%]" />
                     </div>
                     <div>
                       <p className="font-bold text-[#1a1a1a]">Profile Photo Attached</p>

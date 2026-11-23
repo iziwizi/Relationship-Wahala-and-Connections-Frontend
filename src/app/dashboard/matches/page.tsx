@@ -159,13 +159,13 @@ export default function MatchesPage() {
                   key={match.id}
                   className="bg-white rounded-2xl border border-[#e8e0d4] shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
                 >
-                  {/* Photo Container - Always top-aligned so head/eyes/face are never chopped */}
-                  <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-gray-100">
+                  {/* Photo Container - True Portrait 3:4 aspect ratio: guarantees head, face & shoulders are 100% visible */}
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
                     <Image
                       src={match.photo}
                       alt={`${match.firstName}'s portrait`}
                       fill
-                      className="object-cover object-top transition-transform duration-300 hover:scale-105"
+                      className="object-cover object-[center_15%] transition-transform duration-300 hover:scale-105"
                       unoptimized={
                         match.photo.startsWith("https://images.unsplash.com") ||
                         match.photo.startsWith("data:") ||
